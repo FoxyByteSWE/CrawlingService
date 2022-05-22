@@ -17,10 +17,13 @@ def crawlCity(nation, nationISOCode, city):
 	chrome_options = webdriver.ChromeOptions()
 	chrome_options.add_experimental_option("useAutomationExtension", False)
 	chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-
-	driver = webdriver.Chrome("path/to/webdriver", options=chrome_options)
+	chrome_options.add_argument("user-data-dir=C:/Users/marco/Desktop/FoxyByte/Crawler/Profile"); #edit 
+	
+	driver = webdriver.Chrome("C:/Users/marco/Desktop/FoxyByte/Crawler/chromedriver.exe", options=chrome_options) #edit
 	driver.get(cityLocationURL)
 	texts = driver.find_elements_by_css_selector('#react-root > section > main > div class  > div')
+	print("non sono esploso")
+
 
 # M1: main page -> search restaurant -> get location href
 # M2: locations -> search for city name -> get location href (not all cities are present)
@@ -33,18 +36,35 @@ def crawlSpecificLocation(locationURL):
 	chrome_options = webdriver.ChromeOptions()
 	chrome_options.add_experimental_option("useAutomationExtension", False)
 	chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-
-	driver = webdriver.Chrome("C:/Users/marco/OneDrive/Marco/UniPD/Triennale/Ingegneria del Software/Progetto/FoxyByte/chromedriver.exe", options=chrome_options)
+	chrome_options.add_argument("user-data-dir=C:/Users/marco/Desktop/FoxyByte/Crawler/Profile") #edit 
+	
+	driver = webdriver.Chrome("C:/Users/marco/Desktop/FoxyByte/Crawler/chromedriver.exe", options=chrome_options) #edit
 	driver.get(locationURL)
 
-	posts = driver.find_elements_by_css_selector('#react-root > section > main > article  > div > div > div > div > div > a > div > div > img')
+	time.sleep(10)
+
+
+	posts = driver.find_elements_by_css_selector(".FFVAD")
+	print("done")
+	src_data_array=[]
+	for data in posts:
+		src_data_array.append(data.get_attribute('src'))
 	
+	for src in src_data_array:
+		print(src)
+		
+
 
 
 
 
 def crawl(url):
-	driver = webdriver.Chrome("C:/Users/marco/OneDrive/Marco/UniPD/Triennale/Ingegneria del Software/Progetto/FoxyByte/chromedriver.exe")
+	chrome_options = webdriver.ChromeOptions()
+	chrome_options.add_experimental_option("useAutomationExtension", False)
+	chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+	chrome_options.add_argument("user-data-dir=C:/Users/marco/Desktop/FoxyByte/Crawler/Profile"); #edit 
+
+	driver = webdriver.Chrome("C:/Users/marco/Desktop/FoxyByte/Crawler/chromedriver.exe", options=chrome_options) #edit
 	driver.get(url)
 	time.sleep(5)
 
@@ -118,8 +138,10 @@ def login():
 #################################################################
 
 def main():	
-	login()
-
+	#login()
+	#url = "https://www.instagram.com/p/CaUwlR_hS-q"
+	#crawl(url)
+	crawlSpecificLocation("https://www.instagram.com/explore/locations/3110887/ristorante-pizzeria-lunaelaltro-marostica/")
 
 
 ################################################################
