@@ -9,50 +9,98 @@ from urllib.parse import quote_plus
 from bs4 import BeautifulSoup
 from selenium import webdriver
 
-
-def crawlCity(nation, nationISOCode, city):
-	baseLocationURL= "www.instagram.com/explore/locations"
-	cityLocationURL=  baseLocationURL + "/" + nationISOCode + "/" + nation
-	
-	chrome_options = webdriver.ChromeOptions()
-	chrome_options.add_experimental_option("useAutomationExtension", False)
-	chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-	chrome_options.add_argument("user-data-dir=C:/Users/marco/Desktop/FoxyByte/Crawler/Profile"); #edit 
-	
-	driver = webdriver.Chrome("C:/Users/marco/Desktop/FoxyByte/Crawler/chromedriver.exe", options=chrome_options) #edit
-	driver.get(cityLocationURL)
-	texts = driver.find_elements_by_css_selector('#react-root > section > main > div class  > div')
-	print("non sono esploso")
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
-# M1: main page -> search restaurant -> get location href
-# M2: locations -> search for city name -> get location href (not all cities are present)
-#
-#
-#
 
-
-def crawlSpecificLocation(locationURL):
+def buildWebDriver():
 	chrome_options = webdriver.ChromeOptions()
 	chrome_options.add_experimental_option("useAutomationExtension", False)
 	chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
 	chrome_options.add_argument("user-data-dir=C:/Users/marco/Desktop/FoxyByte/Crawler/Profile") #edit 
 	
 	driver = webdriver.Chrome("C:/Users/marco/Desktop/FoxyByte/Crawler/chromedriver.exe", options=chrome_options) #edit
+
+	return driver
+
+
+
+def getLocationPageBySearchBar(locationName, driver):
+#	chrome_options = webdriver.ChromeOptions()
+#	chrome_options.add_experimental_option("useAutomationExtension", False)
+#	chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+#	chrome_options.add_argument("user-data-dir=C:/Users/marco/Desktop/FoxyByte/Crawler/Profile"); #edit 
+	
+#	driver = webdriver.Chrome("C:/Users/marco/Desktop/FoxyByte/Crawler/chromedriver.exe", options=chrome_options) #edit
+	#print("done1")
+	driver.get("https://www.instagram.com/")
+	#print("done2")
+	time.sleep(10)
+	#driver.find_elements_by_xpath(".XTCLo d_djL DljaH").send_keys("prova")
+	#input_search = wait(browser, 20).until(EC.visibility_of_element_located((By.XPATH, "//input[contains(@class,'XTCLo')]")))
+
+	element = WebDriverWait(driver, 20).until(
+	EC.element_to_be_clickable((By.XPATH, "//input[contains(@class,'XTCLo')]")))
+
+	# error: selenium.common.exceptions.ElementClickInterceptedException: Message: element click intercepted: Element <input aria-label="Input di ricerca" autocapitalize="none" class="XTCLo  d_djL  DljaH " placeholder="Cerca" type="text" value=""> is not clickable at point (518, 30). Other element would receive the click: <div class="eyXLr">...</div>
+ 
+	time.sleep(5)
+	#print("waited")
+	driver.execute_script("arguments[0].click();", element)
+
+	time.sleep(5)
+	element.send_keys(locationName)
+	time.sleep(2)
+
+	url_array = driver.find_elements_by_css_selector(".-qQT3")
+	
+	for url in url_array:
+		if 'explore/locations' in str(url.get_attribute('href')):
+			print(url.get_attribute('href'))	
+			return str(url.get_attribute('href'))
+
+
+
+
+def crawlLocation(locationURL, driver):
+	#chrome_options = webdriver.ChromeOptions()
+	#chrome_options.add_experimental_option("useAutomationExtension", False)
+	#chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+	#chrome_options.add_argument("user-data-dir=C:/Users/marco/Desktop/FoxyByte/Crawler/Profile") #edit 
+	
+	#driver = webdriver.Chrome("C:/Users/marco/Desktop/FoxyByte/Crawler/chromedriver.exe", options=chrome_options) #edit
 	driver.get(locationURL)
 
 	time.sleep(10)
-
+	# wait for the page to be fully loaded
+	# then scroll down, let it load more posts, scroll down again, until first ever post
+	# then continue...
 
 	posts = driver.find_elements_by_css_selector(".FFVAD")
-	print("done")
 	src_data_array=[]
 	for data in posts:
 		src_data_array.append(data.get_attribute('src'))
 	
+	post_src_array=[]
 	for src in src_data_array:
-		print(src)
+		post_src_array.append(src)
+	
+	return post_src_array
 		
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -138,10 +186,12 @@ def login():
 #################################################################
 
 def main():	
-	#login()
-	#url = "https://www.instagram.com/p/CaUwlR_hS-q"
-	#crawl(url)
-	crawlSpecificLocation("https://www.instagram.com/explore/locations/3110887/ristorante-pizzeria-lunaelaltro-marostica/")
+	driver = buildWebDriver()
+
+	url = getLocationPageBySearchBar("Al Saiso", driver)
+	posts_array = crawlLocation(url, driver)
+	print("returned the following post image links: \n")
+	print(posts_array)
 
 
 ################################################################
