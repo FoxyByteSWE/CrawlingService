@@ -92,7 +92,7 @@ def crawlLocation(locationURL, driver):
 
 
 
-def crawl(url):
+def getComments(url):
 	chrome_options = webdriver.ChromeOptions()
 	chrome_options.add_experimental_option("useAutomationExtension", False)
 	chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -102,33 +102,13 @@ def crawl(url):
 	driver.get(url)
 	time.sleep(5)
 
-	print("Reached")
-	users_list = []
-	users = driver.find_elements_by_class_name('_7UhW9')
-	for u in users:
-		users_list.append(u.text)
-
 	texts_list = []
-	texts = driver.find_elements_by_css_selector('#react-root > section > main > div > div > article > div > div.qF0y9 > div.cv3IO > div.eo2As > div.EtaWk > ul > ul > div > li > div > div > div.C4VMK > div.MOdxS > span')
-	comments_count = 0
+	texts = driver.find_elements_by_css_selector('.MOdxS ')
+	print(len(texts))
 	for txt in texts:
 		texts_list.append(txt.text)
+		print("Text: ",txt.text)
 
-	max_len = 0
-	if len(users_list) > len(texts_list):
-		max_len = len(users_list)
-	else:
-		max_len = len(texts_list)
-
-	for i in range(max_len):
-		if i < len(users_list):
-			print("User: ",users_list[i])
-		if i < len(texts_list):
-			print("Text: ",texts_list[i])
-	#next_url = driver.find_elements_by_css_selector(".v1Nh3 kIKUG _bz0w [href]")
-	#next_url = driver.find_elements_by_tag_name("a")
-	#for u in next_url:
-		#print(u.get_attribute('href'))
 		
 
 
@@ -144,27 +124,31 @@ def crawl(url):
 #################################################################
 
 def main():
-	locationName=input("Please Input the Location Name: ")
-	driver = buildWebDriver()
-
-	url = getLocationPageBySearchBar(locationName, driver)
-	posts_array = crawlLocation(url, driver)
 
 
-	location_dictionary={}
-	location_dictionary[locationName] = posts_array
-
-	jsonDump = json.dumps(location_dictionary)
-	with open("locationsposts.json", "a") as outfile:
-		outfile.write(jsonDump)
-
-	i=1
-	for url in posts_array:
-		print(url)
-		i=i+1
-
-	print("Got "+str(i)+"posts")
-
+	getComments("https://www.instagram.com/p/Cd52IzArohl/")
+#	
+#	locationName=input("Please Input the Location Name: ")
+#	driver = buildWebDriver()
+#
+#	url = getLocationPageBySearchBar(locationName, driver)
+#	posts_array = crawlLocation(url, driver)
+#
+#
+#	location_dictionary={}
+#	location_dictionary[locationName] = posts_array
+#
+#	jsonDump = json.dumps(location_dictionary)
+#	with open("locationsposts.json", "a") as outfile:
+#		outfile.write(jsonDump)
+#
+#	i=1
+#	for url in posts_array:
+#		print(url)
+#		i=i+1
+#
+#	print("Got "+str(i)+"posts")
+#
 ################################################################
 
 if __name__ == "__main__":
