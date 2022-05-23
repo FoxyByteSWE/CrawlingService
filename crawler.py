@@ -13,43 +13,29 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-
+chromedriverDirectory = "C:/Users/marco/Desktop/FoxyByte/Crawler/chromedriver.exe"  #EDIT
+profileDirectory = "C:/Users/marco/Desktop/FoxyByte/Crawler/Profile"	#EDIT
 
 def buildWebDriver():
 	chrome_options = webdriver.ChromeOptions()
 	chrome_options.add_experimental_option("useAutomationExtension", False)
 	chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-	chrome_options.add_argument("user-data-dir=C:/Users/marco/Desktop/FoxyByte/Crawler/Profile") #edit 
-	
-	driver = webdriver.Chrome("C:/Users/marco/Desktop/FoxyByte/Crawler/chromedriver.exe", options=chrome_options) #edit
+	chrome_options.add_argument("user-data-dir=" + profileDirectory)
 
+	driver = webdriver.Chrome(chromedriverDirectory, options=chrome_options)
 	return driver
 
 
 
 def getLocationPageBySearchBar(locationName, driver):
-#	chrome_options = webdriver.ChromeOptions()
-#	chrome_options.add_experimental_option("useAutomationExtension", False)
-#	chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-#	chrome_options.add_argument("user-data-dir=C:/Users/marco/Desktop/FoxyByte/Crawler/Profile"); #edit 
-	
-#	driver = webdriver.Chrome("C:/Users/marco/Desktop/FoxyByte/Crawler/chromedriver.exe", options=chrome_options) #edit
-	#print("done1")
 	driver.get("https://www.instagram.com/")
-	#print("done2")
-	time.sleep(10)
-	#driver.find_elements_by_xpath(".XTCLo d_djL DljaH").send_keys("prova")
-	#input_search = wait(browser, 20).until(EC.visibility_of_element_located((By.XPATH, "//input[contains(@class,'XTCLo')]")))
+	time.sleep(3)
 
 	element = WebDriverWait(driver, 20).until(
 	EC.element_to_be_clickable((By.XPATH, "//input[contains(@class,'XTCLo')]")))
-
-	# error: selenium.common.exceptions.ElementClickInterceptedException: Message: element click intercepted: Element <input aria-label="Input di ricerca" autocapitalize="none" class="XTCLo  d_djL  DljaH " placeholder="Cerca" type="text" value=""> is not clickable at point (518, 30). Other element would receive the click: <div class="eyXLr">...</div>
  
 	time.sleep(5)
-	#print("waited")
 	driver.execute_script("arguments[0].click();", element)
-
 	time.sleep(5)
 	element.send_keys(locationName)
 	time.sleep(2)
@@ -65,19 +51,19 @@ def getLocationPageBySearchBar(locationName, driver):
 
 
 def crawlLocation(locationURL, driver):
-	#chrome_options = webdriver.ChromeOptions()
-	#chrome_options.add_experimental_option("useAutomationExtension", False)
-	#chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-	#chrome_options.add_argument("user-data-dir=C:/Users/marco/Desktop/FoxyByte/Crawler/Profile") #edit 
-	
-	#driver = webdriver.Chrome("C:/Users/marco/Desktop/FoxyByte/Crawler/chromedriver.exe", options=chrome_options) #edit
 	driver.get(locationURL)
+	time.sleep(3)
 
-	time.sleep(10)
-	# wait for the page to be fully loaded
-	# then scroll down, let it load more posts, scroll down again, until first ever post
-	# then continue...
-
+	screen_height = driver.execute_script("return window.screen.height;")
+	i = 1	
+	while True:
+		driver.execute_script("window.scrollTo(0, {screen_height}*{i});".format(screen_height=screen_height, i=i))  
+		i += 1
+		time.sleep(3)
+		scroll_height = driver.execute_script("return document.body.scrollHeight;")  
+		if (screen_height) * i > scroll_height or i>20:
+			break 
+	
 	posts = driver.find_elements_by_css_selector(".FFVAD")
 	src_data_array=[]
 	for data in posts:
@@ -143,56 +129,41 @@ def crawl(url):
 	#next_url = driver.find_elements_by_tag_name("a")
 	#for u in next_url:
 		#print(u.get_attribute('href'))
+		
 
 
-def login():
 
-	chrome_options = webdriver.ChromeOptions()
-	chrome_options.add_experimental_option("useAutomationExtension", False)
-	chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-	chrome_options.add_argument("user-data-dir=C:/Users/marco/Desktop/FoxyByte/Crawler/Profile"); #edit 
-	
-	driver = webdriver.Chrome("C:/Users/marco/Desktop/FoxyByte/Crawler/chromedriver.exe", options=chrome_options) #edit
-	getdriver = ("https://www.instagram.com/accounts/login/")
-	
-	username = "foxybyte.swe"
-	password = "Swe_2022"
 
-	driver.get(getdriver)
 
-	time.sleep(300)
 
-# Instead of crawling through the login and cookies popup every time,
-# it is easier to create a custom profile for the crawler, so that cookies are 
-# already saved and ready to go, making the crawling less of a headache
 
-# Deprecated code:
 
-#	time.sleep(5)
-#	allowButton = driver.find_element_by_css_selector("button[tabindex='0']").click()
-#	time.sleep(5)
-#	driver.find_element_by_xpath("//input[@name='username']").send_keys(username)
-#	driver.find_element_by_xpath("//input[@name='password']").send_keys(password)
-#	driver.find_element_by_xpath("//button[contains(.,'Accedi')]").click()
-#	time.sleep(50)
-#	driver.find_element_by_css_selector("button[tabindex='0']").click()
-#	time.sleep(5)
-#	driver.find_element_by_css_selector("button[tabindex='0']").click()
-#	time.sleep(5)
 
-#url = "https://www.instagram.com/p/CaUwlR_hS-q"
-#crawl(url)
+
 
 #################################################################
 
-def main():	
+def main():
+	locationName=input("Please Input the Location Name: ")
 	driver = buildWebDriver()
 
-	url = getLocationPageBySearchBar("Al Saiso", driver)
+	url = getLocationPageBySearchBar(locationName, driver)
 	posts_array = crawlLocation(url, driver)
-	print("returned the following post image links: \n")
-	print(posts_array)
 
+
+	location_dictionary={}
+	location_dictionary[locationName] = posts_array
+
+	jsonDump = json.dumps(location_dictionary)
+	with open("locationsposts.json", "a") as outfile:
+		outfile.write(jsonDump)
+
+	i=1
+	for url in posts_array:
+		print(url)
+		i=i+1
+
+	print("Got "+str(i)+"posts")
 
 ################################################################
 
