@@ -40,19 +40,21 @@ def getLocationPageBySearchBar(locationName, driver):
 
 
 
-def getLocationPagePosts(locationURL, driver):
+def getLocationPagePosts(locationURL, driver, scroll):
 	driver.get(locationURL)
 	time.sleep(3)
 
 	screen_height = driver.execute_script("return window.screen.height;")
-	i = 1	
-	while True:
-		driver.execute_script("window.scrollTo(0, {screen_height}*{i});".format(screen_height=screen_height, i=i))  
-		i += 1
-		time.sleep(3)
-		scroll_height = driver.execute_script("return document.body.scrollHeight;")  
-		if (screen_height) * i > scroll_height or i>2:
-			break 
+	
+	if scroll==True:
+		i = 1	
+		while True:
+			driver.execute_script("window.scrollTo(0, {screen_height}*{i});".format(screen_height=screen_height, i=i))  
+			i += 1
+			time.sleep(3)
+			scroll_height = driver.execute_script("return document.body.scrollHeight;")  
+			if (screen_height) * i > scroll_height or i>2:
+				break 
 
 	posts = driver.find_elements_by_css_selector(".v1Nh3 > a")
 	url_array=[]
@@ -92,28 +94,45 @@ def getPostDescriptionAndComments(url, driver):
 def main():
 	
 	locationName=input("Please Input the Location Name: ")
+	
 
 	driver = buildWebDriver()
 
 	locationUrl = getLocationPageBySearchBar(locationName, driver)
 	
-	locationPostsArray = getLocationPagePosts(locationUrl, driver)
+	locationPostsArray = getLocationPagePosts(locationUrl, driver, False)
 
-	for post in locationPostsArray:
-		getPost(post, driver)
-		postImage = getPostImageSrc(str(post), driver) #should only work with single post images
-		postText = getPostDescriptionAndComments(str(post), driver)
+	postdata={}
+
+
+	test = locationPostsArray[0:4]	#just to test a subset of the result
+	print(test)
+	for post in test:
+			getPost(post, driver)
+			postImage = getPostImageSrc(post, driver)
+			postText = getPostDescriptionAndComments(post, driver)
+			postdata[post]= {"image": postImage, "text": postText}
 
 	
 	
-
 	
-	location_dictionary={}
-#	location_dictionary[locationName] = posts_array
-#
-#	jsonDump = json.dumps(location_dictionary)
-#	with open("locationsposts.json", "a") as outfile:
-#		outfile.write(jsonDump)
+	#print(postdata)
+
+# LocationDictionary Structure
+# 	
+# Dictionary -> LocationName -> /////(locationURL (str))
+			#			     -> Posts -> PostImageSrc (str) / (array if multi-photo)
+			#			   			  -> PostText (array) with element[0] being the post description, the rest is comments
+	
+	
+	locations={}
+	locations[locationName]= postdata
+
+	jsondump= json.dumps(locations)
+	os.chdir("C:/Users/marco/Desktop/FoxyByte/Crawler/")
+	with open("locations.json", "a") as outfile:
+		outfile.write(jsondump)
+
 
 
 	sys.exit(0)
