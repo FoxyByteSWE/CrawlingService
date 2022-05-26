@@ -1,14 +1,5 @@
-import pandas as pd
-import time
-import re
-import os
-import csv
-import json
-from urllib.request import urlopen
-from urllib.parse import quote_plus
-from bs4 import BeautifulSoup
+import sys, time, os, json
 from selenium import webdriver
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -31,8 +22,7 @@ def getLocationPageBySearchBar(locationName, driver):
 	driver.get("https://www.instagram.com/")
 	time.sleep(3)
 
-	element = WebDriverWait(driver, 20).until(
-	EC.element_to_be_clickable((By.XPATH, "//input[contains(@class,'XTCLo')]")))
+	element = WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//input[contains(@class,'XTCLo')]")))
  
 	time.sleep(5)
 	driver.execute_script("arguments[0].click();", element)
@@ -50,7 +40,7 @@ def getLocationPageBySearchBar(locationName, driver):
 
 
 
-def crawlLocation(locationURL, driver):
+def getLocationPagePosts(locationURL, driver):
 	driver.get(locationURL)
 	time.sleep(3)
 
@@ -61,94 +51,74 @@ def crawlLocation(locationURL, driver):
 		i += 1
 		time.sleep(3)
 		scroll_height = driver.execute_script("return document.body.scrollHeight;")  
-		if (screen_height) * i > scroll_height or i>20:
+		if (screen_height) * i > scroll_height or i>2:
 			break 
-	
+
+	posts = driver.find_elements_by_css_selector(".v1Nh3 > a")
+	url_array=[]
+	for post in posts:
+		url_array.append(post.get_attribute('href'))
+	return url_array
+
+def getPost(post, driver):
+	driver.get(post)
+
+def getPostImageSrc(url, driver):
+
 	posts = driver.find_elements_by_css_selector(".FFVAD")
 	src_data_array=[]
 	for data in posts:
 		src_data_array.append(data.get_attribute('src'))
-	
 	post_src_array=[]
 	for src in src_data_array:
 		post_src_array.append(src)
-	
 	return post_src_array
-		
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def getComments(url):
-	chrome_options = webdriver.ChromeOptions()
-	chrome_options.add_experimental_option("useAutomationExtension", False)
-	chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-	chrome_options.add_argument("user-data-dir=C:/Users/marco/Desktop/FoxyByte/Crawler/Profile"); #edit 
-
-	driver = webdriver.Chrome("C:/Users/marco/Desktop/FoxyByte/Crawler/chromedriver.exe", options=chrome_options) #edit
+def getPostDescriptionAndComments(url, driver):
 	driver.get(url)
 	time.sleep(5)
 
 	texts_list = []
 	texts = driver.find_elements_by_css_selector('.MOdxS ')
-	print(len(texts))
+	#print(len(texts))
 	for txt in texts:
 		texts_list.append(txt.text)
-		print("Text: ",txt.text)
-
-		
-
-
-
-
-
-
-
-
-
+	return texts_list
 
 
 #################################################################
 
 def main():
+	
+	locationName=input("Please Input the Location Name: ")
 
+	driver = buildWebDriver()
 
-	getComments("https://www.instagram.com/p/Cd52IzArohl/")
-#	
-#	locationName=input("Please Input the Location Name: ")
-#	driver = buildWebDriver()
-#
-#	url = getLocationPageBySearchBar(locationName, driver)
-#	posts_array = crawlLocation(url, driver)
-#
-#
-#	location_dictionary={}
+	locationUrl = getLocationPageBySearchBar(locationName, driver)
+	
+	locationPostsArray = getLocationPagePosts(locationUrl, driver)
+
+	for post in locationPostsArray:
+		getPost(post, driver)
+		postImage = getPostImageSrc(str(post), driver) #should only work with single post images
+		postText = getPostDescriptionAndComments(str(post), driver)
+
+	
+	
+
+	
+	location_dictionary={}
 #	location_dictionary[locationName] = posts_array
 #
 #	jsonDump = json.dumps(location_dictionary)
 #	with open("locationsposts.json", "a") as outfile:
 #		outfile.write(jsonDump)
-#
-#	i=1
-#	for url in posts_array:
-#		print(url)
-#		i=i+1
-#
-#	print("Got "+str(i)+"posts")
-#
+
+
+	sys.exit(0)
+
+
 ################################################################
 
 if __name__ == "__main__":
