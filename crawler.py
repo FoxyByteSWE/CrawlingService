@@ -1,7 +1,6 @@
+from cgi import test
+import os, json
 from instagrapi import Client
-import os
-
-
 
 
 def createLoggedInClient():
@@ -9,40 +8,46 @@ def createLoggedInClient():
 	client.login("foxybyte.swe", "Swe_2022")
 	return client
 
-
 def getAllCrawlableLocationsFromSomewhere():
 	txt_file = open("F:/OneDrive/Marco/UniPD/Triennale/Ingegneria del Software/Progetto/FoxyByte/IGCrawler/locations.txt", "r")
 	content_list = txt_file.readlines()
 	return content_list
-
 
 def getTopPostsFromLocation(locationName, client):
 	pkCode = getLocationPkCodeFromName(locationName, client)
 	mediaListFromLocation = client.location_medias_top(pkCode)
 	return mediaListFromLocation
 
-
 def getLocationPkCodeFromName(locationName, client):
 	locList = (client.fbsearch_places(locationName)[0]).dict()
 	pkCode = locList.get("pk")
 	return pkCode
 
+def writeCrawledDataToJson(locationsData):
+	jsondump= json.dumps(locationsData)
+	os.chdir("F:/OneDrive/Marco/UniPD/Triennale/Ingegneria del Software/Progetto/FoxyByte/IGCrawler/")
+	with open("locationsData.json", "a") as outfile:
+		outfile.write(jsondump)
 
+def crawlAllLocations(locationNamesList, client):
+	locationsData = { }
+	for loc in locationNamesList:
+		postsDump = getTopPostsFromLocation(loc, client)
+		locationsData[loc] = postsDump
+	return locationsData
 
+def beginCrawling():
+	client = createLoggedInClient()
+	locationNamesList = getAllCrawlableLocationsFromSomewhere()
+	locationsData = crawlAllLocations(locationNamesList, client)
+	writeCrawledDataToJson(locationsData)
 
 
 #################################################################
 
 
 def main():
-	client = createLoggedInClient()
-
-	locationNamesList = getAllCrawlableLocationsFromSomewhere()
-	locationsData = []
-	for loc in locationNamesList:
-		locationsData.append(getTopPostsFromLocation(loc, client))
-
-	print(locationsData)
+	beginCrawling()
 
 
 ################################################################
