@@ -1,4 +1,32 @@
 from instagrapi import Client
+import os
+
+
+
+
+def createLoggedInClient():
+	client = Client()
+	client.login("foxybyte.swe", "Swe_2022")
+	return client
+
+
+def getAllCrawlableLocationsFromSomewhere():
+	txt_file = open("F:/OneDrive/Marco/UniPD/Triennale/Ingegneria del Software/Progetto/FoxyByte/IGCrawler/locations.txt", "r")
+	content_list = txt_file.readlines()
+	return content_list
+
+
+def getTopPostsFromLocation(locationName, client):
+	pkCode = getLocationPkCodeFromName(locationName, client)
+	mediaListFromLocation = client.location_medias_top(pkCode)
+	return mediaListFromLocation
+
+
+def getLocationPkCodeFromName(locationName, client):
+	locList = (client.fbsearch_places(locationName)[0]).dict()
+	pkCode = locList.get("pk")
+	return pkCode
+
 
 
 
@@ -7,13 +35,14 @@ from instagrapi import Client
 
 
 def main():
-	client = Client()
-	client. login("foxybyte.swe", "Swe_2022")
-	locList = (client.fbsearch_places("Lunaelaltro")[0]).dict()
-	pkCode = locList.get("pk")
-	print(pkCode)
-	mediaListFromLocation = client.location_medias_top(pkCode)
-	print(mediaListFromLocation)
+	client = createLoggedInClient()
+
+	locationNamesList = getAllCrawlableLocationsFromSomewhere()
+	locationsData = []
+	for loc in locationNamesList:
+		locationsData.append(getTopPostsFromLocation(loc, client))
+
+	print(locationsData)
 
 
 ################################################################
