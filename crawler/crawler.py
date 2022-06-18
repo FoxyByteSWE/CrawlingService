@@ -9,11 +9,11 @@ def createLoggedInClient():
 	return client
 
 def getAllCrawlableLocationsFromSomewhere():
-	txt_file = open("F:/OneDrive/Marco/UniPD/Triennale/Ingegneria del Software/Progetto/FoxyByte/IGCrawler/locations.txt", "r")
+	txt_file = open("F:/OneDrive/Marco/UniPD/Triennale/Ingegneria del Software/Progetto/FoxyByte/IGCrawlerService/crawler/data/locations.txt", "r")
 	content_list = txt_file.readlines()
 	return content_list
 
-def getTopPostsFromLocation(locationName, client):
+def getTopMediasFromLocation(locationName, client):
 	pkCode = getLocationPkCodeFromName(locationName, client)
 	mediaListFromLocation = client.location_medias_top(pkCode)
 	return mediaListFromLocation
@@ -25,22 +25,81 @@ def getLocationPkCodeFromName(locationName, client):
 
 def writeCrawledDataToJson(locationsData):
 	jsondump= json.dumps(locationsData)
-	os.chdir("F:/OneDrive/Marco/UniPD/Triennale/Ingegneria del Software/Progetto/FoxyByte/IGCrawler/")
+	os.chdir("F:/OneDrive/Marco/UniPD/Triennale/Ingegneria del Software/Progetto/FoxyByte/IGCrawlerService/crawler/data")
 	with open("locationsData.json", "a") as outfile:
 		outfile.write(jsondump)
 
 def crawlAllLocations(locationNamesList, client):
 	locationsData = { }
 	for loc in locationNamesList:
-		postsDump = getTopPostsFromLocation(loc, client)
-		locationsData[loc] = postsDump
+		mediasDump = getTopMediasFromLocation(loc, client) #returns a list of "Medias"
+		formattedMediasFromLocation = []
+		for media in mediasDump:
+			formattedMediasFromLocation.append(formatMediaToDictionaryItem(media)) 
+		locationsData[loc] = formattedMediasFromLocation
 	return locationsData
 
+
+#########
+
+#Main Function 
+
 def beginCrawling():
+
 	client = createLoggedInClient()
 	locationNamesList = getAllCrawlableLocationsFromSomewhere()
 	locationsData = crawlAllLocations(locationNamesList, client)
-	writeCrawledDataToJson(locationsData)
+	print(locationsData)
+	#writeCrawledDataToJson(locationsData)
+
+###########	
+
+def getMediaType(media):
+	pass
+
+def getCaptionText(media):
+	pass
+
+def getLocationInfo(location):
+	pass
+
+def getUsefulMediaInfoFromPk(pkCode):
+	pass
+
+def getMediaTime(media):
+	pass
+
+def getMediaLocationName(media):
+	pass
+
+def getMediaLocationPK(media):
+	pass
+
+def getMediaURL(media):
+	pass
+
+def getMediaLikeCount(media):
+	pass
+
+
+def formatMediaToDictionaryItem(media):
+	formattedDictionaryMedia = {}
+	formattedDictionaryMedia["MediaType"] = getMediaType(media)
+	formattedDictionaryMedia["TakenAtTime"] = getMediaTime(media)
+	formattedDictionaryMedia["TakenAtLocationName"] = getMediaLocationName(media)
+	formattedDictionaryMedia["TakenAtLocationPK"] = getMediaLocationPK(media)
+	formattedDictionaryMedia["LikeCount"] = getMediaLikeCount(media)
+	formattedDictionaryMedia["MediaURL"] = getMediaURL(media)
+
+	return formattedDictionaryMedia
+	
+
+
+
+# useful media keys: pk, id, code, media_type, caption_text
+# from pk -> media -> method photo_download or media_info -> url or code (to add base link structure)
+# or in media_info -> resources -> video_url or thumbnail_url (if photo)
+
 
 
 #################################################################
@@ -54,6 +113,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
