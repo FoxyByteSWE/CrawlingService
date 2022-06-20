@@ -1,6 +1,8 @@
-from cgi import test
+
 import os, json
 from instagrapi import Client
+import instagrapi
+from typing import Dict
 
 
 def createLoggedInClient():
@@ -23,7 +25,7 @@ def getLocationPkCodeFromName(locationName, client):
 	pkCode = locList.get("pk")
 	return pkCode
 
-def writeCrawledDataToJson(locationsData):
+def writeCrawledDataToJson(locationsData):  #TypeError: Object of type datetime is not JSON serializable
 	jsondump= json.dumps(locationsData)
 	os.chdir("F:/OneDrive/Marco/UniPD/Triennale/Ingegneria del Software/Progetto/FoxyByte/IGCrawlerService/crawler/data")
 	with open("locationsData.json", "a") as outfile:
@@ -49,37 +51,47 @@ def beginCrawling():
 	client = createLoggedInClient()
 	locationNamesList = getAllCrawlableLocationsFromSomewhere()
 	locationsData = crawlAllLocations(locationNamesList, client)
-	print(locationsData)
 	#writeCrawledDataToJson(locationsData)
+	print(locationsData)
 
 ###########	
 
 def getMediaType(media):
-	pass
+	return media.media_type
 
 def getCaptionText(media):
-	pass
+	return media.caption_text
 
-def getLocationInfo(location):
-	pass
-
-def getUsefulMediaInfoFromPk(pkCode):
-	pass
 
 def getMediaTime(media):
-	pass
+	return media.taken_at
 
 def getMediaLocationName(media):
-	pass
+	return media.location
 
 def getMediaLocationPK(media):
-	pass
-
-def getMediaURL(media):
-	pass
+	return media.pk
 
 def getMediaLikeCount(media):
-	pass
+	return media.like_count
+
+def getMediaURL(media):
+	if getMediaType(media)==1:
+		return media.thumbnail_url
+	if getMediaType(media)==2:
+		return media.video_url
+	if getMediaType(media)==8: #album
+		album = media.resources
+		list=[]
+		for item in album:
+			if getMediaType(item) == 1:
+				list.append(item.thumbnail_url)
+			elif getMediaType(item) == 2:
+				list.append(item.video_url)
+		return list
+
+
+
 
 
 def formatMediaToDictionaryItem(media):
@@ -87,10 +99,8 @@ def formatMediaToDictionaryItem(media):
 	formattedDictionaryMedia["MediaType"] = getMediaType(media)
 	formattedDictionaryMedia["TakenAtTime"] = getMediaTime(media)
 	formattedDictionaryMedia["TakenAtLocationName"] = getMediaLocationName(media)
-	formattedDictionaryMedia["TakenAtLocationPK"] = getMediaLocationPK(media)
 	formattedDictionaryMedia["LikeCount"] = getMediaLikeCount(media)
 	formattedDictionaryMedia["MediaURL"] = getMediaURL(media)
-
 	return formattedDictionaryMedia
 	
 
@@ -107,7 +117,6 @@ def formatMediaToDictionaryItem(media):
 
 def main():
 	beginCrawling()
-
 
 ################################################################
 
