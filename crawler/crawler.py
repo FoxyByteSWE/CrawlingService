@@ -11,7 +11,7 @@ def createLoggedInClient():
 	return client
 
 def getAllCrawlableLocationsFromSomewhere():
-	txt_file = open((str(sys.path[0]))+"\\data\\locations.txt", "r")
+	txt_file = open((str(sys.path[0]))+"/data/locations.txt", "r")
 	content_list = txt_file.readlines()
 	return content_list
 
@@ -27,7 +27,7 @@ def getLocationPkCodeFromName(locationName, client):
 
 def writeCrawledDataToJson(locationsData):  #TypeError: Object of type datetime is not JSON serializable
 	jsondump= json.dumps(locationsData)
-	with open((str(sys.path[0]))+"\\data\\locationsData.json", "a") as outfile:
+	with open((str(sys.path[0]))+"/data/locationsData.json", "a") as outfile:
 		outfile.write(jsondump)
 
 def crawlAllLocations(locationNamesList, client):
