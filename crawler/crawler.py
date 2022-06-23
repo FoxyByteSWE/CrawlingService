@@ -11,7 +11,7 @@ def createLoggedInClient():
 	return client
 
 def getAllCrawlableLocationsFromSomewhere():
-	txt_file = open((str(sys.path[0]))+"\\data\\locations.txt", "r")
+	txt_file = open((str(sys.path[0]))+"/data/locations.txt", "r")
 	content_list = txt_file.readlines()
 	return content_list
 
@@ -25,9 +25,9 @@ def getLocationPkCodeFromName(locationName, client):
 	pkCode = locList.get("pk")
 	return pkCode
 
-def writeCrawledDataToJson(locationsData):  #TypeError: Object of type datetime is not JSON serializable
+def writeCrawledDataToJson(locationsData): 
 	jsondump= json.dumps(locationsData)
-	with open((str(sys.path[0]))+"\\data\\locationsData.json", "a") as outfile:
+	with open((str(sys.path[0]))+"/data/locationsData.json", "a") as outfile:
 		outfile.write(jsondump)
 
 def crawlAllLocations(locationNamesList, client):
@@ -46,12 +46,10 @@ def crawlAllLocations(locationNamesList, client):
 #Main Function 
 
 def beginCrawling():
-
 	client = createLoggedInClient()
 	locationNamesList = getAllCrawlableLocationsFromSomewhere()
 	locationsData = crawlAllLocations(locationNamesList, client)
 	writeCrawledDataToJson(locationsData)
-	#print(locationsData)
 
 ###########	
 
@@ -107,18 +105,20 @@ def formatMediaToDictionaryItem(media): #need to serialize casting to primitive 
 	formattedDictionaryMedia["TakenAtTime"] = parseTakenAtTime(getMediaTime(media))
 	formattedDictionaryMedia["TakenAtLocation"] = getMediaLocationName(media).dict()
 	formattedDictionaryMedia["LikeCount"] = getMediaLikeCount(media)
+	formattedDictionaryMedia["CaptionText"]=getCaptionText(media)
 	formattedDictionaryMedia["MediaURL"] = getMediaURL(media)
 	return formattedDictionaryMedia
 
 
-
-
+def updateLocationList():
+	# fetch list of locations to crawl from Google Places
+	pass
 	
 
 #################################################################
 
-
 def main():
+	updateLocationList()
 	beginCrawling()
 
 ################################################################
