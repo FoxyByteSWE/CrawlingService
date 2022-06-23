@@ -24,7 +24,7 @@ def getLocationPkCodeFromName(locationName, client):
 	pkCode = locList.get("pk")
 	return pkCode
 
-def writeCrawledDataToJson(locationsData):  #TypeError: Object of type datetime is not JSON serializable
+def writeCrawledDataToJson(locationsData): 
 	jsondump= json.dumps(locationsData)
 	with open((str(sys.path[0]))+"/data/locationsData.json", "a") as outfile:
 		outfile.write(jsondump)
@@ -45,12 +45,10 @@ def crawlAllLocations(locationNamesList, client):
 #Main Function 
 
 def beginCrawling():
-
 	client = createLoggedInClient()
 	locationNamesList = getAllCrawlableLocationsFromSomewhere()
 	locationsData = crawlAllLocations(locationNamesList, client)
-	#writeCrawledDataToJson(locationsData)
-	#print(locationsData)
+	writeCrawledDataToJson(locationsData)
 
 ###########	
 
@@ -89,19 +87,31 @@ def getMediaURL(media):
 		return list
 
 
-
+def parseTakenAtTime(input):
+	time = []
+	time.append(input.year)
+	time.append(input.month)
+	time.append(input.day)
+	time.append(input.hour)
+	time.append(input.minute)
+	time.append(input.second)
+	return time
 
 def formatMediaToDictionaryItem(media): #need to serialize casting to primitive data types
-
-	#time = serializeForJson(getMediaTime(media))
 	formattedDictionaryMedia = {}
 	formattedDictionaryMedia["MediaType"] = getMediaType(media)
 	formattedDictionaryMedia["TakenAtTime"] = parseTakenAtTime(getMediaTime(media))
-	formattedDictionaryMedia["TakenAtLocationName"] = getMediaLocationName(media)
+	formattedDictionaryMedia["TakenAtLocation"] = getMediaLocationName(media).dict()
 	formattedDictionaryMedia["LikeCount"] = getMediaLikeCount(media)
+	formattedDictionaryMedia["CaptionText"]=getCaptionText(media)
 	formattedDictionaryMedia["MediaURL"] = getMediaURL(media)
 	print(formattedDictionaryMedia)
 	return formattedDictionaryMedia
+
+
+def updateLocationList():
+	# fetch list of locations to crawl from Google Places
+	pass
 	
 
 def parseTakenAtTime(input):
@@ -114,11 +124,8 @@ def parseTakenAtTime(input):
 	time.append(input.second)
 	return time
 
-
-
-#################################################################
-
 def main():
+	updateLocationList()
 	beginCrawling()
 
 ################################################################
