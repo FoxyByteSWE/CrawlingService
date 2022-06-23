@@ -87,16 +87,6 @@ def getMediaURL(media):
 		return list
 
 
-def parseTakenAtTime(input):
-	time = []
-	time.append(input.year)
-	time.append(input.month)
-	time.append(input.day)
-	time.append(input.hour)
-	time.append(input.minute)
-	time.append(input.second)
-	return time
-
 def formatMediaToDictionaryItem(media): #need to serialize casting to primitive data types
 	formattedDictionaryMedia = {}
 	formattedDictionaryMedia["MediaType"] = getMediaType(media)
