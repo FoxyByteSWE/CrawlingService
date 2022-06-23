@@ -1,7 +1,11 @@
+import enum
 import os, json, sys
 from instagrapi import Client
 import instagrapi
 from typing import Dict
+
+
+
 
 def createLoggedInClient():
 	client = Client()
@@ -18,7 +22,7 @@ def getUserIDfromUsername(username, client):
     return client.user_id_from_username(username)
 
 def getUserFollowing(userid, client):
-    return client.userfollowing(userid)
+    return client.user_following(userid)
 
 def enablePostNotifications(userid, client): #scrape profile if new posts are posted.
     return client.enable_posts_notifications(userid)
@@ -26,13 +30,20 @@ def enablePostNotifications(userid, client): #scrape profile if new posts are po
 def getUserPosts(userid, client):
     return client.user_medias(userid)
 
-
-
 def crawlProfilePosts(profile):
     pass
 
-def classifyLocationType():
-    pass
+def getLocationFromPost(media):
+    return media.location
+
+def getLocationPkCode(location):
+    return location.pk
+
+def classifyLocationType(location):
+    if location.category == "Restaurant":
+        return 1
+    else:
+        return -1
 
 
 
@@ -43,6 +54,8 @@ def classifyLocationType():
 
 def main():
     client = createLoggedInClient()
+    followedUsers = getUserFollowing(getUserIDfromUsername("foxybyte.swe", client), client)
+
     
     # find users: follow major italian influencers, or look for top posts hashtagged with food hashtag and city
 
