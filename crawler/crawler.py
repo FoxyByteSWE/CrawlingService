@@ -3,7 +3,6 @@ from instagrapi import Client
 import instagrapi
 from typing import Dict
 
-
 def createLoggedInClient():
 	client = Client()
 	client.login("foxybyte.swe", "Swe_2022")
@@ -57,7 +56,6 @@ def getMediaType(media):
 
 def getCaptionText(media):
 	return media.caption_text
-
 
 def getMediaTime(media):
 	return media.taken_at
