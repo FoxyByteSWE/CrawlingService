@@ -1,4 +1,3 @@
-
 import os, json, sys
 from instagrapi import Client
 import instagrapi
@@ -51,7 +50,7 @@ def beginCrawling():
 	locationNamesList = getAllCrawlableLocationsFromSomewhere()
 	locationsData = crawlAllLocations(locationNamesList, client)
 	#writeCrawledDataToJson(locationsData)
-	print(locationsData)
+	#print(locationsData)
 
 ###########	
 
@@ -69,7 +68,7 @@ def getMediaLocationName(media):
 	return media.location
 
 def getMediaLocationPK(media):
-	return media.pk
+		return media.pk
 
 def getMediaLikeCount(media):
 	return media.like_count
@@ -92,21 +91,32 @@ def getMediaURL(media):
 
 
 
-
 def formatMediaToDictionaryItem(media): #need to serialize casting to primitive data types
 
 	#time = serializeForJson(getMediaTime(media))
 	formattedDictionaryMedia = {}
 	formattedDictionaryMedia["MediaType"] = getMediaType(media)
-	formattedDictionaryMedia["TakenAtTime"] = getMediaTime(media)
+	formattedDictionaryMedia["TakenAtTime"] = parseTakenAtTime(getMediaTime(media))
 	formattedDictionaryMedia["TakenAtLocationName"] = getMediaLocationName(media)
 	formattedDictionaryMedia["LikeCount"] = getMediaLikeCount(media)
 	formattedDictionaryMedia["MediaURL"] = getMediaURL(media)
+	print(formattedDictionaryMedia)
 	return formattedDictionaryMedia
 	
 
-#################################################################
+def parseTakenAtTime(input):
+	time = []
+	time.append(input.year)
+	time.append(input.month)
+	time.append(input.day)
+	time.append(input.hour)
+	time.append(input.minute)
+	time.append(input.second)
+	return time
 
+
+
+#################################################################
 
 def main():
 	beginCrawling()
