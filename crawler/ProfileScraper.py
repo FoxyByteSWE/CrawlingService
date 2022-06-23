@@ -8,6 +8,13 @@ def createLoggedInClient():
 	client.login("foxybyte.swe", "Swe_2022")
 	return client
 
+def followUser(user):
+    pass
+
+def crawlProfilePosts(profile):
+    pass
+
+
 
 #################################################################
 
