@@ -30,9 +30,6 @@ def enablePostNotifications(userid, client): #scrape profile if new posts are po
 def getUserPosts(userid, client):
     return client.user_medias(userid)
 
-def crawlProfilePosts(profile):
-    pass
-
 def getLocationFromPost(media):
     return media.location
 
@@ -45,8 +42,41 @@ def classifyLocationType(location):
     else:
         return -1
 
+def hasTaggedLocation(post, client):
+    pass
+
+def getProfileTaggedPosts(userid, client):
+    return client.usertag_medias(userid)
 
 
+
+################
+
+# EXTEND USERS POOL
+
+def extendFollowingUsersPoolFromSuggested():
+    pass
+
+def extendFollowingUsersPoolFromTaggedPeople():
+    pass
+
+def extendFollowingUsersPoolFromTaggedPostsSection():
+    pass
+
+
+#####################
+
+# FIND RESTAURANTS
+
+def crawlRestaurantsFromProfilePosts(profile):
+    #implementare con le funzioni sopra
+    #prendi tutti i post
+    #controlla i luoghi taggati
+    #se c'è un luogo taggato && categoria è ristorante, aggiungi il ristorante a lista. Altrimenti, scarta
+    pass
+
+
+#########################
 
 
 
