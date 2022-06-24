@@ -7,9 +7,11 @@ from typing import Dict
 
 
 def createLoggedInClient():
-	client = Client()
-	client.login("foxybyte.swe", "Swe_2022")
-	return client
+    client = Client()
+    client.login("foxybyte.swe", "Swe_2022")
+    client.dump_settings("data/settingsdump.json")
+    #client.load_settings('/tmp/dump.json')
+    return client
 
 def followUser(userid, client):
     return client.user_follow(userid)
@@ -55,6 +57,16 @@ def getPostTaggedPeople(post):
 def getUserIDofTagged():
     pass
 
+def getPostPKCode(post, client):
+    pass
+
+def getDetailedMediaInfoFbSearch(post, client):
+    mi = client.media_info(post.pk)
+    l = mi.location.dict()
+    pk = l.pk
+    loc = client.location_info(pk).dict()
+    return loc
+
 
 
 ################
@@ -77,16 +89,17 @@ def extendFollowingUsersPoolFromTaggedPostsSection():
 
 def crawlRestaurantsFromProfilePosts(userid, client):
     postlist = getUserPosts(userid, client)
-    print(getUsernameFromID(userid))
     newrestaurants = []
-    print(postlist)
     for post in postlist:
-        #if getPostTaggedPeople(post) != None:
-         #   extendFollowingUsersPoolFromTaggedPeople(post)
+        if getPostTaggedPeople(post) != None:
+            extendFollowingUsersPoolFromTaggedPeople(post)
 
-        if(hasTaggedLocation(post)):
-             newrestaurants.append(post.location)
-    #print(newrestaurants)
+        newrestaurants.append(getDetailedMediaInfoFbSearch(post, client))
+
+        #if(hasTaggedLocation(post)):
+         #   newrestaurants.append(client.media_info(post.pk))
+    print(newrestaurants)
+    return newrestaurants
 
 
 #########################
@@ -99,19 +112,7 @@ def main():
     client = createLoggedInClient()
     #followedUsers = getUserFollowing(getUserIDfromUsername("foxybyte.swe", client), client)
     usertest = getUserIDfromUsername("marcouderzo", client)
-
-    print(usertest)
     crawlRestaurantsFromProfilePosts(usertest, client)
-
-    
-    # find users: follow major italian influencers, or look for top posts hashtagged with food hashtag and city
-
-    #retrieve users already followed.
-    #scrape user: 
-    #   get all of user's posts & find the ones with restaurants tagged
-    #   if other people are tagged in post and their profile is not private: then follow them.
-    #   if there are location-tagged posts in user tagged section: follow profile of post creator
-    #   save restaurant location
 
 
 
