@@ -1,4 +1,3 @@
-import enum
 import os, json, sys
 from instagrapi import Client
 import instagrapi
@@ -42,11 +41,19 @@ def classifyLocationType(location):
     else:
         return -1
 
-def hasTaggedLocation(post, client):
-    pass
+def hasTaggedLocation(post):
+    #print(post.location)
+    return post.location != None
 
 def getProfileTaggedPosts(userid, client):
     return client.usertag_medias(userid)
+
+
+def getPostTaggedPeople(post):
+    return post.usertags
+
+def getUserIDofTagged():
+    pass
 
 
 
@@ -57,7 +64,7 @@ def getProfileTaggedPosts(userid, client):
 def extendFollowingUsersPoolFromSuggested():
     pass
 
-def extendFollowingUsersPoolFromTaggedPeople():
+def extendFollowingUsersPoolFromTaggedPeople(list):
     pass
 
 def extendFollowingUsersPoolFromTaggedPostsSection():
@@ -68,12 +75,18 @@ def extendFollowingUsersPoolFromTaggedPostsSection():
 
 # FIND RESTAURANTS
 
-def crawlRestaurantsFromProfilePosts(profile):
-    #implementare con le funzioni sopra
-    #prendi tutti i post
-    #controlla i luoghi taggati
-    #se c'è un luogo taggato && categoria è ristorante, aggiungi il ristorante a lista. Altrimenti, scarta
-    pass
+def crawlRestaurantsFromProfilePosts(userid, client):
+    postlist = getUserPosts(userid, client)
+    print(getUsernameFromID(userid))
+    newrestaurants = []
+    print(postlist)
+    for post in postlist:
+        #if getPostTaggedPeople(post) != None:
+         #   extendFollowingUsersPoolFromTaggedPeople(post)
+
+        if(hasTaggedLocation(post)):
+             newrestaurants.append(post.location)
+    #print(newrestaurants)
 
 
 #########################
@@ -84,7 +97,11 @@ def crawlRestaurantsFromProfilePosts(profile):
 
 def main():
     client = createLoggedInClient()
-    followedUsers = getUserFollowing(getUserIDfromUsername("foxybyte.swe", client), client)
+    #followedUsers = getUserFollowing(getUserIDfromUsername("foxybyte.swe", client), client)
+    usertest = getUserIDfromUsername("marcouderzo", client)
+
+    print(usertest)
+    crawlRestaurantsFromProfilePosts(usertest, client)
 
     
     # find users: follow major italian influencers, or look for top posts hashtagged with food hashtag and city
