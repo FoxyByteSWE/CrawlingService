@@ -7,8 +7,8 @@ import pprint
 def createLoggedInClient():
 	client = Client()
 	client.login("foxybyte.swe", "Swe_2022")
-	client.dump_settings(str(sys.path[0]))+"data/settingsdump.json")
-    #client.load_settings(str(sys.path[0]))+"/data/settingsdump.json")
+	#client.dump_settings((str(sys.path[0]))+"data/settingsdump.json")
+	client.load_settingsi((str(sys.path[0]))+"/data/settingsdump.json")
 	return client
 
 def getAllCrawlableLocationsFromSomewhere():
@@ -128,7 +128,7 @@ def parseTakenAtLocation(input):
 	return dict;
 
 def parseTakenAtLocation(input):
-	url = ""
+	url = input["MediaUrl"].HttpUrl
 	return url;
 
 def main():
@@ -138,11 +138,11 @@ def main():
 ################################################################
 
 if __name__ == "__main__":
-    main()
+	main()
 
 
 #	{'Lunaelaltro\n': [{'MediaType': 1, 
-# 						'TakenAtTime': datetime.datetime(2016, 4, 15, 18, 19, 44, tzinfo=datetime.timezone.utc), 
-# 						'TakenAtLocationName': Location(pk=3110887, name='Ristorante Pizzeria Lunaelaltro - Marostica', phone='', website='', category='', hours={}, address=None, city=None, zip=None, lng=11.660707634193, lat=45.736862428411, external_id=77610911328, external_id_source='facebook_places'), ù
-# 						'LikeCount': 1, 
-# 						'MediaURL': HttpUrl('https://scontent-mxp2-1.cdninstagram.com/v/t51.2885-15/11249882_966261376755731_963030927_n.jpg?se=8&stp=dst-jpg_e35&_nc_ht=scontent-mxp2-1.cdninstagram.com&_nc_cat=111&_nc_ohc=QeSTLR-83PoAX_ePcKi&edm=AKmAybEBAAAA&ccb=7-5&ig_cache_key=MTIyOTEzNTQ0NTAwMDU1ODY0Mg%3D%3D.2-ccb7-5&oh=00_AT90D8dLILH9q4LplVIJVV_F2eb_-rVfShWK7vi8fUZIBg&oe=62BA0E7D&_nc_sid=bcb968', scheme='https', host='scontent-mxp2-1.cdninstagram.com', tld='com', host_type='domain', port='443', path='/v/t51.2885-15/11249882_966261376755731_963030927_n.jpg', query='se=8&stp=dst-jpg_e35&_nc_ht=scontent-mxp2-1.cdninstagram.com&_nc_cat=111&_nc_ohc=QeSTLR-83PoAX_ePcKi&edm=AKmAybEBAAAA&ccb=7-5&ig_cache_key=MTIyOTEzNTQ0NTAwMDU1ODY0Mg%3D%3D.2-ccb7-5&oh=00_AT90D8dLILH9q4LplVIJVV_F2eb_-rVfShWK7vi8fUZIBg&oe=62BA0E7D&_nc_sid=bcb968')}
+#						'TakenAtTime': datetime.datetime(2016, 4, 15, 18, 19, 44, tzinfo=datetime.timezone.utc), 
+#						'TakenAtLocationName': Location(pk=3110887, name='Ristorante Pizzeria Lunaelaltro - Marostica', phone='', website='', category='', hours={}, address=None, city=None, zip=None, lng=11.660707634193, lat=45.736862428411, external_id=77610911328, external_id_source='facebook_places'), ù
+#						'LikeCount': 1, 
+#						'MediaURL': HttpUrl('https://scontent-mxp2-1.cdninstagram.com/v/t51.2885-15/11249882_966261376755731_963030927_n.jpg?se=8&stp=dst-jpg_e35&_nc_ht=scontent-mxp2-1.cdninstagram.com&_nc_cat=111&_nc_ohc=QeSTLR-83PoAX_ePcKi&edm=AKmAybEBAAAA&ccb=7-5&ig_cache_key=MTIyOTEzNTQ0NTAwMDU1ODY0Mg%3D%3D.2-ccb7-5&oh=00_AT90D8dLILH9q4LplVIJVV_F2eb_-rVfShWK7vi8fUZIBg&oe=62BA0E7D&_nc_sid=bcb968', scheme='https', host='scontent-mxp2-1.cdninstagram.com', tld='com', host_type='domain', port='443', path='/v/t51.2885-15/11249882_966261376755731_963030927_n.jpg', query='se=8&stp=dst-jpg_e35&_nc_ht=scontent-mxp2-1.cdninstagram.com&_nc_cat=111&_nc_ohc=QeSTLR-83PoAX_ePcKi&edm=AKmAybEBAAAA&ccb=7-5&ig_cache_key=MTIyOTEzNTQ0NTAwMDU1ODY0Mg%3D%3D.2-ccb7-5&oh=00_AT90D8dLILH9q4LplVIJVV_F2eb_-rVfShWK7vi8fUZIBg&oe=62BA0E7D&_nc_sid=bcb968')}
