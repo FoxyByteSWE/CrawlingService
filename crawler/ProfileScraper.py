@@ -14,7 +14,8 @@ def createLoggedInClient():
     return client
 
 def followUser(userid, client):
-    return client.user_follow(userid)
+    print("dummy following user: "+ (client.user_info(userid)).username)
+    #return client.user_follow(userid)
 
 def getUsernameFromID(userid, client):
     return client.username_from_user_id(userid)
@@ -37,7 +38,7 @@ def getLocationFromPost(media):
 def getLocationPkCode(location):
     return location.pk
 
-def classifyLocationType(location):
+def classifyLocationType(location):  #reimplement with new location tags
     if location.category == "Restaurant":
         return 1
     else:
@@ -53,11 +54,14 @@ def getProfileTaggedPosts(userid, client):
 def getPostTaggedPeople(post):
     return post.usertags
 
-def getUserIDofTagged():
-    pass
+def convertUsertagToUser(usertag):
+    return usertag.user
+
+def getUserIDofTagged(userid, client):
+    return client.usertag_medias(userid)
 
 def getPostPKCode(post, client):
-    pass
+    return post.pk
 
 def getDetailedMediaLocationInfo(post, client):  # this works and retrieves all category and other data
     mediainfo = client.media_info_v1(post.pk)
@@ -66,24 +70,54 @@ def getDetailedMediaLocationInfo(post, client):  # this works and retrieves all 
     else:
         return None
 
-def compareLocationPksToMatch(locPkFromMI, locPkfromLI):
-    pass
+def getSuggestedUsersFromFBSearch(userid, client):
+    return client.fbsearch_suggested_profiles(userid)
 
+
+def convertUserShortToUser(usershort,client):
+    return client.user_info_by_username(usershort.username)
+
+def isProfilePrivate(user):
+    return user.is_private
 
 
 ################
 
 # EXTEND USERS POOL
 
-def extendFollowingUsersPoolFromSuggested():
-    pass
+def extendFollowingUsersPoolFromSuggested(userid, client):
+    list = getSuggestedUsersFromFBSearch(userid, client)
+    for usersh in list:
+        user = convertUserShortToUser(usersh, client)
+        if isProfilePrivate(user) == False:
+            followUser(user.pk)
 
-def extendFollowingUsersPoolFromTaggedPeople(list):
-    pass
+def extendFollowingUsersPoolFromPostTaggedUsers(post,client):
+    list = getPostTaggedPeople(post)
+    for usertag in list:
+        usersh=convertUsertagToUser(usertag)
+        user = convertUserShortToUser(usersh, client)
+        if isProfilePrivate(user) == False:
+            followUser(user.pk)
 
-def extendFollowingUsersPoolFromTaggedPostsSection():
-    pass
 
+def extendFollowingUsersPoolFromTaggedPostsSection(userid, client):
+    list = getProfileTaggedPosts(userid, client)
+    for media in list:
+        user=media.user
+        if isProfilePrivate(user) == False:
+            followUser(user.pk)
+
+
+def extendUsersFollowingPool(post, userid, client):
+    extendFollowingUsersPoolFromPostTaggedUsers(post)
+    extendFollowingUsersPoolFromTaggedPostsSection(userid)
+    extendFollowingUsersPoolFromSuggested(userid)
+    
+
+
+
+        
 
 def writeCrawledDataToJson(locationsData): 
 	jsondump= json.dumps(locationsData)
@@ -105,7 +139,7 @@ def crawlRestaurantsFromProfilePosts(userid, client):
     newrestaurants = []
     for post in postlist:
         if getPostTaggedPeople(post) != None:
-            extendFollowingUsersPoolFromTaggedPeople(post)
+            extendFollowingUsersPoolFromPostTaggedUsers(post)
 
         if hasTaggedLocation(post):
             detailedLocationInfo = getDetailedMediaLocationInfo(post, client)
