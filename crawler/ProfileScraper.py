@@ -44,7 +44,6 @@ def classifyLocationType(location):
         return -1
 
 def hasTaggedLocation(post):
-    #print(post.location)
     return post.location != None
 
 def getProfileTaggedPosts(userid, client):
@@ -60,12 +59,15 @@ def getUserIDofTagged():
 def getPostPKCode(post, client):
     pass
 
-def getDetailedMediaInfoFbSearch(post, client):  # this works and retrieves all category and other data
+def getDetailedMediaLocationInfo(post, client):  # this works and retrieves all category and other data
     mediainfo = client.media_info_v1(post.pk)
     if mediainfo.location != None:
         return client.location_info((mediainfo.location).pk)
     else:
         return None
+
+def compareLocationPksToMatch(locPkFromMI, locPkfromLI):
+    pass
 
 
 
@@ -83,23 +85,36 @@ def extendFollowingUsersPoolFromTaggedPostsSection():
     pass
 
 
+def writeCrawledDataToJson(locationsData): 
+	jsondump= json.dumps(locationsData)
+	with open((str(sys.path[0]))+"/data/locations.json", "a") as outfile:
+		outfile.write(jsondump)
+
+
 #####################
 
 # FIND RESTAURANTS
 
 def crawlRestaurantsFromProfilePosts(userid, client):
+
+    restaurant_tags = ['Restaurant', 'Pub', 'Bar', 'Grocery ', 'Wine', 'Diner', 'Food', 'Meal', 'Breakfast', 'Lunch',
+                           'Dinner', 'Cafe', 'Tea Room', 'Hotel', 'Pizza', 'Coffee', 'Bakery', 'Dessert', 'Gastropub',
+                           'Sandwich', 'Ice Cream', 'Steakhouse']
+
     postlist = getUserPosts(userid, client)
     newrestaurants = []
     for post in postlist:
         if getPostTaggedPeople(post) != None:
             extendFollowingUsersPoolFromTaggedPeople(post)
 
-        newrestaurants.append(getDetailedMediaInfoFbSearch(post, client))
+        if hasTaggedLocation(post):
+            detailedLocationInfo = getDetailedMediaLocationInfo(post, client)
+            print(detailedLocationInfo.category)
+            if detailedLocationInfo.category in restaurant_tags:
+                newrestaurants.append(detailedLocationInfo.dict())
 
-        #if(hasTaggedLocation(post)):
-         #   newrestaurants.append(client.media_info(post.pk))
-    print(newrestaurants)
-    #print(postlist)
+    #print(newrestaurants)
+    writeCrawledDataToJson(newrestaurants)
     return newrestaurants
 
 
@@ -112,7 +127,7 @@ def crawlRestaurantsFromProfilePosts(userid, client):
 def main():
     client = createLoggedInClient()
     #followedUsers = getUserFollowing(getUserIDfromUsername("foxybyte.swe", client), client)
-    usertest = getUserIDfromUsername("marcouderzo", client)
+    usertest = getUserIDfromUsername("alsaiso", client)
     crawlRestaurantsFromProfilePosts(usertest, client)
 
 
