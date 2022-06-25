@@ -7,7 +7,8 @@ import pprint
 def createLoggedInClient():
 	client = Client()
 	client.login("foxybyte.swe", "Swe_2022")
-	client.dump_settings("data/settingsdump.json")
+	client.dump_settings(str(sys.path[0]))+"data/settingsdump.json")
+    #client.load_settings(str(sys.path[0]))+"/data/settingsdump.json")
 	return client
 
 def getAllCrawlableLocationsFromSomewhere():
