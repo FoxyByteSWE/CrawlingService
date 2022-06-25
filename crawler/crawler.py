@@ -2,10 +2,12 @@ import os, json, sys
 from instagrapi import Client
 import instagrapi
 from typing import Dict
+import pprint
 
 def createLoggedInClient():
 	client = Client()
 	client.login("foxybyte.swe", "Swe_2022")
+	client.dump_settings("data/settingsdump.json")
 	return client
 
 def getAllCrawlableLocationsFromSomewhere():
@@ -89,11 +91,12 @@ def formatMediaToDictionaryItem(media): #need to serialize casting to primitive 
 	formattedDictionaryMedia = {}
 	formattedDictionaryMedia["MediaType"] = getMediaType(media)
 	formattedDictionaryMedia["TakenAtTime"] = parseTakenAtTime(getMediaTime(media))
-	formattedDictionaryMedia["TakenAtLocation"] = getMediaLocationName(media).dict()
+	formattedDictionaryMedia["TakenAtLocation"] = parseTakenAtLocation(getMediaLocationName(media).dict())
+	#formattedDictionaryMedia["TakenAtLocation"] = getMediaLocationName(media).dict()
 	formattedDictionaryMedia["LikeCount"] = getMediaLikeCount(media)
 	formattedDictionaryMedia["CaptionText"]=getCaptionText(media)
 	formattedDictionaryMedia["MediaURL"] = getMediaURL(media)
-	print(formattedDictionaryMedia)
+	pprint.pprint(formattedDictionaryMedia)
 	return formattedDictionaryMedia
 
 
@@ -111,6 +114,21 @@ def parseTakenAtTime(input):
 	time.append(input.minute)
 	time.append(input.second)
 	return time
+
+def parseTakenAtLocation(input):
+	dict = {}
+	dict["pk"] = input["TakenAtLocation"].pk
+	dict["name"] = input["TakenAtLocation"].name
+	dict["address"] = input["TakenAtLocation"].address
+	dict["coordinates"] = [input["TakenAtLocation"].lng, input["TakenAtLocation"].lat]
+	dict["category"] = input["TakenAtLocation"].category
+	dict["phone"] = input["TakenAtLocation"].phone
+	dict["website"] = input["TakenAtLocation"].website
+	return dict;
+
+def parseTakenAtLocation(input):
+	url = ""
+	return url;
 
 def main():
 	updateLocationList()
