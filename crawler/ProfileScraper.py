@@ -9,8 +9,8 @@ from typing import Dict
 def createLoggedInClient():
     client = Client()
     client.login("foxybyte.swe", "Swe_2022")
-    client.dump_settings("data/settingsdump.json")
-    #client.load_settings('/tmp/dump.json')
+    #client.dump_settings(str(sys.path[0])+"/data/settingsdump.json")
+    client.load_settings(str(sys.path[0])+"/data/settingsdump.json")
     return client
 
 def followUser(userid, client):
@@ -29,7 +29,7 @@ def enablePostNotifications(userid, client): #scrape profile if new posts are po
     return client.enable_posts_notifications(userid)
 
 def getUserPosts(userid, client):
-    return client.user_medias(userid)
+    return client.user_medias_v1(userid)
 
 def getLocationFromPost(media):
     return media.location
@@ -60,12 +60,12 @@ def getUserIDofTagged():
 def getPostPKCode(post, client):
     pass
 
-def getDetailedMediaInfoFbSearch(post, client):
-    mi = client.media_info(post.pk)
-    l = mi.location.dict()
-    pk = l.pk
-    loc = client.location_info(pk).dict()
-    return loc
+def getDetailedMediaInfoFbSearch(post, client):  # this works and retrieves all category and other data
+    mediainfo = client.media_info_v1(post.pk)
+    if mediainfo.location != None:
+        return client.location_info((mediainfo.location).pk)
+    else:
+        return None
 
 
 
@@ -99,6 +99,7 @@ def crawlRestaurantsFromProfilePosts(userid, client):
         #if(hasTaggedLocation(post)):
          #   newrestaurants.append(client.media_info(post.pk))
     print(newrestaurants)
+    #print(postlist)
     return newrestaurants
 
 
