@@ -31,13 +31,17 @@ def writeCrawledDataToJson(locationsData):
 	with open((str(sys.path[0]))+"/data/locationsData.json", "a") as outfile:
 		outfile.write(jsondump)
 
-def crawlAllLocations(locationNamesList, client):
+
+# la politica di ordinamento per le location può essere una coda con priorità in base
+# all'ultima volta che una certa location è stata analizzata
+
+def crawlAllLocations(locationNamesList, client, nPostsWanted):
 	locationsData = { }
 	for loc in locationNamesList:
 		mediasDump = getTopMediasFromLocation(loc, client) #returns a list of "Medias"
 		formattedMediasFromLocation = []
-		for media in mediasDump:
-			formattedMediasFromLocation.append(formatMediaToDictionaryItem(media)) 
+		for media in mediasDump[0:nPostsWanted]:
+			formattedMediasFromLocation.append(formatMediaToDictionaryItem(media,client)) 
 		locationsData[loc] = formattedMediasFromLocation
 	return locationsData
 
@@ -49,7 +53,8 @@ def crawlAllLocations(locationNamesList, client):
 def beginCrawling():
 	client = createLoggedInClient()
 	locationNamesList = getAllCrawlableLocationsFromSomewhere()
-	locationsData = crawlAllLocations(locationNamesList, client)
+	nPostsWanted = 2 # only get N+1 top posts from each location
+	locationsData = crawlAllLocations(locationNamesList, client, nPostsWanted)
 	writeCrawledDataToJson(locationsData)
 
 ###########	
@@ -63,8 +68,11 @@ def getCaptionText(media):
 def getMediaTime(media):
 	return media.taken_at
 
-def getMediaLocationName(media):
-	return media.location
+def getMediaLocationCoordinates(media):
+	coordinates = {'lng': (media.location).lng , 
+				   'lat': (media.location).lat }
+	return coordinates
+
 
 def getMediaLocationPK(media):
 		return media.pk
@@ -88,12 +96,11 @@ def getMediaURL(media):
 		return list
 
 
-def formatMediaToDictionaryItem(media): #need to serialize casting to primitive data types
+def formatMediaToDictionaryItem(media,client): #need to serialize casting to primitive data types
 	formattedDictionaryMedia = {}
 	formattedDictionaryMedia["MediaType"] = getMediaType(media)
 	formattedDictionaryMedia["TakenAtTime"] = parseTakenAtTime(getMediaTime(media))
-	formattedDictionaryMedia["TakenAtLocation"] = parseTakenAtLocation(media)
-	#formattedDictionaryMedia["TakenAtLocation"] = getMediaLocationName(media).dict()
+	formattedDictionaryMedia["TakenAtLocation"] = parseTakenAtLocation(media,client) #extra step necessary.
 	formattedDictionaryMedia["LikeCount"] = getMediaLikeCount(media)
 	formattedDictionaryMedia["CaptionText"] = getCaptionText(media)
 	formattedDictionaryMedia["MediaURL"] = parseMediaUrl(getMediaURL(media))
@@ -101,10 +108,14 @@ def formatMediaToDictionaryItem(media): #need to serialize casting to primitive 
 	return formattedDictionaryMedia
 
 
-def updateLocationList():
-	# fetch list of locations to crawl from Google Places
-	pass
 	
+def getDetailedMediaLocationInfo(media, client):  # this works and retrieves all category and other data
+    mediainfo = client.media_info_v1(media.pk)
+    if mediainfo.location != None:
+        return client.location_info((mediainfo.location).pk)
+    else:
+        return None
+
 
 def parseTakenAtTime(input):
 	time = []
@@ -116,13 +127,14 @@ def parseTakenAtTime(input):
 	time.append(input.second)
 	return time
 
-def parseTakenAtLocation(media):
-	input = getMediaLocationName(media).dict()
+def parseTakenAtLocation(media,client):
+	input = getDetailedMediaLocationInfo(media, client).dict()
+	coordinates = getMediaLocationCoordinates(media)
 	dict = {}
 	dict["pk"] = input["pk"]
 	dict["name"] = input["name"]
 	dict["address"] = input["address"]
-	dict["coordinates"] = [input["lng"], input["lat"]]
+	dict["coordinates"] = [coordinates["lng"], coordinates["lat"]]
 	dict["category"] = input["category"]
 	dict["phone"] = input["phone"]
 	dict["website"] = input["website"]
@@ -137,7 +149,6 @@ def parseMediaUrl(input):
 	return url;
 
 def main():
-	updateLocationList()
 	beginCrawling()
 
 ################################################################
