@@ -1,7 +1,7 @@
+import os, sys
 import logging
 import boto3
 from botocore.exceptions import ClientError
-import os
 
 def listBuckets():
 	s3 = boto3.client('s3')
@@ -35,7 +35,7 @@ def uploadFile(file_name, bucket, object_name=None):
 
 def main():
 	listBuckets()
-	#uploadFile()
+	uploadFile((str(sys.path[0]))+"/data/locationsData.json", "foxybyteswe")
 
 if __name__ == "__main__":
 	main()
