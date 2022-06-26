@@ -13,6 +13,10 @@ def createLoggedInClient():  #TODO: handle login_required exception
     #client.load_settings(str(sys.path[0])+"/data/settingsdump.json")
     return client
 
+
+def resetLoginSettings():
+    pass
+
 def trackUser(user, client,newusers):
     username=(client.user_info(user.pk)).username
     print("tracking user: "+ username)
@@ -98,26 +102,21 @@ def writeNewUsersToJSONFile(newusers):
 
 
 def isAlreadyTracked(user): #check if database or file already contains this user
+    data = getTrackedUsersFromJSON()
+    if user.username in data:
+        return True
+    else:
+        return False
+
+def getTrackedUsersFromJSON():
     filepath = (str(sys.path[0]))+"/data/trackedUsers.json"
     with open(filepath) as usersFile:
         try:
             data = json.load(usersFile)
+            return data
         except Exception as e:
             print("Error Loading JSON. Probably Empty File.")
-            exit(0)
-        if user.username in data:
-            return True
-        else:
             return False
-        
-    
-def convertUserToDictionary(user):
-    pass
-
-
-
-def getTrackedUsersFromJSON():
-    pass
 
 ################
 
@@ -194,15 +193,15 @@ def crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPosts
         if allowExtendUserBase and getPostTaggedPeople(post) != None:
             extendUsersFollowingPool(post, userid, client, 2)
 
-#        if hasTaggedLocation(post):
-#            detailedLocationInfo = getDetailedMediaLocationInfo(post, client)
-#            print(detailedLocationInfo.category)
-#            if detailedLocationInfo.category in restaurant_tags:
-#                newrestaurants.append(detailedLocationInfo.dict())
+        if hasTaggedLocation(post):
+            detailedLocationInfo = getDetailedMediaLocationInfo(post, client)
+            print(detailedLocationInfo.category)
+            if detailedLocationInfo.category in restaurant_tags:
+                newrestaurants.append(detailedLocationInfo.dict())
 
     #print(newrestaurants)
-#    writeCrawledDataToJson(newrestaurants)
-#    return newrestaurants
+    writeCrawledDataToJson(newrestaurants)
+    return newrestaurants
 
 
 #########################
@@ -212,17 +211,19 @@ def crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPosts
 #################################################################
 
 def main():
-    client = createLoggedInClient()
-    #followedUsers = getUserFollowing(getUserIDfromUsername("foxybyte.swe", client), client)
-    #isAlreadyTracked("dummy")
-    trackedUsers = getTrackedUsersFromJSON()
-    test = getUserInfoByUsername("marcouderzo", client)
-    print(test)
-    usertest = getUserIDfromUsername("marcouderzo", client)
+    #trackedUsers = getTrackedUsersFromJSON()
+    #print(trackedUsers)
     allowExtendUserBase = True
     nPostsAllowed = 7
 
-    crawlRestaurantsFromProfilePosts(usertest, client, allowExtendUserBase, nPostsAllowed)
+    client = createLoggedInClient()
+    userid = getUserIDfromUsername("marcouderzo", client)
+    crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPostsAllowed)
+    
+#    trackedUsers = getTrackedUsersFromJSON()    
+#        for user in trackedUsers:
+#        userid = getUserIDfromUsername("marcouderzo", client)
+#        crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPostsAllowed)
 
 
 
