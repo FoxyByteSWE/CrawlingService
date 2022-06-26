@@ -13,9 +13,11 @@ def createLoggedInClient():
     client.load_settings(str(sys.path[0])+"/data/settingsdump.json")
     return client
 
-def followUser(userid, client):
-    print("dummy following user: "+ (client.user_info(userid)).username)
-    #return client.user_follow(userid)
+def trackUser(user, client,newusers):
+    username=(client.user_info(user.pk)).username
+    print("tracking user: "+ username)
+    newusers[username]=user.dict()
+    return newusers
 
 def getUsernameFromID(userid, client):
     return client.username_from_user_id(userid)
@@ -77,8 +79,34 @@ def getSuggestedUsersFromFBSearch(userid, client):
 def convertUserShortToUser(usershort,client):
     return client.user_info_by_username(usershort.username)
 
+
+def getUserInfoByUsername(username, client):
+    return client.user_info_by_username(username)
+
+def convertUserShortToUserv2(usershort,client):
+    return client.user_info_by_username(usershort["username"])
+
 def isProfilePrivate(user):
     return user.is_private
+
+
+def writeNewUsersToJSONFile(newusers):
+    jsondump= json.dumps(newusers)
+    with open((str(sys.path[0]))+"/data/trackedUsers.json", "a") as outfile:
+	    outfile.write(jsondump)
+
+def isAlreadyTracked(user): #check if database or file already contains this user
+    usersJson = open((str(sys.path[0]))+"/data/trackedUsers.json", "r")
+    data = json.load(usersJson)
+    print("done")
+    if user.username in data:
+        return True
+    else:
+        return False
+        
+    
+def convertUserToDictionary(user):
+    pass
 
 
 ################
@@ -87,32 +115,47 @@ def isProfilePrivate(user):
 
 def extendFollowingUsersPoolFromSuggested(userid, client):
     list = getSuggestedUsersFromFBSearch(userid, client)
+    newusers={}
     for usersh in list:
-        user = convertUserShortToUser(usersh, client)
+        user = getUserInfoByUsername((convertUserShortToUserv2(usersh, client).username),client)
         if isProfilePrivate(user) == False:
-            followUser(user.pk)
+            if isAlreadyTracked(user) == False:
+                newusers = trackUser(user, client, newusers)
+    if newusers:
+        writeNewUsersToJSONFile(newusers)
+
 
 def extendFollowingUsersPoolFromPostTaggedUsers(post,client):
     list = getPostTaggedPeople(post)
+    newusers={}
     for usertag in list:
         usersh=convertUsertagToUser(usertag)
-        user = convertUserShortToUser(usersh, client)
+        user = getUserInfoByUsername((convertUserShortToUser(usersh, client).username),client)
         if isProfilePrivate(user) == False:
-            followUser(user.pk)
+            if isAlreadyTracked(user) == False:
+                newusers = trackUser(user, client, newusers)
+    if newusers:
+        writeNewUsersToJSONFile(newusers)
+
 
 
 def extendFollowingUsersPoolFromTaggedPostsSection(userid, client):
     list = getProfileTaggedPosts(userid, client)
+    newusers={}
     for media in list:
-        user=media.user
-        if isProfilePrivate(user) == False:
-            followUser(user.pk)
+        user=getUserInfoByUsername(getUsernameFromID(userid,client),client)
+        if isAlreadyTracked(user) == False:
+            if isProfilePrivate(user) == False:
+                    newusers = trackUser(user, client, newusers)
+    if newusers:
+        writeNewUsersToJSONFile(newusers)
+    
 
 
 def extendUsersFollowingPool(post, userid, client):
-    extendFollowingUsersPoolFromPostTaggedUsers(post)
-    extendFollowingUsersPoolFromTaggedPostsSection(userid)
-    extendFollowingUsersPoolFromSuggested(userid)
+    #extendFollowingUsersPoolFromPostTaggedUsers(post, client)
+    extendFollowingUsersPoolFromTaggedPostsSection(userid, client)
+    #extendFollowingUsersPoolFromSuggested(userid, client)
     
 
 
@@ -139,17 +182,17 @@ def crawlRestaurantsFromProfilePosts(userid, client):
     newrestaurants = []
     for post in postlist:
         if getPostTaggedPeople(post) != None:
-            extendFollowingUsersPoolFromPostTaggedUsers(post)
+            extendUsersFollowingPool(post, userid, client)
 
-        if hasTaggedLocation(post):
-            detailedLocationInfo = getDetailedMediaLocationInfo(post, client)
-            print(detailedLocationInfo.category)
-            if detailedLocationInfo.category in restaurant_tags:
-                newrestaurants.append(detailedLocationInfo.dict())
+#        if hasTaggedLocation(post):
+#            detailedLocationInfo = getDetailedMediaLocationInfo(post, client)
+#            print(detailedLocationInfo.category)
+#            if detailedLocationInfo.category in restaurant_tags:
+#                newrestaurants.append(detailedLocationInfo.dict())
 
     #print(newrestaurants)
-    writeCrawledDataToJson(newrestaurants)
-    return newrestaurants
+#    writeCrawledDataToJson(newrestaurants)
+#    return newrestaurants
 
 
 #########################
@@ -161,7 +204,7 @@ def crawlRestaurantsFromProfilePosts(userid, client):
 def main():
     client = createLoggedInClient()
     #followedUsers = getUserFollowing(getUserIDfromUsername("foxybyte.swe", client), client)
-    usertest = getUserIDfromUsername("alsaiso", client)
+    usertest = getUserIDfromUsername("marcouderzo", client)
     crawlRestaurantsFromProfilePosts(usertest, client)
 
 
