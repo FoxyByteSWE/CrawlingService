@@ -7,8 +7,8 @@ import pprint
 def createLoggedInClient():
 	client = Client()
 	client.login("foxybyte.swe", "Swe_2022")
-	#client.dump_settings((str(sys.path[0]))+"data/settingsdump.json")
-	client.load_settingsi((str(sys.path[0]))+"/data/settingsdump.json")
+	#client.dump_settings((str(sys.path[0]))+"/data/settingsdump.json")
+	#client.load_settings((str(sys.path[0]))+"/data/settingsdump.json")
 	return client
 
 def getAllCrawlableLocationsFromSomewhere():
@@ -92,11 +92,11 @@ def formatMediaToDictionaryItem(media): #need to serialize casting to primitive 
 	formattedDictionaryMedia = {}
 	formattedDictionaryMedia["MediaType"] = getMediaType(media)
 	formattedDictionaryMedia["TakenAtTime"] = parseTakenAtTime(getMediaTime(media))
-	formattedDictionaryMedia["TakenAtLocation"] = parseTakenAtLocation(getMediaLocationName(media).dict())
+	formattedDictionaryMedia["TakenAtLocation"] = parseTakenAtLocation(media)
 	#formattedDictionaryMedia["TakenAtLocation"] = getMediaLocationName(media).dict()
 	formattedDictionaryMedia["LikeCount"] = getMediaLikeCount(media)
-	formattedDictionaryMedia["CaptionText"]=getCaptionText(media)
-	formattedDictionaryMedia["MediaURL"] = getMediaURL(media)
+	formattedDictionaryMedia["CaptionText"] = getCaptionText(media)
+	formattedDictionaryMedia["MediaURL"] = parseMediaUrl(getMediaURL(media))
 	pprint.pprint(formattedDictionaryMedia)
 	return formattedDictionaryMedia
 
@@ -116,19 +116,24 @@ def parseTakenAtTime(input):
 	time.append(input.second)
 	return time
 
-def parseTakenAtLocation(input):
+def parseTakenAtLocation(media):
+	input = getMediaLocationName(media).dict()
 	dict = {}
-	dict["pk"] = input["TakenAtLocation"].pk
-	dict["name"] = input["TakenAtLocation"].name
-	dict["address"] = input["TakenAtLocation"].address
-	dict["coordinates"] = [input["TakenAtLocation"].lng, input["TakenAtLocation"].lat]
-	dict["category"] = input["TakenAtLocation"].category
-	dict["phone"] = input["TakenAtLocation"].phone
-	dict["website"] = input["TakenAtLocation"].website
+	dict["pk"] = input["pk"]
+	dict["name"] = input["name"]
+	dict["address"] = input["address"]
+	dict["coordinates"] = [input["lng"], input["lat"]]
+	dict["category"] = input["category"]
+	dict["phone"] = input["phone"]
+	dict["website"] = input["website"]
 	return dict;
 
-def parseTakenAtLocation(input):
-	url = input["MediaUrl"].HttpUrl
+def parseMediaUrl(input):
+	url = str(input)
+	start = url.find("'") + 1
+	url = url[start:]
+	end = url.find("'")
+	url = url[:end]
 	return url;
 
 def main():
