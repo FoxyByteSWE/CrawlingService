@@ -4,12 +4,12 @@ import instagrapi
 from typing import Dict
 import pprint
 
-proxy = 'http://96.9.71.18:33427'
+#proxy = 'http://96.9.71.18:33427'
 
-os.environ['http_proxy'] = proxy 
-os.environ['HTTP_PROXY'] = proxy
-os.environ['https_proxy'] = proxy
-os.environ['HTTPS_PROXY'] = proxy
+#os.environ['http_proxy'] = proxy 
+#os.environ['HTTP_PROXY'] = proxy
+#os.environ['https_proxy'] = proxy
+#os.environ['HTTPS_PROXY'] = proxy
 
 def createLoggedInClient():
 	client = Client()

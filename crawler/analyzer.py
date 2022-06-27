@@ -3,9 +3,8 @@ import logging
 import boto3
 from botocore.exceptions import ClientError
 
-def analyzeText():
+def analyzeText(text):
 	client = boto3.client('comprehend')
-	text = "Molto bello!"
 	response = client.detect_sentiment(
 		Text = text,
 		LanguageCode = 'it'
@@ -23,7 +22,7 @@ def parseResponse(response):
 	return dict
 
 def main():
-	analyzeText()
+	analyzeText("Molto bello!")
 
 if __name__ == "__main__":
 	main()
