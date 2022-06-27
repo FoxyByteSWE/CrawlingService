@@ -18,10 +18,15 @@ def createLoggedInClient():
 	#client.load_settings((str(sys.path[0]))+"/data/settingsdump.json")
 	return client
 
-def getAllCrawlableLocationsFromSomewhere():
-	txt_file = open((str(sys.path[0]))+"/data/locations.txt", "r")
-	content_list = txt_file.readlines()
-	return content_list
+def getAllCrawlableLocationsFromJSON():
+	filepath = (str(sys.path[0]))+"/data/locations.json"
+	with open(filepath) as locations:
+		try:
+			data = json.load(locations)
+			return data
+		except Exception as e:
+			print("Error Loading JSON. Probably Empty File.")
+			return False
 
 def getTopMediasFromLocation(locationName, client):
 	pkCode = getLocationPkCodeFromName(locationName, client)
@@ -42,14 +47,16 @@ def writeCrawledDataToJson(locationsData):
 # la politica di ordinamento per le location può essere una coda con priorità in base
 # all'ultima volta che una certa location è stata analizzata
 
-def crawlAllLocations(locationNamesList, client, nPostsWanted):
+def crawlAllLocations(locationsDict, client, nPostsWanted):
 	locationsData = { }
-	for loc in locationNamesList:
-		mediasDump = getTopMediasFromLocation(loc, client) #returns a list of "Medias"
+	for loc in locationsDict.values():
+		print("loc is type: " + str(type(loc)))
+		mediasDump = getTopMediasFromLocation(loc["name"], client) #returns a list of "Medias"
 		formattedMediasFromLocation = []
-		for media in mediasDump[0:nPostsWanted]:
+		for media in mediasDump[0:nPostsWanted-1]:
 			formattedMediasFromLocation.append(formatMediaToDictionaryItem(media,client)) 
-		locationsData[loc] = formattedMediasFromLocation
+		locationsData[loc["pk"]]["name"] = loc["name"]
+		locationsData[loc["pk"]]["posts"] = formattedMediasFromLocation
 	return locationsData
 
 
@@ -59,9 +66,9 @@ def crawlAllLocations(locationNamesList, client, nPostsWanted):
 
 def beginCrawling():
 	client = createLoggedInClient()
-	locationNamesList = getAllCrawlableLocationsFromSomewhere()
-	nPostsWanted = 2 # only get N+1 top posts from each location
-	locationsData = crawlAllLocations(locationNamesList, client, nPostsWanted)
+	locationsDict = getAllCrawlableLocationsFromJSON()
+	nPostsWanted = 2 # only get N top posts from each location
+	locationsData = crawlAllLocations(locationsDict, client, nPostsWanted)
 	writeCrawledDataToJson(locationsData)
 
 ###########	
@@ -102,9 +109,14 @@ def getMediaURL(media):
 				list.append(item.video_url)
 		return list
 
+def getPostPartialURL(media):
+	return media.code
+
+
 
 def formatMediaToDictionaryItem(media,client): #need to serialize casting to primitive data types
 	formattedDictionaryMedia = {}
+	formattedDictionaryMedia["PostPartialURL"] = getPostPartialURL(media)
 	formattedDictionaryMedia["MediaType"] = getMediaType(media)
 	formattedDictionaryMedia["TakenAtTime"] = parseTakenAtTime(getMediaTime(media))
 	formattedDictionaryMedia["TakenAtLocation"] = parseTakenAtLocation(media,client) #extra step necessary.
@@ -114,6 +126,27 @@ def formatMediaToDictionaryItem(media,client): #need to serialize casting to pri
 	pprint.pprint(formattedDictionaryMedia)
 	return formattedDictionaryMedia
 
+
+def readLocationsDataFromJSON():
+	filepath = (str(sys.path[0]))+"/data/locationsData.json"
+	with open(filepath) as locationsData:
+		try:
+			data = json.load(locationsData)
+			return data
+		except Exception as e:
+			print("Error Loading JSON. Probably Empty File.")
+			return False
+
+def buildComprehendLocationDictionary(locationpk):
+	locationsData = readLocationsDataFromJSON()
+
+	comprehendDict = {}
+	location = locationsData.get(locationpk)
+
+	for post in location.get("posts"):
+		comprehendDict[post["pk"]] = post["data"]["CaptionText"]
+	pprint.pprint(comprehendDict)
+	return comprehendDict
 
 	
 def getDetailedMediaLocationInfo(media, client):  # this works and retrieves all category and other data
@@ -155,6 +188,9 @@ def parseMediaUrl(input):
 	url = url[:end]
 	return url;
 
+
+
+
 def main():
 	beginCrawling()
 
@@ -162,10 +198,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-
-
-#	{'Lunaelaltro\n': [{'MediaType': 1, 
-#						'TakenAtTime': datetime.datetime(2016, 4, 15, 18, 19, 44, tzinfo=datetime.timezone.utc), 
-#						'TakenAtLocationName': Location(pk=3110887, name='Ristorante Pizzeria Lunaelaltro - Marostica', phone='', website='', category='', hours={}, address=None, city=None, zip=None, lng=11.660707634193, lat=45.736862428411, external_id=77610911328, external_id_source='facebook_places'), ù
-#						'LikeCount': 1, 
-#						'MediaURL': HttpUrl('https://scontent-mxp2-1.cdninstagram.com/v/t51.2885-15/11249882_966261376755731_963030927_n.jpg?se=8&stp=dst-jpg_e35&_nc_ht=scontent-mxp2-1.cdninstagram.com&_nc_cat=111&_nc_ohc=QeSTLR-83PoAX_ePcKi&edm=AKmAybEBAAAA&ccb=7-5&ig_cache_key=MTIyOTEzNTQ0NTAwMDU1ODY0Mg%3D%3D.2-ccb7-5&oh=00_AT90D8dLILH9q4LplVIJVV_F2eb_-rVfShWK7vi8fUZIBg&oe=62BA0E7D&_nc_sid=bcb968', scheme='https', host='scontent-mxp2-1.cdninstagram.com', tld='com', host_type='domain', port='443', path='/v/t51.2885-15/11249882_966261376755731_963030927_n.jpg', query='se=8&stp=dst-jpg_e35&_nc_ht=scontent-mxp2-1.cdninstagram.com&_nc_cat=111&_nc_ohc=QeSTLR-83PoAX_ePcKi&edm=AKmAybEBAAAA&ccb=7-5&ig_cache_key=MTIyOTEzNTQ0NTAwMDU1ODY0Mg%3D%3D.2-ccb7-5&oh=00_AT90D8dLILH9q4LplVIJVV_F2eb_-rVfShWK7vi8fUZIBg&oe=62BA0E7D&_nc_sid=bcb968')}

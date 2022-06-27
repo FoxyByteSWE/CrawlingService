@@ -121,7 +121,18 @@ def getTrackedUsersFromJSON():
             return data
         except Exception as e:
             print("Error Loading JSON. Probably Empty File.")
-            return False
+            return None
+
+
+def getTrackedLocationsFromJSON():
+    filepath = (str(sys.path[0]))+"/data/locations.json"
+    with open(filepath) as locationsFile:
+        try:
+            data = json.load(locationsFile)
+            return data
+        except Exception as e:
+            print("Error Loading JSON. Probably Empty File.")
+            return None
 
 ################
 
@@ -168,8 +179,9 @@ def extendFollowingUsersPoolFromTaggedPostsSection(userid, client, limit):
 
 def extendUsersFollowingPool(post, userid, client, limit):
     #extendFollowingUsersPoolFromPostTaggedUsers(post, client, limit)
-    extendFollowingUsersPoolFromTaggedPostsSection(userid, client, limit)
+    #extendFollowingUsersPoolFromTaggedPostsSection(userid, client, limit)
     #extendFollowingUsersPoolFromSuggested(userid, client, limit)
+    pass
     
 
 
@@ -180,6 +192,25 @@ def writeCrawledDataToJson(locationsData):
 	jsondump= json.dumps(locationsData)
 	with open((str(sys.path[0]))+"/data/locations.json", "a") as outfile:
 		outfile.write(jsondump)
+
+
+
+def createLocation(input, coordinates):
+    dict = {}
+    
+    dict["pk"] = input["pk"]
+    dict["name"] = input["name"]
+    dict["address"] = input["address"]
+    dict["coordinates"] = [coordinates["lng"], coordinates["lat"]]
+    dict["category"] = input["category"]
+    dict["phone"] = input["phone"]
+    dict["website"] = input["website"]
+    return dict;
+
+def getMediaLocationCoordinates(media):
+    coordinates = {'lng': (media.location).lng , 
+                    'lat': (media.location).lat }
+    return coordinates
 
 
 #####################
@@ -193,21 +224,26 @@ def crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPosts
                            'Sandwich', 'Ice Cream', 'Steakhouse']
 
     postlist = getUserPosts(userid, client)
-    newrestaurants = []
+    newrestaurants = {}
     for post in postlist[0:nPostsAllowed]:
         if allowExtendUserBase and getPostTaggedPeople(post) != None:
             extendUsersFollowingPool(post, userid, client, 2)
 
         if hasTaggedLocation(post):
             detailedLocationInfo = getDetailedMediaLocationInfo(post, client)
-            print(detailedLocationInfo.category)
-            if detailedLocationInfo.category in restaurant_tags:
-                newrestaurants.append(detailedLocationInfo.dict())
+            if detailedLocationInfo.category in restaurant_tags and isLocationTracked(detailedLocationInfo)==False:
+                coordinates = getMediaLocationCoordinates(post)
+                newrestaurants[detailedLocationInfo.pk]= createLocation(detailedLocationInfo.dict(), coordinates)
 
-    #print(newrestaurants)
     writeCrawledDataToJson(newrestaurants)
     return newrestaurants
 
+def isLocationTracked(location):
+    data = getTrackedLocationsFromJSON()
+    if location.pk in data:
+        return True
+    else:
+        return False
 
 #########################
 
@@ -219,10 +255,12 @@ def main():
     #trackedUsers = getTrackedUsersFromJSON()
     #print(trackedUsers)
     allowExtendUserBase = True
-    nPostsAllowed = 7
+    nPostsAllowed = 1
 
     client = createLoggedInClient()
-    userid = getUserIDfromUsername("marcouderzo", client)
+    #writeNewUsersToJSONFile(getUserInfoByUsername("marcouderzo", client).dict())
+
+    userid = getUserIDfromUsername("alsaiso", client)
     crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPostsAllowed)
     
 #    trackedUsers = getTrackedUsersFromJSON()    
