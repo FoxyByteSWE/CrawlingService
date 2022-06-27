@@ -3,6 +3,8 @@ import logging
 import boto3
 from botocore.exceptions import ClientError
 
+BUCKET_NAME = "foxybyteswe"
+
 def listBuckets():
 	s3 = boto3.client('s3')
 	response = s3.list_buckets()
@@ -10,6 +12,11 @@ def listBuckets():
 	print('Existing buckets:')
 	for bucket in response['Buckets']:
 		print(f'  {bucket["Name"]}')
+
+def listBucketObjetcs(bucket):
+	s3 = boto3.client('s3')
+	for key in s3.list_objects(Bucket=bucket)['Contents']:
+		print(key['Key'])
 
 def uploadFile(file_name, bucket, object_name=None):
 	# If S3 object_name was not specified, use file_name
@@ -29,11 +36,19 @@ def downloadFile(bucket, object_name, file_name):
 	s3 = boto3.client('s3')
 	s3.download_file(bucket, object_name, file_name)
 
+def deleteFile(bucket, file_name):
+	s3_client = boto3.client('s3')
+	response = s3_client.delete_object(
+		Bucket = bucket,
+		Key = file_name
+	)
 
 def main():
 	listBuckets()
-	#uploadFile((str(sys.path[0]))+"/data/locationsData.json", "foxybyteswe")
-	downloadFile("foxybyteswe", "locationsData.json", (str(sys.path[0]))+"/data/Downloaded_locationsData.json")
+	listBucketObjetcs(BUCKET_NAME)
+	#uploadFile((str(sys.path[0]))+"/data/locationsData.json", BUCKET_NAME)
+	#downloadFile(BUCKET_NAME, "locationsData.json", (str(sys.path[0]))+"/data/Downloaded_locationsData.json")
+	#deleteFile(BUCKET_NAME, "locationsData.json")
 
 if __name__ == "__main__":
 	main()

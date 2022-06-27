@@ -3,12 +3,12 @@ from instagrapi import Client
 import instagrapi
 from typing import Dict
 
-proxy = 'http://46.105.142.10:7497'
+#proxy = 'http://46.105.142.10:7497'
 
-os.environ['http_proxy'] = proxy 
-os.environ['HTTP_PROXY'] = proxy
-os.environ['https_proxy'] = proxy
-os.environ['HTTPS_PROXY'] = proxy
+#os.environ['http_proxy'] = proxy 
+#os.environ['HTTP_PROXY'] = proxy
+#os.environ['https_proxy'] = proxy
+#os.environ['HTTPS_PROXY'] = proxy
 
 
 def createLoggedInClient():  #TODO: handle login_required exception
