@@ -3,9 +3,6 @@ import logging
 import boto3
 from botocore.exceptions import ClientError
 
-KEY_ID = "AKIARMTOPHZNJLHKG34W"
-ACCESS_KEY = "InRFYCONYUELaWnhdkoh9lP9ybM63Fef0r50vjBt"
-
 def listBuckets():
 	s3 = boto3.client('s3')
 	response = s3.list_buckets()
