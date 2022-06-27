@@ -25,7 +25,7 @@ def getAllCrawlableLocationsFromJSON():
 			data = json.load(locations)
 			return data
 		except Exception as e:
-			print("Error Loading JSON. Probably Empty File.")
+			print(e)
 			return False
 
 def getTopMediasFromLocation(locationName, client):
@@ -50,13 +50,13 @@ def writeCrawledDataToJson(locationsData):
 def crawlAllLocations(locationsDict, client, nPostsWanted):
 	locationsData = { }
 	for loc in locationsDict.values():
-		print("loc is type: " + str(type(loc)))
 		mediasDump = getTopMediasFromLocation(loc["name"], client) #returns a list of "Medias"
 		formattedMediasFromLocation = []
 		for media in mediasDump[0:nPostsWanted-1]:
 			formattedMediasFromLocation.append(formatMediaToDictionaryItem(media,client)) 
-		locationsData[loc["pk"]]["name"] = loc["name"]
-		locationsData[loc["pk"]]["posts"] = formattedMediasFromLocation
+		locationPk = loc["pk"]
+		#print(locationPk)
+		locationsData[locationPk] = formattedMediasFromLocation
 	return locationsData
 
 
@@ -123,7 +123,7 @@ def formatMediaToDictionaryItem(media,client): #need to serialize casting to pri
 	formattedDictionaryMedia["LikeCount"] = getMediaLikeCount(media)
 	formattedDictionaryMedia["CaptionText"] = getCaptionText(media)
 	formattedDictionaryMedia["MediaURL"] = parseMediaUrl(getMediaURL(media))
-	pprint.pprint(formattedDictionaryMedia)
+	#pprint.pprint(formattedDictionaryMedia)
 	return formattedDictionaryMedia
 
 
@@ -134,17 +134,17 @@ def readLocationsDataFromJSON():
 			data = json.load(locationsData)
 			return data
 		except Exception as e:
-			print("Error Loading JSON. Probably Empty File.")
-			return False
+			print(e)
+			return None
 
 def buildComprehendLocationDictionary(locationpk):
 	locationsData = readLocationsDataFromJSON()
 
 	comprehendDict = {}
-	location = locationsData.get(locationpk)
+	location = locationsData[locationpk]
 
-	for post in location.get("posts"):
-		comprehendDict[post["pk"]] = post["data"]["CaptionText"]
+	for post in location:
+		comprehendDict[post["PostPartialURL"]] = post["CaptionText"]
 	pprint.pprint(comprehendDict)
 	return comprehendDict
 
@@ -192,7 +192,8 @@ def parseMediaUrl(input):
 
 
 def main():
-	beginCrawling()
+	buildComprehendLocationDictionary("4706333")
+	#beginCrawling()
 
 ################################################################
 
