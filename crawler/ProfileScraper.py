@@ -20,17 +20,23 @@ def createLoggedInClient():  #TODO: handle login_required exception
     return client
 
 
+#######################################
+
+# OTHER
+
 def resetLoginSettings():
     pass
 
-def trackUser(user, client):
-    #=(client.user_info(user.pk)).username
-    #username = client.user_info_by_username_v1(username).pk
-    username = user.username
-    usersfromjson = getTrackedUsersFromJSON()
-    print("tracking user: "+ username)
-    usersfromjson[username]=user.dict()
-    writeNewUsersToJSONFile(usersfromjson)
+
+def getNowTime():
+    return time.time()
+
+def updateLastLocationCheckTime(locationpk):
+    pass
+
+######################################
+
+# USER GETTERS
 
 def getUsernameFromID(userid, client):
     print("getUsernameFromID")
@@ -41,14 +47,50 @@ def getUserIDfromUsername(username, client):
     return getUserInfoByUsername(username, client).pk
     #return client.user_id_from_username(username)
 
+def getUserInfoByUsername(username, client):
+    print("getUserInfoByUsername")
+    return client.user_info_by_username_v1(username)
+
 def getUserFollowing(userid, client):
     return client.user_following(userid)
 
-def enablePostNotifications(userid, client): #scrape profile if new posts are posted.
-    return client.enable_posts_notifications(userid)
-
 def getUserPosts(userid, client):
     return client.user_medias_v1(userid)
+
+def getSuggestedUsersFromFBSearch(userid, client):
+    return client.fbsearch_suggested_profiles(userid)
+
+def isProfilePrivate(user):
+    return user.is_private
+
+def getPostTaggedPeople(post):
+    return post.usertags
+
+def getUserIDofTagged(userid, client):
+    return client.usertag_medias(userid)
+
+def getProfileTaggedPosts(userid, client):
+    return client.usertag_medias(userid)
+
+
+###########################################
+
+ # USER CONVERTERS
+
+def convertUsertagToUser(usertag):
+    return usertag.user
+
+def convertUserShortToUser(usershort,client):
+    print("convertUserShortToUser")
+    return client.user_info_by_username(usershort.username)
+
+def convertUserShortToUserv2(usershort,client):
+    print("convertUserShortToUserv2")
+    return client.user_info_by_username_v1(usershort["username"])
+
+########################################
+
+# LOCATION GETTERS
 
 def getLocationFromPost(media):
     return media.location
@@ -56,30 +98,8 @@ def getLocationFromPost(media):
 def getLocationPkCode(location):
     return location.pk
 
-def classifyLocationType(location):  #reimplement with new location tags
-    if location.category == "Restaurant":
-        return 1
-    else:
-        return -1
-
 def hasTaggedLocation(post):
-    return post.location != None
-
-def getProfileTaggedPosts(userid, client):
-    return client.usertag_medias(userid)
-
-
-def getPostTaggedPeople(post):
-    return post.usertags
-
-def convertUsertagToUser(usertag):
-    return usertag.user
-
-def getUserIDofTagged(userid, client):
-    return client.usertag_medias(userid)
-
-def getPostPKCode(post, client):
-    return post.pk
+    return post.location != None   # TODO: Da Testare per il != None
 
 def getDetailedMediaLocationInfo(post, client):  # this works and retrieves all category and other data
     mediainfo = client.media_info_v1(post.pk)
@@ -88,41 +108,76 @@ def getDetailedMediaLocationInfo(post, client):  # this works and retrieves all 
     else:
         return None
 
-def getSuggestedUsersFromFBSearch(userid, client):
-    return client.fbsearch_suggested_profiles(userid)
+
+################################
+
+# LOCATION TRACKING
+
+def getTrackedLocationsFromJSON():
+    filepath = (str(sys.path[0]))+"/data/locations.json"
+    with open(filepath) as locationsFile:
+        try:
+            data = json.load(locationsFile)
+            return data
+        except Exception as e:
+            print(e)
+            return None
 
 
-def convertUserShortToUser(usershort,client):
-    print("convertUserShortToUser")
-    return client.user_info_by_username(usershort.username)
+def writeLocationsToJSON(locations): 
+	jsondump= json.dumps(locations)
+	with open((str(sys.path[0]))+"/data/locations.json", "w") as outfile:
+		outfile.write(jsondump)
 
 
-def getUserInfoByUsername(username, client):
-    print("getUserInfoByUsername")
-    return client.user_info_by_username_v1(username)
+def trackLocation(locationdict):
+    locationsFromJSON = getTrackedLocationsFromJSON()
+    print("tracking location: "+ locationdict["name"])
+    locationsFromJSON[locationdict["pk"]]=locationdict
+    writeNewUsersToJSONFile(locationsFromJSON)
 
-def convertUserShortToUserv2(usershort,client):
-    print("convertUserShortToUserv2")
-    return client.user_info_by_username_v1(usershort["username"])
 
-def isProfilePrivate(user):
-    return user.is_private
 
+def isLocationTracked(location):
+    data = getTrackedLocationsFromJSON()
+    if location.pk in data:
+        return True
+    else:
+        return False
+
+##########################################
+
+# LOCATION
+
+def createLocation(input, coordinates):
+    dict = {}
+    #dict["LastChecked"]=getNowTime()
+    dict["pk"] = input["pk"]
+    dict["name"] = input["name"]
+    dict["address"] = input["address"]
+    dict["coordinates"] = [coordinates["lng"], coordinates["lat"]]
+    dict["category"] = input["category"]
+    dict["phone"] = input["phone"]
+    dict["website"] = input["website"]
+    return dict;
+
+def getMediaLocationCoordinates(media):
+    coordinates = {'lng': (media.location).lng , 
+                    'lat': (media.location).lat }
+    return coordinates
+
+
+
+
+###########################################
+
+# USER TRACKING
 
 def writeNewUsersToJSONFile(newusers):
     jsondump= json.dumps(newusers)
     with open((str(sys.path[0]))+"/data/trackedUsers.json", "w") as outfile:
 	    outfile.write(jsondump)
 
-
-
-def isAlreadyTracked(user): #check if database or file already contains this user
-    data = getTrackedUsersFromJSON()
-    #print(data)
-    if user.username in data:
-        return True
-    else:
-        return False
 
 def getTrackedUsersFromJSON():
     filepath = (str(sys.path[0]))+"/data/trackedUsers.json"
@@ -135,15 +190,27 @@ def getTrackedUsersFromJSON():
             return None
 
 
-def getTrackedLocationsFromJSON():
-    filepath = (str(sys.path[0]))+"/data/locations.json"
-    with open(filepath) as locationsFile:
-        try:
-            data = json.load(locationsFile)
-            return data
-        except Exception as e:
-            print(e)
-            return None
+
+def isAlreadyTracked(user): #check if database or file already contains this user
+    data = getTrackedUsersFromJSON()
+    #print(data)
+    if user.username in data:
+        return True
+    else:
+        return False
+
+
+def trackUser(user, client):
+    #=(client.user_info(user.pk)).username
+    #username = client.user_info_by_username_v1(username).pk
+    username = user.username
+    usersfromjson = getTrackedUsersFromJSON()
+    print("tracking user: "+ username)
+    usersfromjson[username]=user.dict()
+    writeNewUsersToJSONFile(usersfromjson)
+
+
+
 
 
 
@@ -180,43 +247,6 @@ def extendFollowingUsersPoolFromTaggedPostsSection(userid, client, limit):
                     trackUser(user, client)
 
 
-def writeLocationsToJSON(locations): 
-	jsondump= json.dumps(locations)
-	with open((str(sys.path[0]))+"/data/locations.json", "w") as outfile:
-		outfile.write(jsondump)
-
-
-def trackLocation(locationdict):
-    locationsFromJSON = getTrackedLocationsFromJSON()
-    print("tracking location: "+ locationdict["name"])
-    locationsFromJSON[locationdict["pk"]]=locationdict
-    writeNewUsersToJSONFile(locationsFromJSON)
-
-
-
-def getNowTime():
-    return time.time()
-
-def updateLastLocationCheckTime(locationpk):
-    pass
-
-def createLocation(input, coordinates):
-    dict = {}
-    #dict["LastChecked"]=getNowTime()
-    dict["pk"] = input["pk"]
-    dict["name"] = input["name"]
-    dict["address"] = input["address"]
-    dict["coordinates"] = [coordinates["lng"], coordinates["lat"]]
-    dict["category"] = input["category"]
-    dict["phone"] = input["phone"]
-    dict["website"] = input["website"]
-    return dict;
-
-def getMediaLocationCoordinates(media):
-    coordinates = {'lng': (media.location).lng , 
-                    'lat': (media.location).lat }
-    return coordinates
-
 
 #####################
 
@@ -245,12 +275,6 @@ def crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPosts
 
 
 
-def isLocationTracked(location):
-    data = getTrackedLocationsFromJSON()
-    if location.pk in data:
-        return True
-    else:
-        return False
 
 #########################
 
