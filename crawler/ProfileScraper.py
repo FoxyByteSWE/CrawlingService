@@ -137,12 +137,18 @@ def getTrackedLocationsFromJSON():
             print(e)
             return None
 
+
+
 ################
 
 # EXTEND USERS POOL
 
 def extendFollowingUsersPoolFromSuggested(userid, client, limit):
     list = getSuggestedUsersFromFBSearch(userid, client)
+    print(len(list))
+    L = list[0:limit]
+    print(len(L))
+    print(L)
     for usersh in list[0:limit]:
         user = getUserInfoByUsername((convertUserShortToUserv2(usersh, client).username),client)
         if isProfilePrivate(user) == False:
@@ -169,16 +175,19 @@ def extendFollowingUsersPoolFromTaggedPostsSection(userid, client, limit):
             if isProfilePrivate(user) == False:
                     trackUser(user, client)
 
-    
 
-
-
-        
-
-def writeCrawledDataToJson(locationsData): 
-	jsondump= json.dumps(locationsData)
-	with open((str(sys.path[0]))+"/data/locations.json", "a") as outfile:
+def writeLocationsToJSON(locations): 
+	jsondump= json.dumps(locations)
+	with open((str(sys.path[0]))+"/data/locations.json", "w") as outfile:
 		outfile.write(jsondump)
+
+
+def trackLocation(locationdict):
+    locationsFromJSON = getTrackedLocationsFromJSON()
+    print("tracking location: "+ locationdict["name"])
+    locationsFromJSON[locationdict["pk"]]=locationdict
+    writeNewUsersToJSONFile(locationsFromJSON)
+
 
 
 def getNowTime():
@@ -216,19 +225,19 @@ def crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPosts
                            'Sandwich', 'Ice Cream', 'Steakhouse']
 
     postlist = getUserPosts(userid, client)
-    newrestaurants = {}
-    for post in postlist[0:nPostsAllowed]:
-        if allowExtendUserBase and getPostTaggedPeople(post) != None:
-            extendFollowingUsersPoolFromPostTaggedUsers(post, client)
 
+    for post in postlist[0:nPostsAllowed]:
         if hasTaggedLocation(post):
             detailedLocationInfo = getDetailedMediaLocationInfo(post, client)
             if detailedLocationInfo.category in restaurant_tags and isLocationTracked(detailedLocationInfo)==False:
                 coordinates = getMediaLocationCoordinates(post)
-                newrestaurants[detailedLocationInfo.pk]= createLocation(detailedLocationInfo.dict(), coordinates)
+                trackLocation(createLocation(detailedLocationInfo.dict(), coordinates))
+        
+        if allowExtendUserBase and getPostTaggedPeople(post) != None:
+            print("Now extending User Base")
+            extendFollowingUsersPoolFromPostTaggedUsers(post, client)
 
-    writeCrawledDataToJson(newrestaurants)
-    return newrestaurants
+
 
 def isLocationTracked(location):
     data = getTrackedLocationsFromJSON()
@@ -254,9 +263,12 @@ def main():
     for user in trackedUsers:
         print(user)
         userid = getUserIDfromUsername(user, client)
-        extendFollowingUsersPoolFromTaggedPostsSection(userid, client, 4)
-        #extendFollowingUsersPoolFromSuggested(userid, client, 4)
-        #crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPostsAllowed)
+        crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPostsAllowed)
+        if allowExtendUserBase:
+            print("Now extending User Base")
+            extendFollowingUsersPoolFromTaggedPostsSection(userid, client, 4)
+            extendFollowingUsersPoolFromSuggested(userid, client, 4)
+        
 
 
 
