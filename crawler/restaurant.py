@@ -1,11 +1,26 @@
 import json
 import sys
+import datetime
 from pprint import pprint
-
+	
 class Restaurant:
 	def __init__(self, pk = 0, medias = []):
 		self.pk = pk
 		self.medias = medias
+
+	def isOld(self, m):
+		now = datetime.datetime.now()
+		post_taken_at = datetime.datetime(m.TakenAtTime[0], m.TakenAtTime[1], m.TakenAtTime[2], m.TakenAtTime[3], m.TakenAtTime[4], m.TakenAtTime[5])
+		age = (now - post_taken_at).days
+		if age > 720:
+			return True
+		else:
+			return False
+	
+	def removeOldMedias(self):
+		self.medias = [m for m in self.medias if not self.isOld(m)]
+		
+				
 
 class Media:
 	def __init__(self, PostPartialURL = "", MediaType = 1, TakenAtTime = [], TakenAtLocation = {}, LikeCount = 0, CaptionText = "", MediaURL = ""):
@@ -48,6 +63,10 @@ def Restaurants2json(restaurants, file):
 	f.write(out)
 	f.close()
 
+def removeOldMedias(restaurants):
+	for r in restaurants:
+		r.removeOldMedias()
+
 def main():
 	restaurants = json2Restaurants((str(sys.path[0]))+"/data/locationsData.json")
 	for r in restaurants:
@@ -55,6 +74,11 @@ def main():
 		for m in r.medias:
 			pprint(vars(m))
 	Restaurants2json(restaurants, "test.json")
+	removeOldMedias(restaurants)
+	for r in restaurants:
+		print(r.pk)
+		for m in r.medias:
+			pprint(vars(m))
 
 if __name__ == "__main__":
 	main()
