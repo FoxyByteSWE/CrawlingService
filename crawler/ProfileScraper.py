@@ -1,4 +1,5 @@
-import os, json, sys
+import os, json, sys, time
+from pprint import pprint
 from instagrapi import Client
 import instagrapi
 from typing import Dict
@@ -22,11 +23,12 @@ def createLoggedInClient():  #TODO: handle login_required exception
 def resetLoginSettings():
     pass
 
-def trackUser(user, client,newusers):
+def trackUser(user, client):
     username=(client.user_info(user.pk)).username
+    usersfromjson = getTrackedUsersFromJSON()
     print("tracking user: "+ username)
-    newusers[username]=user.dict()
-    return newusers
+    usersfromjson[username]=user.dict()
+    writeNewUsersToJSONFile(usersfromjson)
 
 def getUsernameFromID(userid, client):
     return client.username_from_user_id(userid)
@@ -101,13 +103,14 @@ def isProfilePrivate(user):
 
 def writeNewUsersToJSONFile(newusers):
     jsondump= json.dumps(newusers)
-    with open((str(sys.path[0]))+"/data/trackedUsers.json", "a") as outfile:
+    with open((str(sys.path[0]))+"/data/trackedUsers.json", "w") as outfile:
 	    outfile.write(jsondump)
 
 
 
 def isAlreadyTracked(user): #check if database or file already contains this user
     data = getTrackedUsersFromJSON()
+    #print(data)
     if user.username in data:
         return True
     else:
@@ -120,7 +123,7 @@ def getTrackedUsersFromJSON():
             data = json.load(usersFile)
             return data
         except Exception as e:
-            print("Error Loading JSON. Probably Empty File.")
+            print(e)
             return None
 
 
@@ -131,7 +134,7 @@ def getTrackedLocationsFromJSON():
             data = json.load(locationsFile)
             return data
         except Exception as e:
-            print("Error Loading JSON. Probably Empty File.")
+            print(e)
             return None
 
 ################
@@ -140,48 +143,32 @@ def getTrackedLocationsFromJSON():
 
 def extendFollowingUsersPoolFromSuggested(userid, client, limit):
     list = getSuggestedUsersFromFBSearch(userid, client)
-    newusers={}
     for usersh in list[0:limit]:
         user = getUserInfoByUsername((convertUserShortToUserv2(usersh, client).username),client)
         if isProfilePrivate(user) == False:
             if isAlreadyTracked(user) == False:
-                newusers = trackUser(user, client, newusers)
-    if newusers:
-        writeNewUsersToJSONFile(newusers)
+                trackUser(user, client)
 
 
-def extendFollowingUsersPoolFromPostTaggedUsers(post,client, limit):
+def extendFollowingUsersPoolFromPostTaggedUsers(post,client):
     list = getPostTaggedPeople(post)
-    newusers={}
     for usertag in list:
         usersh=convertUsertagToUser(usertag)
         user = getUserInfoByUsername((convertUserShortToUser(usersh, client).username),client)
         if isProfilePrivate(user) == False:
             if isAlreadyTracked(user) == False:
-                newusers = trackUser(user, client, newusers)
-    if newusers:
-        writeNewUsersToJSONFile(newusers)
+                trackUser(user, client)
 
 
 
 def extendFollowingUsersPoolFromTaggedPostsSection(userid, client, limit):
     list = getProfileTaggedPosts(userid, client)
-    newusers={}
-    for media in list:
+    for media in list[0:limit]:
         user=getUserInfoByUsername(getUsernameFromID(userid,client),client)
         if isAlreadyTracked(user) == False:
             if isProfilePrivate(user) == False:
-                    newusers = trackUser(user, client, newusers)
-    if newusers:
-        writeNewUsersToJSONFile(newusers)
-    
+                    trackUser(user, client)
 
-
-def extendUsersFollowingPool(post, userid, client, limit):
-    #extendFollowingUsersPoolFromPostTaggedUsers(post, client, limit)
-    #extendFollowingUsersPoolFromTaggedPostsSection(userid, client, limit)
-    #extendFollowingUsersPoolFromSuggested(userid, client, limit)
-    pass
     
 
 
@@ -194,6 +181,11 @@ def writeCrawledDataToJson(locationsData):
 		outfile.write(jsondump)
 
 
+def getNowTime():
+    return time.time()
+
+def updateLastLocationCheckTime(locationpk):
+    pass
 
 def createLocation(input, coordinates):
     dict = {}
@@ -227,7 +219,7 @@ def crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPosts
     newrestaurants = {}
     for post in postlist[0:nPostsAllowed]:
         if allowExtendUserBase and getPostTaggedPeople(post) != None:
-            extendUsersFollowingPool(post, userid, client, 2)
+            extendFollowingUsersPoolFromPostTaggedUsers(post, client)
 
         if hasTaggedLocation(post):
             detailedLocationInfo = getDetailedMediaLocationInfo(post, client)
@@ -252,21 +244,19 @@ def isLocationTracked(location):
 #################################################################
 
 def main():
-    #trackedUsers = getTrackedUsersFromJSON()
-    #print(trackedUsers)
     allowExtendUserBase = True
-    nPostsAllowed = 1
+    nPostsAllowed = 4
 
     client = createLoggedInClient()
-    #writeNewUsersToJSONFile(getUserInfoByUsername("marcouderzo", client).dict())
+    trackedUsers = getTrackedUsersFromJSON()    
 
-    userid = getUserIDfromUsername("alsaiso", client)
-    crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPostsAllowed)
-    
-#    trackedUsers = getTrackedUsersFromJSON()    
-#        for user in trackedUsers:
-#        userid = getUserIDfromUsername("marcouderzo", client)
-#        crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPostsAllowed)
+
+    for user in trackedUsers:
+        print(user)
+        userid = getUserIDfromUsername(user, client)
+        extendFollowingUsersPoolFromTaggedPostsSection(userid, client, 4)
+        #extendFollowingUsersPoolFromSuggested(userid, client, 4)
+        #crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPostsAllowed)
 
 
 
