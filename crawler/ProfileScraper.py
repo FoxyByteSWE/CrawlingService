@@ -24,17 +24,22 @@ def resetLoginSettings():
     pass
 
 def trackUser(user, client):
-    username=(client.user_info(user.pk)).username
+    #=(client.user_info(user.pk)).username
+    #username = client.user_info_by_username_v1(username).pk
+    username = user.username
     usersfromjson = getTrackedUsersFromJSON()
     print("tracking user: "+ username)
     usersfromjson[username]=user.dict()
     writeNewUsersToJSONFile(usersfromjson)
 
 def getUsernameFromID(userid, client):
+    print("getUsernameFromID")
     return client.username_from_user_id(userid)
 
 def getUserIDfromUsername(username, client):
-    return client.user_id_from_username(username)
+    print("getUserIDfromUsername")
+    return getUserInfoByUsername(username, client).pk
+    #return client.user_id_from_username(username)
 
 def getUserFollowing(userid, client):
     return client.user_following(userid)
@@ -88,14 +93,17 @@ def getSuggestedUsersFromFBSearch(userid, client):
 
 
 def convertUserShortToUser(usershort,client):
+    print("convertUserShortToUser")
     return client.user_info_by_username(usershort.username)
 
 
 def getUserInfoByUsername(username, client):
-    return client.user_info_by_username(username)
+    print("getUserInfoByUsername")
+    return client.user_info_by_username_v1(username)
 
 def convertUserShortToUserv2(usershort,client):
-    return client.user_info_by_username(usershort["username"])
+    print("convertUserShortToUserv2")
+    return client.user_info_by_username_v1(usershort["username"])
 
 def isProfilePrivate(user):
     return user.is_private
@@ -145,10 +153,6 @@ def getTrackedLocationsFromJSON():
 
 def extendFollowingUsersPoolFromSuggested(userid, client, limit):
     list = getSuggestedUsersFromFBSearch(userid, client)
-    print(len(list))
-    L = list[0:limit]
-    print(len(L))
-    print(L)
     for usersh in list[0:limit]:
         user = getUserInfoByUsername((convertUserShortToUserv2(usersh, client).username),client)
         if isProfilePrivate(user) == False:
@@ -198,7 +202,7 @@ def updateLastLocationCheckTime(locationpk):
 
 def createLocation(input, coordinates):
     dict = {}
-    
+    #dict["LastChecked"]=getNowTime()
     dict["pk"] = input["pk"]
     dict["name"] = input["name"]
     dict["address"] = input["address"]
@@ -233,9 +237,11 @@ def crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPosts
                 coordinates = getMediaLocationCoordinates(post)
                 trackLocation(createLocation(detailedLocationInfo.dict(), coordinates))
         
-        if allowExtendUserBase and getPostTaggedPeople(post) != None:
+        if allowExtendUserBase and getPostTaggedPeople(post) != []:
             print("Now extending User Base")
+            print(getPostTaggedPeople(post))
             extendFollowingUsersPoolFromPostTaggedUsers(post, client)
+            print("Finished Extending User Base")
 
 
 
@@ -261,13 +267,14 @@ def main():
 
 
     for user in trackedUsers:
-        print(user)
+        print("MAIN LOOP: " + str(user))
         userid = getUserIDfromUsername(user, client)
         crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPostsAllowed)
         if allowExtendUserBase:
-            print("Now extending User Base")
+            print("Now extending User  (from main)")
             extendFollowingUsersPoolFromTaggedPostsSection(userid, client, 4)
             extendFollowingUsersPoolFromSuggested(userid, client, 4)
+            print("Finished Extending User Base (from main)")
         
 
 
