@@ -18,6 +18,12 @@ def createLoggedInClient():
 	#client.load_settings((str(sys.path[0]))+"/data/settingsdump.json")
 	return client
 
+
+#############################################
+
+# LOCATION GETTERS
+
+
 def getAllCrawlableLocationsFromJSON():
 	filepath = (str(sys.path[0]))+"/data/locations.json"
 	with open(filepath) as locations:
@@ -28,15 +34,16 @@ def getAllCrawlableLocationsFromJSON():
 			print(e)
 			return False
 
-def getTopMediasFromLocation(locationName, client):
-	pkCode = getLocationPkCodeFromName(locationName, client)
-	mediaListFromLocation = client.location_medias_top(pkCode)
-	return mediaListFromLocation
-
 def getLocationPkCodeFromName(locationName, client):
 	locList = (client.fbsearch_places(locationName)[0]).dict()
 	pkCode = locList.get("pk")
 	return pkCode
+
+
+def getTopMediasFromLocation(locationName, client):
+	pkCode = getLocationPkCodeFromName(locationName, client)
+	mediaListFromLocation = client.location_medias_top(pkCode)
+	return mediaListFromLocation
 
 def writeCrawledDataToJson(locationsData): 
 	jsondump= json.dumps(locationsData)
@@ -44,34 +51,11 @@ def writeCrawledDataToJson(locationsData):
 		outfile.write(jsondump)
 
 
-# la politica di ordinamento per le location può essere una coda con priorità in base
-# all'ultima volta che una certa location è stata analizzata
-
-def crawlAllLocations(locationsDict, client, nPostsWanted):
-	locationsData = { }
-	for loc in locationsDict.values():
-		mediasDump = getTopMediasFromLocation(loc["name"], client) #returns a list of "Medias"
-		formattedMediasFromLocation = []
-		for media in mediasDump[0:nPostsWanted-1]:
-			formattedMediasFromLocation.append(formatMediaToDictionaryItem(media,client)) 
-		locationPk = loc["pk"]
-		#print(locationPk)
-		locationsData[locationPk] = formattedMediasFromLocation
-	return locationsData
 
 
-#########
+###################################################
 
-#Main Function 
-
-def beginCrawling():
-	client = createLoggedInClient()
-	locationsDict = getAllCrawlableLocationsFromJSON()
-	nPostsWanted = 2 # only get N top posts from each location
-	locationsData = crawlAllLocations(locationsDict, client, nPostsWanted)
-	writeCrawledDataToJson(locationsData)
-
-###########	
+# GETTERS FOR FORMATTEDMEDIADICTIONARY
 
 def getMediaType(media):
 	return media.media_type
@@ -112,8 +96,6 @@ def getMediaURL(media):
 def getPostPartialURL(media):
 	return media.code
 
-
-
 def formatMediaToDictionaryItem(media,client): #need to serialize casting to primitive data types
 	formattedDictionaryMedia = {}
 	formattedDictionaryMedia["PostPartialURL"] = getPostPartialURL(media)
@@ -126,6 +108,10 @@ def formatMediaToDictionaryItem(media,client): #need to serialize casting to pri
 	#pprint.pprint(formattedDictionaryMedia)
 	return formattedDictionaryMedia
 
+
+#######################################
+
+# OTHER
 
 def readLocationsDataFromJSON():
 	filepath = (str(sys.path[0]))+"/data/locationsData.json"
@@ -157,6 +143,10 @@ def getDetailedMediaLocationInfo(media, client):  # this works and retrieves all
         return None
 
 
+################################################
+
+# PARSING FUNCTIONS
+
 def parseTakenAtTime(input):
 	time = []
 	time.append(input.year)
@@ -187,6 +177,64 @@ def parseMediaUrl(input):
 	end = url.find("'")
 	url = url[:end]
 	return url;
+
+
+
+
+########################################
+
+#MAIN CRAWLING FUNCTIONS
+
+# la politica di ordinamento per le location può essere una coda con priorità in base
+# all'ultima volta che una certa location è stata analizzata
+
+def crawlAllLocations(locationsDict, client, nPostsWanted):
+	for loc in locationsDict.values():
+		mediasDump = getTopMediasFromLocation(loc["name"], client) #returns a list of "Medias"
+		formattedMediasFromLocation = []
+		locationPk = loc["pk"]
+		for media in mediasDump[0:nPostsWanted-1]:
+			formattedmedia = formatMediaToDictionaryItem(media,client)
+			if isMediaDuplicated(formattedmedia,locationPk) == False:
+				formattedMediasFromLocation.append(formattedmedia) 
+		saveCrawledDataFromLocationToJSON(formattedMediasFromLocation, locationPk)
+
+
+def getCrawledDataFromJSON():
+	filepath = (str(sys.path[0]))+"/data/locationsData.json"
+	with open(filepath) as locationsFile:
+		try:
+			data = json.load(locationsFile)
+			return data
+		except Exception as e:
+			print(e)
+			return None
+	
+
+def saveCrawledDataFromLocationToJSON(mediasfromloc, locationPK):
+	locationsFromJSON = getCrawledDataFromJSON()
+	locationsFromJSON[locationPK].append(mediasfromloc)
+	writeCrawledDataToJson(locationsFromJSON)
+
+
+def isMediaDuplicated(media, locationPk):
+	fromjson = getCrawledDataFromJSON()
+	if locationPk in fromjson.keys():
+		if media["PostPartialURL"] == fromjson[locationPk]["PostPartialURL"]:
+			return True
+		else:
+			return False
+	return False
+
+def beginCrawling():
+	client = createLoggedInClient()
+	locationsDict = getAllCrawlableLocationsFromJSON()
+	nPostsWanted = 2 # only get N top posts from each location
+	locationsData = crawlAllLocations(locationsDict, client, nPostsWanted)
+	writeCrawledDataToJson(locationsData)
+
+###########	
+
 
 
 
