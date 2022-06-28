@@ -192,8 +192,7 @@ def parseMediaUrl(input):
 
 
 def main():
-	buildComprehendLocationDictionary("4706333")
-	#beginCrawling()
+	beginCrawling()
 
 ################################################################
 
