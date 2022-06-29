@@ -1,4 +1,4 @@
-import os, json, sys
+import os, json, sys, time
 from instagrapi import Client
 import instagrapi
 from typing import Dict
@@ -178,8 +178,23 @@ def parseMediaUrl(input):
 	url = url[:end]
 	return url;
 
+########################################
 
+# ORDER BY TIME
 
+def getNowTime():
+    return time.time()
+
+def updateLocationsCrawlingQueue(locationsdict):
+	data = getAllCrawlableLocationsFromJSON()
+	sortedlist = []
+	for location in data.values():
+		sortedlist.append(location)
+	sortedlist=sorted(sortedlist, key=lambda d: d['LastChecked'])
+	return sortedlist
+
+def updateLocationLastCheckedTime(location):
+	location["LastChecked"] = getNowTime()
 
 ########################################
 
@@ -189,7 +204,9 @@ def parseMediaUrl(input):
 # all'ultima volta che una certa location è stata analizzata
 
 def crawlAllLocations(locationsDict, client, nPostsWanted):
+	queue = updateLocationsCrawlingQueue(locationsDict)
 	for loc in locationsDict.values():
+	#for loc in  queue: #decomment to test
 		mediasDump = getTopMediasFromLocation(loc["name"], client) #returns a list of "Medias"
 		formattedMediasFromLocation = []
 		locationPk = loc["pk"]
@@ -198,6 +215,7 @@ def crawlAllLocations(locationsDict, client, nPostsWanted):
 			if isMediaDuplicated(formattedmedia,locationPk) == False:
 				formattedMediasFromLocation.append(formattedmedia) 
 		saveCrawledDataFromLocationToJSON(formattedMediasFromLocation, locationPk)
+		
 
 
 def getCrawledDataFromJSON():
