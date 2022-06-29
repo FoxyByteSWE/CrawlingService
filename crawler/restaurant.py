@@ -30,6 +30,9 @@ class Restaurant:
 			if self.coordinates == "" and m.TakenAtLocation["coordinates"] != "":
 				self.coordinates = m.TakenAtLocation["name"]
 
+	def printRanking(self):
+		print('{0:.1f}'.format(self.ranking))
+
 	def isOld(self, m):
 		now = datetime.datetime.now()
 		post_taken_at = datetime.datetime(m.TakenAtTime[0], m.TakenAtTime[1], m.TakenAtTime[2], m.TakenAtTime[3], m.TakenAtTime[4], m.TakenAtTime[5])
