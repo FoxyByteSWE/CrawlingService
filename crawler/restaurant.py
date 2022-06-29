@@ -20,6 +20,8 @@ class Restaurant:
 	def removeOldMedias(self):
 		self.medias = [m for m in self.medias if not self.isOld(m)]
 		
+	#def toJSON(self):
+		#return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 				
 
 class Media:
@@ -51,17 +53,23 @@ def json2Restaurants(path):
 	return restaurant_list
 
 def Restaurants2json(restaurants, file):
-	out = '{'
+	out = ""
 	for r in restaurants:
+		out += '{'
 		out += '"' + r.pk + '": '
 		for m in r.medias:
 			out += '['
 			out += json.dumps(m.__dict__)
-			out += ']'
-	out += '}'
+			out += '], '
+		out = out[:-2]
+		out += '}'
+		out += '\n'
+
+	out = out[:-1]
 	f = open(file, "w")
 	f.write(out)
 	f.close()
+
 
 def removeOldMedias(restaurants):
 	for r in restaurants:
