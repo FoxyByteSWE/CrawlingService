@@ -53,19 +53,17 @@ def json2Restaurants(path):
 	return restaurant_list
 
 def Restaurants2json(restaurants, file):
-	out = ""
+	out = '{'
 	for r in restaurants:
-		out += '{'
-		out += '"' + r.pk + '": '
+		out += '"' + r.pk + '": ['
 		for m in r.medias:
-			out += '['
 			out += json.dumps(m.__dict__)
-			out += '], '
+			out += ', '
 		out = out[:-2]
-		out += '}'
-		out += '\n'
+		out += '], '
 
-	out = out[:-1]
+	out = out[:-2]
+	out += '}'
 	f = open(file, "w")
 	f.write(out)
 	f.close()
@@ -77,12 +75,16 @@ def removeOldMedias(restaurants):
 
 def main():
 	restaurants = json2Restaurants((str(sys.path[0]))+"/data/locationsData.json")
+
 	for r in restaurants:
 		print(r.pk)
 		for m in r.medias:
 			pprint(vars(m))
-	Restaurants2json(restaurants, "test.json")
+
+	Restaurants2json(restaurants, (str(sys.path[0]))+"/data/test_Restaurants2json.json")
+
 	removeOldMedias(restaurants)
+
 	for r in restaurants:
 		print(r.pk)
 		for m in r.medias:
