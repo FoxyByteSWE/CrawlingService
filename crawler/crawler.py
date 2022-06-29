@@ -47,7 +47,7 @@ def getTopMediasFromLocation(locationName, client):
 
 def writeCrawledDataToJson(locationsData): 
 	jsondump= json.dumps(locationsData)
-	with open((str(sys.path[0]))+"/data/locationsData.json", "a") as outfile:
+	with open((str(sys.path[0]))+"/data/locationsData.json", "w") as outfile:
 		outfile.write(jsondump)
 
 
@@ -213,7 +213,10 @@ def getCrawledDataFromJSON():
 
 def saveCrawledDataFromLocationToJSON(mediasfromloc, locationPK):
 	locationsFromJSON = getCrawledDataFromJSON()
-	locationsFromJSON[locationPK].append(mediasfromloc)
+	try:
+		locationsFromJSON[locationPK].append(mediasfromloc)
+	except KeyError:
+		locationsFromJSON[locationPK] = mediasfromloc
 	writeCrawledDataToJson(locationsFromJSON)
 
 
@@ -229,9 +232,9 @@ def isMediaDuplicated(media, locationPk):
 def beginCrawling():
 	client = createLoggedInClient()
 	locationsDict = getAllCrawlableLocationsFromJSON()
-	nPostsWanted = 2 # only get N top posts from each location
+	nPostsWanted = 3 # only get N top posts from each location
 	locationsData = crawlAllLocations(locationsDict, client, nPostsWanted)
-	writeCrawledDataToJson(locationsData)
+
 
 ###########	
 

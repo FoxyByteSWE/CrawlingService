@@ -134,7 +134,7 @@ def trackLocation(locationdict):
     locationsFromJSON = getTrackedLocationsFromJSON()
     print("tracking location: "+ locationdict["name"])
     locationsFromJSON[locationdict["pk"]]=locationdict
-    writeNewUsersToJSONFile(locationsFromJSON)
+    writeLocationsToJSON(locationsFromJSON)
 
 
 
@@ -256,13 +256,15 @@ def crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPosts
 
     restaurant_tags = ['Restaurant', 'Italian Restaurant','Pub', 'Bar', 'Grocery ', 'Wine', 'Diner', 'Food', 'Meal', 'Breakfast', 'Lunch',
                            'Dinner', 'Cafe', 'Tea Room', 'Hotel', 'Pizza', 'Coffee', 'Bakery', 'Dessert', 'Gastropub',
-                           'Sandwich', 'Ice Cream', 'Steakhouse']
+                           'Sandwich', 'Ice Cream', 'Steakhouse', 'Pizza place', 'Fast food restaurant', 'Deli']
 
     postlist = getUserPosts(userid, client)
-
+    if nPostsAllowed > len(postlist):
+        nPostsAllowed = len(postlist)
     for post in postlist[0:nPostsAllowed]:
         if hasTaggedLocation(post):
             detailedLocationInfo = getDetailedMediaLocationInfo(post, client)
+            print("location is a: "+str(detailedLocationInfo.category))
             if detailedLocationInfo.category in restaurant_tags and isLocationTracked(detailedLocationInfo)==False:
                 coordinates = getMediaLocationCoordinates(post)
                 trackLocation(createLocation(detailedLocationInfo.dict(), coordinates))
@@ -283,13 +285,13 @@ def crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPosts
 #################################################################
 
 def main():
-    allowExtendUserBase = True
-    nPostsAllowed = 4
+    allowExtendUserBase = False
+    nPostsAllowed = 40
 
     client = createLoggedInClient()
-    trackedUsers = getTrackedUsersFromJSON()    
+    #trackedUsers = getTrackedUsersFromJSON()    
 
-
+    trackedUsers = ["foxybyte.swe"]
     for user in trackedUsers:
         print("MAIN LOOP: " + str(user))
         userid = getUserIDfromUsername(user, client)
