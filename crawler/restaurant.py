@@ -4,9 +4,31 @@ import datetime
 from pprint import pprint
 	
 class Restaurant:
-	def __init__(self, pk = 0, medias = []):
+	def __init__(self, pk = 0, medias = [], name = "", category = "", address = "", website = "", phone = "", coordinates = "", ranking = -1):
 		self.pk = pk
 		self.medias = medias
+		self.name = name
+		self.category = category
+		self.address = address
+		self.website = website
+		self.phone = phone
+		self.coordinates = coordinates
+		self.ranking = ranking
+
+	def assignValues(self):
+		for m in self.medias:
+			if self.name == "" and m.TakenAtLocation["name"] != "":
+				self.name = m.TakenAtLocation["name"]
+			if self.category == "" and m.TakenAtLocation["category"] != "":
+				self.category = m.TakenAtLocation["category"]
+			if self.address == "" and m.TakenAtLocation["address"] != "":
+				self.address = m.TakenAtLocation["name"]
+			if self.website == "" and m.TakenAtLocation["name"] != "":
+				self.website = m.TakenAtLocation["name"]
+			if self.phone == "" and m.TakenAtLocation["phone"] != "":
+				self.phone = m.TakenAtLocation["name"]
+			if self.coordinates == "" and m.TakenAtLocation["coordinates"] != "":
+				self.coordinates = m.TakenAtLocation["name"]
 
 	def isOld(self, m):
 		now = datetime.datetime.now()
@@ -75,9 +97,11 @@ def removeOldMedias(restaurants):
 
 def main():
 	restaurants = json2Restaurants((str(sys.path[0]))+"/data/locationsData.json")
+	for r in restaurants:
+		r.assignValues()
 
 	for r in restaurants:
-		print(r.pk)
+		pprint(vars(r))
 		for m in r.medias:
 			pprint(vars(m))
 
@@ -86,7 +110,7 @@ def main():
 	removeOldMedias(restaurants)
 
 	for r in restaurants:
-		print(r.pk)
+		pprint(vars(r))
 		for m in r.medias:
 			pprint(vars(m))
 
