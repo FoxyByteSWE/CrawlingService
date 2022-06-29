@@ -1,6 +1,7 @@
 import json
 import sys
 import datetime
+from geopy.geocoders import Nominatim
 from pprint import pprint
 	
 class Restaurant:
@@ -21,14 +22,16 @@ class Restaurant:
 				self.name = m.TakenAtLocation["name"]
 			if self.category == "" and m.TakenAtLocation["category"] != "":
 				self.category = m.TakenAtLocation["category"]
-			if self.address == "" and m.TakenAtLocation["address"] != "":
-				self.address = m.TakenAtLocation["address"]
+			#if self.address == "" and m.TakenAtLocation["address"] != "":
+				#self.address = m.TakenAtLocation["address"]
 			if self.website == "" and m.TakenAtLocation["website"] != "":
 				self.website = m.TakenAtLocation["website"]
 			if self.phone == "" and m.TakenAtLocation["phone"] != "":
 				self.phone = m.TakenAtLocation["phone"]
 			if self.coordinates == "" and m.TakenAtLocation["coordinates"] != "":
 				self.coordinates = m.TakenAtLocation["coordinates"]
+		geolocator = Nominatim(user_agent="geoapiExercises")
+		self.address = geolocator.reverse(str(self.coordinates[1]) + "," + str(self.coordinates[0]))
 
 	def returnFormattedRanking(self):
 		return '{0:.1f}'.format(self.ranking)
