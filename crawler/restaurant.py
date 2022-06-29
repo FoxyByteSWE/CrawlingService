@@ -22,15 +22,18 @@ class Restaurant:
 			if self.category == "" and m.TakenAtLocation["category"] != "":
 				self.category = m.TakenAtLocation["category"]
 			if self.address == "" and m.TakenAtLocation["address"] != "":
-				self.address = m.TakenAtLocation["name"]
-			if self.website == "" and m.TakenAtLocation["name"] != "":
-				self.website = m.TakenAtLocation["name"]
+				self.address = m.TakenAtLocation["address"]
+			if self.website == "" and m.TakenAtLocation["website"] != "":
+				self.website = m.TakenAtLocation["website"]
 			if self.phone == "" and m.TakenAtLocation["phone"] != "":
-				self.phone = m.TakenAtLocation["name"]
+				self.phone = m.TakenAtLocation["phone"]
 			if self.coordinates == "" and m.TakenAtLocation["coordinates"] != "":
-				self.coordinates = m.TakenAtLocation["name"]
+				self.coordinates = m.TakenAtLocation["coordinates"]
 
-	def printRanking(self):
+	def returnFormattedRanking(self):
+		return '{0:.1f}'.format(self.ranking)
+
+	def printFormattedRanking(self):
 		print('{0:.1f}'.format(self.ranking))
 
 	def isOld(self, m):
