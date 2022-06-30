@@ -5,6 +5,7 @@ Questo repository contiene il servizio di crawling per il progetto di SWE 2021/2
 ## Requires
 
 - [instagrapi](https://github.com/adw0rd/instagrapi) :  `pip install instagrapi`
+- [boto3](https://github.com/boto/boto3) : `pip install boto3`
 
 ## Changes
 
