@@ -151,7 +151,7 @@ def isLocationTracked(location):
 
 def createLocation(input, coordinates):
     dict = {}
-    #dict["LastChecked"]=getNowTime() # decomment this in order for time-based queueing to work
+    #dict["LastChecked"]=0 # decomment this in order for time-based queueing to work
     dict["pk"] = input["pk"]
     dict["name"] = input["name"]
     dict["address"] = input["address"]
@@ -289,8 +289,8 @@ def main():
     nPostsAllowed = 40
 
     client = createLoggedInClient()
-    trackedUsers = getTrackedUsersFromJSON()    
-    #trackedUsers = ["foxybyte.swe"] #tests from our account's posts.
+    #trackedUsers = getTrackedUsersFromJSON()    
+    trackedUsers = ["foxybyte.swe"] #tests from our account's posts.
     
     for user in trackedUsers:
         print("MAIN LOOP: " + str(user))

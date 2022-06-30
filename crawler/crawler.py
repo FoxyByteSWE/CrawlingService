@@ -193,8 +193,20 @@ def updateLocationsCrawlingQueue(locationsdict):
 	sortedlist=sorted(sortedlist, key=lambda d: d['LastChecked'])
 	return sortedlist
 
-def updateLocationLastCheckedTime(location):
-	location["LastChecked"] = getNowTime()
+def updateLocationLastCheckedTime(locationpk):
+	datajson = getAllCrawlableLocationsFromJSON()
+	print(datajson)
+	print(locationpk)
+	locationpk = str(locationpk)
+	locationfromJson = datajson[locationpk]
+	print(locationfromJson)
+	locationfromJson["LastChecked"] = getNowTime()
+	writeLocationsToJSON(locationfromJson)
+
+def writeLocationsToJSON(locations): 
+	jsondump= json.dumps(locations)
+	with open((str(sys.path[0]))+"/data/locations.json", "w") as outfile:
+		outfile.write(jsondump)
 
 ########################################
 
@@ -204,7 +216,7 @@ def updateLocationLastCheckedTime(location):
 # all'ultima volta che una certa location è stata analizzata
 
 def crawlAllLocations(locationsDict, client, nPostsWanted):
-	queue = updateLocationsCrawlingQueue(locationsDict)
+	#queue = updateLocationsCrawlingQueue(locationsDict)
 	for loc in locationsDict.values():
 	#for loc in  queue: #decomment to test
 		mediasDump = getTopMediasFromLocation(loc["name"], client) #returns a list of "Medias"
