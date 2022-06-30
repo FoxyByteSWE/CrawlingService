@@ -3,8 +3,8 @@ import os, json, sys
 import googlemaps # pip install googlemaps
 import requests
 
-#API_KEY = open('API_KEY.txt').read()
-#map_client = googlemaps.Client(API_KEY)
+API_KEY = open('API_KEY.txt').read()
+map_client = googlemaps.Client(API_KEY)
 
 def getAllLocationsFromJSON():
 	filepath = (str(sys.path[0]))+"/data/locations.json"
@@ -16,9 +16,6 @@ def getAllLocationsFromJSON():
 			print(e)
 			return None
 
-
-
-print(response.text)
 
 def get_place_info(location_name):
     try:

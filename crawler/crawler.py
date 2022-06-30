@@ -216,9 +216,8 @@ def writeLocationsToJSON(locations):
 # all'ultima volta che una certa location è stata analizzata
 
 def crawlAllLocations(locationsDict, client, nPostsWanted):
-	#queue = updateLocationsCrawlingQueue(locationsDict)
 	for loc in locationsDict.values():
-	#for loc in  queue: #decomment to test
+		print("boi")
 		mediasDump = getTopMediasFromLocation(loc["name"], client) #returns a list of "Medias"
 		formattedMediasFromLocation = []
 		locationPk = loc["pk"]
@@ -226,7 +225,8 @@ def crawlAllLocations(locationsDict, client, nPostsWanted):
 			formattedmedia = formatMediaToDictionaryItem(media,client)
 			if isMediaDuplicated(formattedmedia,locationPk) == False:
 				formattedMediasFromLocation.append(formattedmedia) 
-		saveCrawledDataFromLocationToJSON(formattedMediasFromLocation, locationPk)
+		if formattedMediasFromLocation != []:
+			saveCrawledDataFromLocationToJSON(formattedMediasFromLocation, locationPk)
 		
 
 
@@ -244,19 +244,31 @@ def getCrawledDataFromJSON():
 def saveCrawledDataFromLocationToJSON(mediasfromloc, locationPK):
 	locationsFromJSON = getCrawledDataFromJSON()
 	try:
-		locationsFromJSON[locationPK].append(mediasfromloc)
-	except KeyError:
+		locobj=locationsFromJSON[locationPK] #lista di dizionari
+		locobj.append(mediasfromloc)
+		locationsFromJSON[locationPK]=locobj
+		print(locobj)
+		print("arrivato")
+	except KeyError: # AAA
 		locationsFromJSON[locationPK] = mediasfromloc
+		print("madonna magnetica")
 	writeCrawledDataToJson(locationsFromJSON)
 
 
 def isMediaDuplicated(media, locationPk):
 	fromjson = getCrawledDataFromJSON()
+	locationPk= str(locationPk)
 	if locationPk in fromjson.keys():
-		if media["PostPartialURL"] == fromjson[locationPk]["PostPartialURL"]:
-			return True
-		else:
-			return False
+		singlelocationdata=fromjson[locationPk]  #lista di dizionari
+		print("singlelocationdata")
+		print(singlelocationdata)
+		for item in singlelocationdata:	
+			if media["PostPartialURL"] == item["PostPartialURL"]:
+				print("dup")
+				return True
+			else:
+				print(str(media["PostPartialURL"]) + " is not a dup of " + str(item["PostPartialURL"]))  #WFoOCETdEH is not a dup
+		return False
 	return False
 
 def beginCrawling():
