@@ -11,7 +11,6 @@ from typing import Dict
 #os.environ['https_proxy'] = proxy
 #os.environ['HTTPS_PROXY'] = proxy
 
-
 def createLoggedInClient():  #TODO: handle login_required exception
     client = Client()
     client.login("foxybyte.swe", "Swe_2022")
