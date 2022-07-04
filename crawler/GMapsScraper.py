@@ -6,8 +6,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-chromedriverDirectory = "C:/Users/marco/Desktop/FoxyByte/IGCrawlerService/chromedriver.exe"  #EDIT
-
+if os.name == 'posix':
+	chromedriverDirectory = (str(sys.path[0]))+"/../chromedriver"
+else:
+	chromedriverDirectory = (str(sys.path[0]))+"/../chromedriver.exe"
 
 def buildWebDriver():
 	chrome_options = webdriver.ChromeOptions()
