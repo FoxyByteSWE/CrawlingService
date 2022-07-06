@@ -3,6 +3,8 @@ import sys
 import datetime
 from geopy.geocoders import Nominatim
 from pprint import pprint
+
+from Media import Media
 	
 class Restaurant:
 	def __init__(self, pk = 0, medias = [], name = "", category = "", address = "", website = "", phone = "", coordinates = "", ranking = -1):
@@ -51,20 +53,6 @@ class Restaurant:
 	def removeOldMedias(self):
 		self.medias = [m for m in self.medias if not self.isOld(m)]
 		
-	#def toJSON(self):
-		#return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
-				
-
-class Media:
-	def __init__(self, PostPartialURL = "", MediaType = 1, TakenAtTime = [], TakenAtLocation = {}, LikeCount = 0, CaptionText = "", MediaURL = ""):
-		self.PostPartialURL = PostPartialURL
-		self.MediaType = MediaType
-		self.TakenAtTime = TakenAtTime
-		self.TakenAtLocation = TakenAtLocation
-		self.LikeCount = LikeCount
-		self.CaptionText = CaptionText
-		self.MediaURL = MediaURL
-
 def json2Restaurants(path):
 
 	with open(path, 'r') as inputfile:
