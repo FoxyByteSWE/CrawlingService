@@ -13,9 +13,28 @@ sys.path.insert(1, (str(sys.path[0]))+"/../../RankingService/")
 from ComprehendClient import ComprehendClient
 from RekognitionClient import RekognitionClient
 
+
+
+# GMaoScraoer
+import requests
+import os, json, sys
+import sys, time, os, json
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+if os.name == 'posix':
+	#chromedriverDirectory = (str(sys.path[0]))+"/../chromedriver"
+	chromedriverDirectory = (str(sys.path[0]))+"/../IGCrawlerService/chromedriver"
+else:
+	#chromedriverDirectory = (str(sys.path[0]))+"/../chromedriver.exe"
+	chromedriverDirectory = (str(sys.path[0]))+"/../IGCrawlerService/chromedriver.exe"
+
+
+
 class Restaurant:
 
-	def __init__(self, pk = 0, medias = [], name = "", category = "", address = "", website = "", phone = "", coordinates = "", ranking = -1):
+	def __init__(self, pk = 0, medias = [], name = "", category = "", address = "", website = "", phone = "", main_image_url = "", coordinates = "", ranking = -1):
 		self.pk = pk
 		self.medias = medias
 		self.name = name
@@ -23,6 +42,7 @@ class Restaurant:
 		self.address = address
 		self.website = website
 		self.phone = phone
+		self.main_image_url = main_image_url
 		self.coordinates = coordinates
 		self.ranking = ranking
 
@@ -42,6 +62,7 @@ class Restaurant:
 				self.coordinates = m.TakenAtLocation["coordinates"]
 		geolocator = Nominatim(user_agent="geoapiExercises")
 		self.address = geolocator.reverse(str(self.coordinates[1]) + "," + str(self.coordinates[0]))
+		self.main_image_url = self.getMainImageUrl()
 
 	def returnFormattedRanking(self):
 		return '{0:.1f}'.format(self.ranking)
@@ -60,6 +81,31 @@ class Restaurant:
 	
 	def removeOldMedias(self):
 		self.medias = [m for m in self.medias if not self.isOld(m)]
+
+
+
+	def buildWebDriver(self):
+		chrome_options = webdriver.ChromeOptions()
+		chrome_options.add_experimental_option("useAutomationExtension", False)
+		chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+		driver = webdriver.Chrome(chromedriverDirectory, options=chrome_options)
+		return driver
+
+	def getMainLocationImageFromGMaps(self, locationName, driver):
+		driver.get("https://www.google.com/maps/search/?api=1&query="+locationName)
+		time.sleep(5)
+		cover_img = driver.find_element(By.XPATH, "//img[@decoding='async']")
+		src = cover_img.get_property("src")
+		return src
+
+	def getMainImageUrl(self):
+		driver = self.buildWebDriver()
+		source = self.getMainLocationImageFromGMaps(self.name+str(self.address), driver)
+		return source
+
+
+
+
 
 def rank(restaurants):
 
