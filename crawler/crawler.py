@@ -162,7 +162,7 @@ def parseTakenAtTime(input):
 	time.append(input.second)
 	return time
 
-def parseTakenAtLocation(media,client):
+def parseTakenAtLocation(media, client):
 	input = getDetailedMediaLocationInfo(media, client).dict()
 	coordinates = getMediaLocationCoordinates(media)
 	dict = {}
@@ -280,7 +280,7 @@ def isMediaDuplicated(media, locationPk):
 def beginCrawling():
 	client = createLoggedInClient()
 	locationsDict = getAllCrawlableLocationsFromJSON()
-	nPostsWanted = 3 # only get N top posts from each location
+	nPostsWanted = 50 # only get N top posts from each location
 	locationsData = crawlAllLocations(locationsDict, client, nPostsWanted)
 
 

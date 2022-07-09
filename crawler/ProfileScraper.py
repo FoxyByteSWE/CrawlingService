@@ -293,7 +293,7 @@ def main():
 
     client = createLoggedInClient()
     #trackedUsers = getTrackedUsersFromJSON()    
-    trackedUsers = ["foxybyte.swe"] #tests from our account's posts.
+    trackedUsers = ["marcouderzo"] #tests from our account's posts.
     
     for user in trackedUsers:
         print("MAIN LOOP: " + str(user))

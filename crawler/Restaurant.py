@@ -62,7 +62,7 @@ class Restaurant:
 				self.coordinates = m.TakenAtLocation["coordinates"]
 		geolocator = Nominatim(user_agent="geoapiExercises")
 		self.address = geolocator.reverse(str(self.coordinates[1]) + "," + str(self.coordinates[0]))
-		self.main_image_url = self.getMainImageUrl()
+		#self.main_image_url = self.getMainImageUrl()
 
 	def returnFormattedRanking(self):
 		return '{0:.1f}'.format(self.ranking)
@@ -74,7 +74,7 @@ class Restaurant:
 		now = datetime.datetime.now()
 		post_taken_at = datetime.datetime(m.TakenAtTime[0], m.TakenAtTime[1], m.TakenAtTime[2], m.TakenAtTime[3], m.TakenAtTime[4], m.TakenAtTime[5])
 		age = (now - post_taken_at).days
-		if age > 720:
+		if age > 1800:
 			return True
 		else:
 			return False
@@ -93,14 +93,18 @@ class Restaurant:
 
 	def getMainLocationImageFromGMaps(self, locationName, driver):
 		driver.get("https://www.google.com/maps/search/?api=1&query="+locationName)
-		time.sleep(5)
-		cover_img = driver.find_element(By.XPATH, "//img[@decoding='async']")
+		time.sleep(20)
+		try:
+			cover_img = driver.find_element(By.XPATH, "//img[@decoding='async']")
+		except Exception as e:
+			print(e)
+			return ""
 		src = cover_img.get_property("src")
 		return src
 
 	def getMainImageUrl(self):
 		driver = self.buildWebDriver()
-		source = self.getMainLocationImageFromGMaps(self.name+str(self.address), driver)
+		source = self.getMainLocationImageFromGMaps(self.name + " " + str(self.address), driver)
 		return source
 
 
@@ -123,15 +127,15 @@ def rank(restaurants):
 			age = (now - post_taken_at).days
 			#print(age)
 
-			if age <= 30:
+			if age <= 90:
 				weight = 1
-			elif age <= 90:
-				weight = 0.9
-			elif age <= 180:
-				weight = 0.7
 			elif age <= 360:
-				weight = 0.5
+				weight = 0.9
 			elif age <= 720:
+				weight = 0.7
+			elif age <= 1080:
+				weight = 0.5
+			elif age <= 1800:
 				weight = 0.2
 			else:
 				weight = 0
