@@ -62,7 +62,7 @@ class Restaurant:
 				self.coordinates = m.TakenAtLocation["coordinates"]
 		geolocator = Nominatim(user_agent="geoapiExercises")
 		self.address = geolocator.reverse(str(self.coordinates[1]) + "," + str(self.coordinates[0]))
-		#self.main_image_url = self.getMainImageUrl()
+		self.main_image_url = self.getMainImageUrl()
 
 	def returnFormattedRanking(self):
 		return '{0:.1f}'.format(self.ranking)
