@@ -45,6 +45,11 @@ def getTopMediasFromLocation(locationName, client):
 	mediaListFromLocation = client.location_medias_top(pkCode)
 	return mediaListFromLocation
 
+def getMostRecentMediasFromLocation(locationName, client):
+	pkCode = getLocationPkCodeFromName(locationName, client)
+	mediaListFromLocation = client.location_medias_recent(pkCode)
+	return mediaListFromLocation
+
 def writeCrawledDataToJson(locationsData): 
 	jsondump= json.dumps(locationsData)
 	with open((str(sys.path[0]))+"/data/locationsData.json", "w") as outfile:
@@ -218,7 +223,8 @@ def writeLocationsToJSON(locations):
 def crawlAllLocations(locationsDict, client, nPostsWanted):
 	for loc in locationsDict.values():
 		print("boi")
-		mediasDump = getTopMediasFromLocation(loc["name"], client) #returns a list of "Medias"
+		#mediasDump = getTopMediasFromLocation(loc["name"], client) #returns a list of "Medias"
+		mediasDump = getMostRecentMediasFromLocation(loc["name"], client) #returns a list of "Medias"
 		formattedMediasFromLocation = []
 		locationPk = loc["pk"]
 		for media in mediasDump[0:nPostsWanted-1]:

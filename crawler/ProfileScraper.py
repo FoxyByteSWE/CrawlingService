@@ -288,7 +288,7 @@ def crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPosts
 #################################################################
 
 def main():
-    allowExtendUserBase = False
+    allowExtendUserBase = True
     nPostsAllowed = 40
 
     client = createLoggedInClient()
