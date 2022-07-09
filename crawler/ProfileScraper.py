@@ -218,7 +218,11 @@ def trackUser(user, client):
 # EXTEND USERS POOL
 
 def extendFollowingUsersPoolFromSuggested(userid, client, limit):
-    list = getSuggestedUsersFromFBSearch(userid, client)
+    try:
+        list = getSuggestedUsersFromFBSearch(userid, client)
+    except Exception as e:
+        print(e)
+        return
     for usersh in list[0:limit]:
         user = getUserInfoByUsername((convertUserShortToUserv2(usersh, client).username),client)
         if isProfilePrivate(user) == False:
