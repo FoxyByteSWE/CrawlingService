@@ -82,6 +82,68 @@ class Restaurant:
 	def removeOldMedias(self):
 		self.medias = [m for m in self.medias if not self.isOld(m)]
 
+	def rank(self):
+
+		comprehend = ComprehendClient()
+		rekognition = RekognitionClient()
+
+		pos = neg = neu = mix = 0
+		weight_list = []
+		#print("Comments for restaurant " + r.pk)
+
+		for m in self.medias:
+			now = datetime.datetime.now()
+			post_taken_at = datetime.datetime(m.TakenAtTime[0], m.TakenAtTime[1], m.TakenAtTime[2], m.TakenAtTime[3], m.TakenAtTime[4], m.TakenAtTime[5])
+			age = (now - post_taken_at).days
+			#print(age)
+
+			if age <= 90:
+				weight = 1
+			elif age <= 360:
+				weight = 0.9
+			elif age <= 720:
+				weight = 0.7
+			elif age <= 1080:
+				weight = 0.5
+			elif age <= 1800:
+				weight = 0.2
+			else:
+				weight = 0
+
+			if m.CaptionText != "":
+				print(m.CaptionText)
+				score = comprehend.analyzeText(m.CaptionText)
+				print(score)
+				pos += score["Positive"] * weight
+				neg += score["Negative"] * weight
+				#neu += score["Neutral"] * weight
+				#mix += score["Mixed"] * weight
+				weight_list.append(weight)
+
+		if sum(weight_list) == 0:
+			pos = neg = 0
+		else:
+			pos /= sum(weight_list)
+			neg /= sum(weight_list)
+			#neu /= sum(weight_list)
+			#mix /= sum(weight_list)
+
+		ranking = pos-neg
+		ranking = self.linearRanking(ranking)
+		#ranking = self.sigmoidRanking(ranking)
+		ranking = round(ranking, 1)
+
+		self.ranking = ranking
+
+	def linearRanking(self, x):
+		x = 5*x + 5
+		return x
+
+	def sigmoidRanking(self, x):
+		x = 1 / (1 + exp(-5*x))
+		x = 10*x
+		return x
+
 
 
 	def buildWebDriver(self):
@@ -110,68 +172,6 @@ class Restaurant:
 
 
 
-
-def rank(restaurants):
-
-	comprehend = ComprehendClient()
-	rekognition = RekognitionClient()
-
-	for r in restaurants:
-		pos = neg = neu = mix = 0
-		weight_list = []
-		#print("Comments for restaurant " + r.pk)
-
-		for m in r.medias:
-			now = datetime.datetime.now()
-			post_taken_at = datetime.datetime(m.TakenAtTime[0], m.TakenAtTime[1], m.TakenAtTime[2], m.TakenAtTime[3], m.TakenAtTime[4], m.TakenAtTime[5])
-			age = (now - post_taken_at).days
-			#print(age)
-
-			if age <= 90:
-				weight = 1
-			elif age <= 360:
-				weight = 0.9
-			elif age <= 720:
-				weight = 0.7
-			elif age <= 1080:
-				weight = 0.5
-			elif age <= 1800:
-				weight = 0.2
-			else:
-				weight = 0
-
-			if m.CaptionText != "":
-				#print(m.CaptionText)
-				score = comprehend.analyzeText(m.CaptionText)
-				pos += score["Positive"] * weight
-				neg += score["Negative"] * weight
-				#neu += score["Neutral"] * weight
-				#mix += score["Mixed"] * weight
-				weight_list.append(weight)
-
-		if sum(weight_list) == 0:
-			pos = neg = 0
-		else:
-			pos /= sum(weight_list)
-			neg /= sum(weight_list)
-			#neu /= sum(weight_list)
-			#mix /= sum(weight_list)
-
-		ranking = pos-neg
-		ranking = linearRanking(ranking)
-		#ranking = sigmoidRanking(ranking)
-		ranking = round(ranking, 1)
-
-		r.ranking = ranking
-
-def linearRanking(x):
-	x = 5*x + 5
-	return x
-
-def sigmoidRanking(x):
-	x = 1 / (1 + exp(-5*x))
-	x = 10*x
-	return x
 
 		
 def json2Restaurants(path):
@@ -208,7 +208,6 @@ def Restaurants2json(restaurants, file):
 	f.write(out)
 	f.close()
 
-
 def removeOldMedias(restaurants):
 	for r in restaurants:
 		r.removeOldMedias()
@@ -218,10 +217,10 @@ def main():
 	for r in restaurants:
 		r.assignValues()
 
-	for r in restaurants:
-		pprint(vars(r))
-		for m in r.medias:
-			pprint(vars(m))
+	#for r in restaurants:
+		#pprint(vars(r))
+		#for m in r.medias:
+			#pprint(vars(m))
 
 	Restaurants2json(restaurants, (str(sys.path[0]))+"/data/test_Restaurants2json.json")
 
@@ -232,8 +231,8 @@ def main():
 		for m in r.medias:
 			pprint(vars(m))
 
-	rank(restaurants)
 	for r in restaurants:
+		r.rank()
 		print(r.pk)
 		print(r.name)
 		r.printFormattedRanking()
