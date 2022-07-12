@@ -53,15 +53,15 @@ def getUserInfoByUsername(username, client):
 	return client.user_info_by_username_v1(username)
 
 def getUserFollowing(userid, client):
-	@time.sleep(2)
+	#time.sleep(2)
 	return client.user_following(userid)
 
 def getUserPosts(userid, client):
-	@time.sleep(2)
+	#time.sleep(2)
 	return client.user_medias_v1(userid)
 
 def getSuggestedUsersFromFBSearch(userid, client):
-	@time.sleep(2)
+	#time.sleep(2)
 	return client.fbsearch_suggested_profiles(userid)
 
 def isProfilePrivate(user):
