@@ -19,18 +19,15 @@ def buildWebDriver():
 	return driver
 
 
+def find():
+	#does instagrapi have some name based search method? shall we use Selenium instead?
+	# 1. scrape restaurant location
+	# 2. compare username of profiles to restaurant location name: need to find a way to find SIMILAR names, not exact matches, which would be uncommon.
+	# 3. if found, get profile picture of said account. If not, well... discard the restaurant all together, they have to be on instagram to be on our site.
 
-def getMainLocationImageFromGMaps(locationName, driver):
-    driver.get("https://www.google.com/maps/search/?api=1&query="+locationName)
-    time.sleep(5)
-    cover_img = driver.find_element(By.XPATH, "//img[@decoding='async']")
-    src = cover_img.get_property("src")
-    return src
 
 def main():
-    driver=buildWebDriver()
-    source= getMainLocationImageFromGMaps("Al Saiso",driver)
-    print(source)
+
 
 
 
