@@ -19,13 +19,11 @@ def checkForRestaurantUsername(media, restaurantName):
 		minL = strippedRN
 
 	distance = Levenshtein.distance(strippedRN, username)
-	normalizedL = (maxL - distance)/maxL
+	normalizedL = (len(maxL) - distance)/len(maxL)
 
-
-	if strippedRN.find(username) != -1 or  normalizedL < 0.5: 
-		print(username + " and " + strippedRN + " are similar and likely correlated")
+	if strippedRN.find(username) != -1 or  normalizedL > 0.4:  # forse se a Levenshtein.distance() passo la sottrostringa del nome se la trova magari se la cava meglio (?)
+		print(username + " and " + strippedRN + " are similar and likely correlated. ")
 		return True
 	else:
-		return False;
-
+		return False
 	
