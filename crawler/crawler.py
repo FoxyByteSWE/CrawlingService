@@ -202,11 +202,11 @@ def updateLocationsCrawlingQueue(locationsdict):
 
 def updateLocationLastCheckedTime(locationpk):
 	datajson = getAllCrawlableLocationsFromJSON()
-	print(datajson)
-	print(locationpk)
+	#print(datajson)
+	#print(locationpk)
 	locationpk = str(locationpk)
 	locationfromJson = datajson[locationpk]
-	print(locationfromJson)
+	#print(locationfromJson)
 	locationfromJson["LastChecked"] = getNowTime()
 	writeLocationsToJSON(locationfromJson)
 
@@ -233,7 +233,7 @@ def crawlAllLocations(locationsDict, client, nPostsWanted):
 				
 				uname = media.user.username
 				propic = parseMediaUrl(client.user_info_by_username(uname).profile_pic_url)
-				print(propic)
+				#print(propic)
 				formattedmedia = formatMediaToDictionaryItem(media,client)
 				if isMediaDuplicated(formattedmedia,locationPk) == False:
 						formattedMediasFromLocation.append(formattedmedia) 
@@ -263,7 +263,7 @@ def saveCrawledDataFromLocationToJSON(mediasfromloc, locationPK):
 		locobj=locationsFromJSON[locationPK] #lista di dizionari
 		locobj.append(mediasfromloc)
 		locationsFromJSON[locationPK]=locobj
-		print(locobj)
+		#print(locobj)
 	except KeyError: # AAA
 		locationsFromJSON[locationPK] = mediasfromloc
 	writeCrawledDataToJson(locationsFromJSON)
@@ -274,11 +274,11 @@ def isMediaDuplicated(media, locationPk):
 	locationPk= str(locationPk)
 	if locationPk in fromjson.keys():
 		singlelocationdata=fromjson[locationPk]  #lista di dizionari
-		print("singlelocationdata")
-		print(singlelocationdata)
+		#print("singlelocationdata")
+		#print(singlelocationdata)
 		for item in singlelocationdata:	
 			if media["PostPartialURL"] == item["PostPartialURL"]:
-				print("dup")
+				#print("dup")
 				return True
 			else:
 				print(str(media["PostPartialURL"]) + " is not a dup of " + str(item["PostPartialURL"]))
