@@ -4,6 +4,8 @@ import instagrapi
 from typing import Dict
 import pprint
 
+import RestaurantProfileFinder
+
 #proxy = 'http://96.9.71.18:33427'
 
 #os.environ['http_proxy'] = proxy 
@@ -200,11 +202,11 @@ def updateLocationsCrawlingQueue(locationsdict):
 
 def updateLocationLastCheckedTime(locationpk):
 	datajson = getAllCrawlableLocationsFromJSON()
-	print(datajson)
-	print(locationpk)
+	#print(datajson)
+	#print(locationpk)
 	locationpk = str(locationpk)
 	locationfromJson = datajson[locationpk]
-	print(locationfromJson)
+	#print(locationfromJson)
 	locationfromJson["LastChecked"] = getNowTime()
 	writeLocationsToJSON(locationfromJson)
 
@@ -222,17 +224,25 @@ def writeLocationsToJSON(locations):
 
 def crawlAllLocations(locationsDict, client, nPostsWanted):
 	for loc in locationsDict.values():
-		print("boi")
-		#mediasDump = getTopMediasFromLocation(loc["name"], client) #returns a list of "Medias"
-		mediasDump = getMostRecentMediasFromLocation(loc["name"], client) #returns a list of "Medias"
+		mediasDump = getTopMediasFromLocation(loc["name"], client) #returns a list of "Medias"
+		#mediasDump = getMostRecentMediasFromLocation(loc["name"], client) #returns a list of "Medias"
 		formattedMediasFromLocation = []
 		locationPk = loc["pk"]
 		for media in mediasDump[0:nPostsWanted-1]:
-			formattedmedia = formatMediaToDictionaryItem(media,client)
-			if isMediaDuplicated(formattedmedia,locationPk) == False:
-				formattedMediasFromLocation.append(formattedmedia) 
-		if formattedMediasFromLocation != []:
-			saveCrawledDataFromLocationToJSON(formattedMediasFromLocation, locationPk)
+			if RestaurantProfileFinder.checkForRestaurantUsername(media, loc["name"]) == True:
+				
+				uname = media.user.username
+				propic = parseMediaUrl(client.user_info_by_username(uname).profile_pic_url)
+				#print(propic)
+				formattedmedia = formatMediaToDictionaryItem(media,client)
+				if isMediaDuplicated(formattedmedia,locationPk) == False:
+						formattedMediasFromLocation.append(formattedmedia) 
+				if formattedMediasFromLocation != []:
+					saveCrawledDataFromLocationToJSON(formattedMediasFromLocation, locationPk)
+			else:
+				print("No Profile Found, discarding restaurant.")
+				
+
 		
 
 
@@ -253,11 +263,9 @@ def saveCrawledDataFromLocationToJSON(mediasfromloc, locationPK):
 		locobj=locationsFromJSON[locationPK] #lista di dizionari
 		locobj.append(mediasfromloc)
 		locationsFromJSON[locationPK]=locobj
-		print(locobj)
-		print("arrivato")
+		#print(locobj)
 	except KeyError: # AAA
 		locationsFromJSON[locationPK] = mediasfromloc
-		print("madonna magnetica")
 	writeCrawledDataToJson(locationsFromJSON)
 
 
@@ -266,14 +274,14 @@ def isMediaDuplicated(media, locationPk):
 	locationPk= str(locationPk)
 	if locationPk in fromjson.keys():
 		singlelocationdata=fromjson[locationPk]  #lista di dizionari
-		print("singlelocationdata")
-		print(singlelocationdata)
+		#print("singlelocationdata")
+		#print(singlelocationdata)
 		for item in singlelocationdata:	
 			if media["PostPartialURL"] == item["PostPartialURL"]:
-				print("dup")
+				#print("dup")
 				return True
 			else:
-				print(str(media["PostPartialURL"]) + " is not a dup of " + str(item["PostPartialURL"]))  #WFoOCETdEH is not a dup
+				print(str(media["PostPartialURL"]) + " is not a dup of " + str(item["PostPartialURL"]))
 		return False
 	return False
 

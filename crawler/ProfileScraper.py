@@ -38,17 +38,17 @@ def updateLastLocationCheckTime(locationpk):
 # USER GETTERS
 
 def getUsernameFromID(userid, client):
-	print("getUsernameFromID")
+	#print("getUsernameFromID")
 	#time.sleep(2)
 	return client.username_from_user_id(userid)
 
 def getUserIDfromUsername(username, client):
-	print("getUserIDfromUsername")
+	#print("getUserIDfromUsername")
 	return getUserInfoByUsername(username, client).pk
 	#return client.user_id_from_username(username)
 
 def getUserInfoByUsername(username, client):
-	print("getUserInfoByUsername")
+	#print("getUserInfoByUsername")
 	#time.sleep(2)
 	return client.user_info_by_username_v1(username)
 
@@ -87,11 +87,11 @@ def convertUsertagToUser(usertag):
 	return usertag.user
 
 def convertUserShortToUser(usershort,client):
-	print("convertUserShortToUser")
+	#print("convertUserShortToUser")
 	return client.user_info_by_username(usershort.username)
 
 def convertUserShortToUserv2(usershort,client):
-	print("convertUserShortToUserv2")
+	#print("convertUserShortToUserv2")
 	return client.user_info_by_username_v1(usershort["username"])
 
 ########################################
@@ -275,16 +275,16 @@ def crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPosts
 	for post in postlist[0:nPostsAllowed]:
 		if hasTaggedLocation(post):
 			detailedLocationInfo = getDetailedMediaLocationInfo(post, client)
-			print("location is a: "+str(detailedLocationInfo.category))
+			#print("location is a: "+str(detailedLocationInfo.category))
 			if detailedLocationInfo.category in restaurant_tags and isLocationTracked(detailedLocationInfo)==False:
 				coordinates = getMediaLocationCoordinates(post)
 				trackLocation(createLocation(detailedLocationInfo.dict(), coordinates))
 		
 		if allowExtendUserBase and getPostTaggedPeople(post) != []:
-			print("Now extending User Base")
-			print(getPostTaggedPeople(post))
+			#print("Now extending User Base")
+			#print(getPostTaggedPeople(post))
 			extendFollowingUsersPoolFromPostTaggedUsers(post, client)
-			print("Finished Extending User Base")
+			#print("Finished Extending User Base")
 
 
 
@@ -300,18 +300,18 @@ def main():
 	nPostsAllowed = 40
 
 	client = createLoggedInClient()
-	#trackedUsers = getTrackedUsersFromJSON()	 
-	trackedUsers = ["marcouderzo"] #tests from our account's posts.
+	trackedUsers = getTrackedUsersFromJSON()	 
+	#trackedUsers = ["marcouderzo"] #tests from our account's posts.
 	
 	for user in trackedUsers:
 		print("MAIN LOOP: " + str(user))
 		userid = getUserIDfromUsername(user, client)
 		crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPostsAllowed)
 		if allowExtendUserBase:
-			print("Now extending User  (from main)")
+			#print("Now extending User  (from main)")
 			extendFollowingUsersPoolFromTaggedPostsSection(userid, client, 4)
 			extendFollowingUsersPoolFromSuggested(userid, client, 4)
-			print("Finished Extending User Base (from main)")
+			#print("Finished Extending User Base (from main)")
 		
 
 
