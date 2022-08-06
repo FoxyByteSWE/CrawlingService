@@ -34,7 +34,7 @@ else:
 
 class Restaurant:
 
-	def __init__(self, pk = 0, medias = [], name = "", category = "", address = "", website = "", phone = "", main_image_url = "", coordinates = "", ranking = -1):
+	def __init__(self, pk = 0, medias = [], name = "", category = "", address = "", website = "", phone = "", main_image_url = "", coordinates = "", ranking = -1, comments = []):
 		self.pk = pk
 		self.medias = medias
 		self.name = name
@@ -45,6 +45,7 @@ class Restaurant:
 		self.main_image_url = main_image_url
 		self.coordinates = coordinates
 		self.ranking = ranking
+		self.comments = comments
 
 	def assignValues(self):
 		for m in self.medias:
@@ -62,7 +63,8 @@ class Restaurant:
 				self.coordinates = m.TakenAtLocation["coordinates"]
 		geolocator = Nominatim(user_agent="geoapiExercises")
 		self.address = geolocator.reverse(str(self.coordinates[1]) + "," + str(self.coordinates[0]))
-		self.main_image_url = self.getMainImageUrl()
+		self.topComments()
+		#self.main_image_url = self.getMainImageUrl()
 
 	def returnFormattedRanking(self):
 		return '{0:.1f}'.format(self.ranking)
@@ -144,6 +146,24 @@ class Restaurant:
 		x = 10*x
 		return x
 
+	def topComments(self):
+		comprehend = ComprehendClient()
+		list = []
+		for m in self.medias:
+			if len(m.CaptionText) > 0:
+				score = comprehend.analyzeText(m.CaptionText)
+				list.append([score["Positive"], score["Negative"], m.MediaURL, m.CaptionText])
+		if len(list) > 0:
+			list.sort(reverse = True, key = lambda x: x[0])
+			if len(list[0][3]) > 1000:
+				list[0][3] = list[0][3][:997] + "..."
+			self.comments = [[list[0][2], list[0][3]]]
+			list.sort(reverse = True, key = lambda x: x[1])
+			if len(list[0][3]) > 1000:
+				list[0][3] = list[0][3][:997] + "..."
+			if list[0][2] != self.comments[0][0]:
+				self.comments.append([list[0][2], list[0][3]])
+
 
 
 	def buildWebDriver(self):
@@ -222,20 +242,22 @@ def main():
 		#for m in r.medias:
 			#pprint(vars(m))
 
-	Restaurants2json(restaurants, (str(sys.path[0]))+"/data/test_Restaurants2json.json")
+	#Restaurants2json(restaurants, (str(sys.path[0]))+"/data/test_Restaurants2json.json")
 
-	removeOldMedias(restaurants)
+	#removeOldMedias(restaurants)
+
+	#for r in restaurants:
+		#pprint(vars(r))
+		#for m in r.medias:
+			#pprint(vars(m))
 
 	for r in restaurants:
-		pprint(vars(r))
-		for m in r.medias:
-			pprint(vars(m))
-
-	for r in restaurants:
-		r.rank()
-		print(r.pk)
-		print(r.name)
-		r.printFormattedRanking()
+		#r.rank()
+		#print(r.pk)
+		#print(r.name)
+		#r.printFormattedRanking()
+		#r.topComments()
+		#pprint(r.comments)
 		print('\n')
 
 if __name__ == "__main__":
