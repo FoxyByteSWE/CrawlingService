@@ -115,14 +115,11 @@ class ProfileScraper:
 
 
 	def trackUser(self, user, client):
-		#=(client.user_info(user.pk)).username
 		#username = client.user_info_by_username_v1(username).pk
 		username = user.username
-		#usersfromjson = ProfileScraper.getTrackedUsersFromJSON()
 		usersfromjson = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
 		print("tracking user: "+ username)
 		usersfromjson[username]=user.dict()
-		#ProfileScraper.writeNewUsersToJSONFile(usersfromjson)
 		self.writeToJSON(usersfromjson, JSONUtils.UsersWriteJSONStrategy)
 
 
@@ -134,7 +131,7 @@ class ProfileScraper:
 
 	# EXTEND USERS POOL
 
-	def extendFollowingUsersPoolFromSuggested(userid, client, limit):
+	def extendFollowingUsersPoolFromSuggested(self, userid, client, limit):
 		try:
 			list = InstagrapiUtils.getSuggestedUsersFromFBSearch(userid, client)
 		except Exception as e:
@@ -143,28 +140,28 @@ class ProfileScraper:
 		for usersh in list[0:limit]:
 			user = InstagrapiUtils.getUserInfoByUsername((InstagrapiUtils.convertUserShortToUserv2(usersh, client).username),client)
 			if InstagrapiUtils.isProfilePrivate(user) == False:
-				if ProfileScraper.isAlreadyTracked(user) == False:
-					ProfileScraper.trackUser(user, client)
+				if self.isAlreadyTracked(user) == False:
+					self.trackUser(user, client)
 
 
-	def extendFollowingUsersPoolFromPostTaggedUsers(post,client):
+	def extendFollowingUsersPoolFromPostTaggedUsers(self,post,client):
 		list = InstagrapiUtils.getPostTaggedPeople(post)
 		for usertag in list:
 			usersh=InstagrapiUtils.convertUsertagToUser(usertag)
 			user = InstagrapiUtils.GetUserInfoByUsername((InstagrapiUtils.convertUserShortToUser(usersh, client).username),client)
 			if InstagrapiUtils.isProfilePrivate(user) == False:
-				if ProfileScraper.isAlreadyTracked(user) == False:
-					ProfileScraper.trackUser(user, client)
+				if self.isAlreadyTracked(user) == False:
+					self.trackUser(user, client)
 
 
 
-	def extendFollowingUsersPoolFromTaggedPostsSection(userid, client, limit):
+	def extendFollowingUsersPoolFromTaggedPostsSection(self, userid, client, limit):
 		list = InstagrapiUtils.getProfileTaggedPosts(userid, client)
 		for media in list[0:limit]:
 			user=InstagrapiUtils.getUserInfoByUsername(InstagrapiUtils.getUsernameFromID(userid,client),client)
-			if ProfileScraper.isAlreadyTracked(user) == False:
+			if self.isAlreadyTracked(user) == False:
 				if InstagrapiUtils.isProfilePrivate(user) == False:
-						ProfileScraper.trackUser(user, client)
+						self.trackUser(user, client)
 
 
 
@@ -172,7 +169,7 @@ class ProfileScraper:
 
 	# FIND RESTAURANTS
 
-	def crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPostsAllowed):
+	def crawlRestaurantsFromProfilePosts(self, userid, client, allowExtendUserBase, nPostsAllowed):
 
 		restaurant_tags = ['Restaurant', 'Italian Restaurant','Pub', 'Bar', 'Grocery ', 'Wine', 'Diner', 'Food', 'Meal', 'Breakfast', 'Lunch',
 							'Dinner', 'Cafe', 'Tea Room', 'Hotel', 'Pizza', 'Coffee', 'Bakery', 'Dessert', 'Gastropub',
@@ -185,14 +182,14 @@ class ProfileScraper:
 			if InstagrapiUtils.hasTaggedLocation(post):
 				detailedLocationInfo = InstagrapiUtils.getDetailedMediaLocationInfo(post, client)
 				#print("location is a: "+str(detailedLocationInfo.category))
-				if detailedLocationInfo.category in restaurant_tags and ProfileScraper.isLocationTracked(detailedLocationInfo)==False:
-					coordinates = ProfileScraper.getMediaLocationCoordinates(post)
-					ProfileScraper.trackLocation(ProfileScraper.createLocation(detailedLocationInfo.dict(), coordinates))
+				if detailedLocationInfo.category in restaurant_tags and self.isLocationTracked(detailedLocationInfo)==False:
+					coordinates = self.getMediaLocationCoordinates(post)
+					self.trackLocation(self.createLocation(detailedLocationInfo.dict(), coordinates))
 			
 			if allowExtendUserBase and InstagrapiUtils.getPostTaggedPeople(post) != []:
 				#print("Now extending User Base")
 				#print(getPostTaggedPeople(post))
-				ProfileScraper.extendFollowingUsersPoolFromPostTaggedUsers(post, client)
+				self.extendFollowingUsersPoolFromPostTaggedUsers(post, client)
 				#print("Finished Extending User Base")
 
 
