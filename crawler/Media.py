@@ -1,7 +1,6 @@
 import json
 import sys
 import datetime
-from geopy.geocoders import Nominatim
 from pprint import pprint
 	
 class Media:
