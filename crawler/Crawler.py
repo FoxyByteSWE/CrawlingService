@@ -6,6 +6,7 @@ import pprint
 
 import RestaurantProfileFinder
 from InstagrapiUtils import InstagrapiUtils
+from JSONUtils import JSONUtils
 
 #proxy = 'http://96.9.71.18:33427'
 
@@ -16,56 +17,23 @@ from InstagrapiUtils import InstagrapiUtils
 
 
 class Crawler:
-	
-	def getAllCrawlableLocationsFromJSON():
-		filepath = (str(sys.path[0]))+"/data/locations.json"
-		with open(filepath) as locations:
-			try:
-				data = json.load(locations)
-				return data
-			except Exception as e:
-				print(e)
-				return False
 
-	def readLocationsDataFromJSON():
-		filepath = (str(sys.path[0]))+"/data/locationsData.json"
-		with open(filepath) as locationsData:
-			try:
-				data = json.load(locationsData)
-				return data
-			except Exception as e:
-				print(e)
-				return None
+	def readFromJSON(processing_strategy: JSONUtils.ReadJSONStrategy):
+		return processing_strategy.readFromJSON()
+
+	def writeToJSON(data, processing_strategy: JSONUtils.WriteJSONStrategy):
+		return processing_strategy.writeToJSON(data)
 
 
-	def writeCrawledDataToJson(locationsData): 
-		jsondump= json.dumps(locationsData)
-		with open((str(sys.path[0]))+"/data/locationsData.json", "w") as outfile:
-			outfile.write(jsondump)
-
-
-	def getCrawledDataFromJSON():
-		filepath = (str(sys.path[0]))+"/data/locationsData.json"
-		with open(filepath) as locationsFile:
-			try:
-				data = json.load(locationsFile)
-				return data
-			except Exception as e:
-				print(e)
-				return {}
-		
-
-	def saveCrawledDataFromLocationToJSON(mediasfromloc, locationPK):
-		locationsFromJSON = Crawler.getCrawledDataFromJSON()
+	def saveCrawledDataFromLocation(mediasfromloc, locationPK):
+		locationsFromJSON = Crawler.readFromJSON(JSONUtils.CrawledDataReadJSONStrategy)
 		try:
 			locobj=locationsFromJSON[locationPK] #lista di dizionari
 			locobj.append(mediasfromloc)
 			locationsFromJSON[locationPK]=locobj
 		except KeyError:
 			locationsFromJSON[locationPK] = mediasfromloc
-		Crawler.writeCrawledDataToJson(locationsFromJSON)
-
-
+		Crawler.writeToJSON(JSONUtils.CrawledDataWriteJSONStrategy)
 
 
 	def formatMediaToDictionaryItem(media,client): #need to serialize casting to primitive data types
@@ -85,7 +53,7 @@ class Crawler:
 
 
 	def buildComprehendLocationDictionary(locationpk):
-		locationsData = Crawler.readLocationsDataFromJSON()
+		locationsData = Crawler.readFromJSON(JSONUtils.CrawledDataReadJSONStrategy)
 
 		comprehendDict = {}
 		location = locationsData[locationpk]
@@ -130,7 +98,7 @@ class Crawler:
 
 
 	def isMediaDuplicated(media, locationPk):
-		fromjson = Crawler.getCrawledDataFromJSON()
+		fromjson = Crawler.readFromJSON(JSONUtils.CrawledDataReadJSONStrategy)
 		if fromjson == {}:  # meaning it is empty
 			return False
 		locationPk= str(locationPk)
@@ -164,7 +132,7 @@ class Crawler:
 					if Crawler.isMediaDuplicated(formattedmedia,locationPk) == False:
 							formattedMediasFromLocation.append(formattedmedia) 
 					if formattedMediasFromLocation != []:
-						Crawler.saveCrawledDataFromLocationToJSON(formattedMediasFromLocation, locationPk)
+						Crawler.saveCrawledDataFromLocation(formattedMediasFromLocation, locationPk)
 				else:
 					print("No Profile Found, discarding restaurant.")
 					

@@ -6,6 +6,7 @@ from typing import Dict
 from abc import ABC, abstractmethod
 
 from InstagrapiUtils import InstagrapiUtils
+from JSONUtils import JSONUtils
 
 #proxy = 'http://46.105.142.10:7497'
 
@@ -16,66 +17,13 @@ from InstagrapiUtils import InstagrapiUtils
 
 
 
-class WriteJSONStrategy(ABC):
-	@abstractmethod
-	def writeToJSON(self, data):
-		pass
-
-
-class UsersWriteJSONStrategy(WriteJSONStrategy):
-	def writeToJSON(self, data): #writenewuserstojsonfile
-		jsondump= json.dumps(data)
-		with open((str(sys.path[0]))+"/data/trackedUsers.json", "w") as outfile:
-			outfile.write(jsondump)	
-
-class TrackedLocationsWriteJSONStrategy(WriteJSONStrategy):
-	def writeToJSON(self, data): #writenewuserstojsonfile
-		jsondump= json.dumps(data)
-		with open((str(sys.path[0]))+"/data/locations.json", "w") as outfile:
-			outfile.write(jsondump)
-
-
-class ReadJSONStrategy(ABC):
-	@abstractmethod
-	def readFromJSON(self):
-		pass
-
-
-
-class TrackedLocationsReadJSONStrategy(ReadJSONStrategy):
-	def readFromJSON(self):
-		filepath = (str(sys.path[0]))+"/data/locations.json"
-		with open(filepath) as locationsFile:
-			try:
-				data = json.load(locationsFile)
-				return data
-			except Exception as e:
-				print(e)
-				return {}
-
-
-class UsersReadJSONStrategy(ReadJSONStrategy):
-	def readFromJSON(self):
-		filepath = (str(sys.path[0]))+"/data/trackedUsers.json"
-		with open(filepath) as usersFile:
-			try:
-				data = json.load(usersFile)
-				return data
-			except Exception as e:
-				print(e)
-				return {}
-
-
-
-
-
 class ProfileScraper:
 
 
-	def readFromJSON(self, processing_strategy: ReadJSONStrategy):
+	def readFromJSON(processing_strategy: JSONUtils.ReadJSONStrategy):
 		return processing_strategy.readFromJSON()
 
-	def writeToJSON(self, data, processing_strategy: WriteJSONStrategy):
+	def writeToJSON(data, processing_strategy: JSONUtils.WriteJSONStrategy):
 		return processing_strategy.writeToJSON(data)
 
 #	def getTrackedLocationsFromJSON():
@@ -96,11 +44,11 @@ class ProfileScraper:
 
 
 	def trackLocation(self, locationdict):
-		locationsFromJSON = self.readFromJSON(TrackedLocationsReadJSONStrategy)
+		locationsFromJSON = self.readFromJSON(JSONUtils.TrackedLocationsReadJSONStrategy)
 		print("tracking location: "+ locationdict["name"])
 		locationsFromJSON[locationdict["pk"]]=locationdict
 		#ProfileScraper.writeLocationsToJSON(locationsFromJSON)
-		self.writeToJSON(locationsFromJSON, TrackedLocationsWriteJSONStrategy)
+		self.writeToJSON(locationsFromJSON, JSONUtils.TrackedLocationsWriteJSONStrategy)
 
 
 
@@ -124,7 +72,7 @@ class ProfileScraper:
 
 	def isLocationTracked(self, location):
 		#data = ProfileScraper.getTrackedLocationsFromJSON()
-		data = self.readFromJSON(TrackedLocationsReadJSONStrategy)
+		data = self.readFromJSON(JSONUtils.TrackedLocationsReadJSONStrategy)
 		if location.pk in data:
 			return True
 		else:
@@ -158,7 +106,7 @@ class ProfileScraper:
 
 	def isAlreadyTracked(self, user): #check if database or file already contains this user
 		#data = ProfileScraper.getTrackedUsersFromJSON()
-		data = self.readFromJSON(UsersReadJSONStrategy)
+		data = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
 		#print(data)
 		if user.username in data:
 			return True
@@ -171,11 +119,11 @@ class ProfileScraper:
 		#username = client.user_info_by_username_v1(username).pk
 		username = user.username
 		#usersfromjson = ProfileScraper.getTrackedUsersFromJSON()
-		usersfromjson = self.readFromJSON(UsersReadJSONStrategy)
+		usersfromjson = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
 		print("tracking user: "+ username)
 		usersfromjson[username]=user.dict()
 		#ProfileScraper.writeNewUsersToJSONFile(usersfromjson)
-		self.writeToJSON(usersfromjson, UsersWriteJSONStrategy)
+		self.writeToJSON(usersfromjson, JSONUtils.UsersWriteJSONStrategy)
 
 
 
@@ -203,7 +151,7 @@ class ProfileScraper:
 		list = InstagrapiUtils.getPostTaggedPeople(post)
 		for usertag in list:
 			usersh=InstagrapiUtils.convertUsertagToUser(usertag)
-			user = InstagrapiUtils.etUserInfoByUsername((InstagrapiUtils.convertUserShortToUser(usersh, client).username),client)
+			user = InstagrapiUtils.GetUserInfoByUsername((InstagrapiUtils.convertUserShortToUser(usersh, client).username),client)
 			if InstagrapiUtils.isProfilePrivate(user) == False:
 				if ProfileScraper.isAlreadyTracked(user) == False:
 					ProfileScraper.trackUser(user, client)
@@ -264,7 +212,7 @@ def main():
 	nPostsAllowed = 40
 
 	client = InstagrapiUtils.createLoggedInClient()
-	trackedUsers = ProfileScraper.getTrackedUsersFromJSON()	 
+	trackedUsers = ProfileScraper.readFromJSON(JSONUtils.UsersReadJSONStrategy())
 	#trackedUsers = ["marcouderzo"] #tests from our account's posts.
 	
 	for user in trackedUsers:
