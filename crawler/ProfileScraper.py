@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 
 from InstagrapiUtils import InstagrapiUtils
 from JSONUtils import JSONUtils
+from Config import CrawlingServiceConfig
 
 #proxy = 'http://46.105.142.10:7497'
 
@@ -26,22 +27,6 @@ class ProfileScraper:
 	def writeToJSON(data, processing_strategy: JSONUtils.WriteJSONStrategy):
 		return processing_strategy.writeToJSON(data)
 
-#	def getTrackedLocationsFromJSON():
-#		filepath = (str(sys.path[0]))+"/data/locations.json"
-#		with open(filepath) as locationsFile:
-#			try:
-#				data = json.load(locationsFile)
-#				return data
-#			except Exception as e:
-#				print(e)
-#				return None
-
-
-#	def writeLocationsToJSON(locations): 
-#		jsondump= json.dumps(locations)
-#		with open((str(sys.path[0]))+"/data/locations.json", "w") as outfile:
-#			outfile.write(jsondump)
-
 
 	def trackLocation(self, locationdict):
 		locationsFromJSON = self.readFromJSON(JSONUtils.TrackedLocationsReadJSONStrategy)
@@ -49,25 +34,6 @@ class ProfileScraper:
 		locationsFromJSON[locationdict["pk"]]=locationdict
 		#ProfileScraper.writeLocationsToJSON(locationsFromJSON)
 		self.writeToJSON(locationsFromJSON, JSONUtils.TrackedLocationsWriteJSONStrategy)
-
-
-
-#	def writeNewUsersToJSONFile(newusers):
-#		jsondump= json.dumps(newusers)
-#		with open((str(sys.path[0]))+"/data/trackedUsers.json", "w") as outfile:
-#			outfile.write(jsondump)
-#
-#
-#	def getTrackedUsersFromJSON():
-#		filepath = (str(sys.path[0]))+"/data/trackedUsers.json"
-#		with open(filepath) as usersFile:
-#			try:
-#				data = json.load(usersFile)
-#				return data
-#			except Exception as e:
-#				print(e)
-#				return None
-
 
 
 	def isLocationTracked(self, location):
@@ -205,8 +171,10 @@ def main():
 	
 	# Settings can be fetched through a JSON Config File
 
-	allowExtendUserBase = True   
-	nPostsAllowed = 40
+	config = CrawlingServiceConfig()
+
+	allowExtendUserBase = config.allowExtendUserBase 
+	nPostsAllowed = config.nPostsAllowedForProfileScraping
 
 	client = InstagrapiUtils.createLoggedInClient()
 	trackedUsers = ProfileScraper.readFromJSON(JSONUtils.UsersReadJSONStrategy())

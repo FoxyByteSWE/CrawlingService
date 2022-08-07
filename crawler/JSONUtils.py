@@ -44,6 +44,8 @@ class JSONUtils:
 
 
 
+
+
     ######################### READING FROM JSON #####################
 
 
@@ -89,4 +91,17 @@ class JSONUtils:
                 except Exception as e:
                     print(e)
                     return {}
+
+    
+    class ConfigReadJSONStrategy(ReadJSONStrategy):
+        def readFromJSON(self):
+            filepath = (str(sys.path[0]))+"/data/config.json"
+            with open(filepath) as usersFile:
+                try:
+                    data = json.load(usersFile)
+                    return data
+                except Exception as e:
+                    print(e)
+                    return {}
+
             

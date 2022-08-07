@@ -7,6 +7,7 @@ import pprint
 import RestaurantProfileFinder
 from InstagrapiUtils import InstagrapiUtils
 from JSONUtils import JSONUtils
+from Config import CrawlingServiceConfig
 
 #proxy = 'http://96.9.71.18:33427'
 
@@ -142,9 +143,12 @@ class Crawler:
 
 
 	def beginCrawling():
+		config = CrawlingServiceConfig()
+		nPostsWanted = config.nPostsWantedForEachLocation
+
 		client = InstagrapiUtils.createLoggedInClient()
 		locationsDict = Crawler.getAllCrawlableLocationsFromJSON()
-		nPostsWanted = 50 # only get N top posts from each location
+		
 		locationsData = Crawler.crawlAllLocations(locationsDict, client, nPostsWanted)
 
 

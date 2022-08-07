@@ -1,0 +1,5 @@
+{
+    "allowExtendUserBase": "True",
+    "nPostsAllowedForProfileScraping": 40,
+    "nPostsWantedForEachLocation": 50
+}
