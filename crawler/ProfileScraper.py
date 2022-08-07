@@ -3,7 +3,7 @@ from pprint import pprint
 from instagrapi import Client
 import instagrapi
 from typing import Dict
-
+from abc import ABC, abstractmethod
 
 from InstagrapiUtils import InstagrapiUtils
 
@@ -16,9 +16,34 @@ from InstagrapiUtils import InstagrapiUtils
 
 
 
-class ProfileScraper:
+class WriteJSONStrategy(ABC):
+	@abstractmethod
+	def writeToJSON(self, data):
+		pass
 
-	def getTrackedLocationsFromJSON():
+
+class UsersWriteJSONStrategy(WriteJSONStrategy):
+	def writeToJSON(self, data): #writenewuserstojsonfile
+		jsondump= json.dumps(data)
+		with open((str(sys.path[0]))+"/data/trackedUsers.json", "w") as outfile:
+			outfile.write(jsondump)	
+
+class TrackedLocationsWriteJSONStrategy(WriteJSONStrategy):
+	def writeToJSON(self, data): #writenewuserstojsonfile
+		jsondump= json.dumps(data)
+		with open((str(sys.path[0]))+"/data/locations.json", "w") as outfile:
+			outfile.write(jsondump)
+
+
+class ReadJSONStrategy(ABC):
+	@abstractmethod
+	def readFromJSON(self):
+		pass
+
+
+
+class TrackedLocationsReadJSONStrategy(ReadJSONStrategy):
+	def readFromJSON(self):
 		filepath = (str(sys.path[0]))+"/data/locations.json"
 		with open(filepath) as locationsFile:
 			try:
@@ -26,30 +51,11 @@ class ProfileScraper:
 				return data
 			except Exception as e:
 				print(e)
-				return None
+				return {}
 
 
-	def writeLocationsToJSON(locations): 
-		jsondump= json.dumps(locations)
-		with open((str(sys.path[0]))+"/data/locations.json", "w") as outfile:
-			outfile.write(jsondump)
-
-
-	def trackLocation(locationdict):
-		locationsFromJSON = ProfileScraper.getTrackedLocationsFromJSON()
-		print("tracking location: "+ locationdict["name"])
-		locationsFromJSON[locationdict["pk"]]=locationdict
-		ProfileScraper.writeLocationsToJSON(locationsFromJSON)
-
-
-
-	def writeNewUsersToJSONFile(newusers):
-		jsondump= json.dumps(newusers)
-		with open((str(sys.path[0]))+"/data/trackedUsers.json", "w") as outfile:
-			outfile.write(jsondump)
-
-
-	def getTrackedUsersFromJSON():
+class UsersReadJSONStrategy(ReadJSONStrategy):
+	def readFromJSON(self):
 		filepath = (str(sys.path[0]))+"/data/trackedUsers.json"
 		with open(filepath) as usersFile:
 			try:
@@ -57,12 +63,68 @@ class ProfileScraper:
 				return data
 			except Exception as e:
 				print(e)
-				return None
+				return {}
 
 
 
-	def isLocationTracked(location):
-		data = ProfileScraper.getTrackedLocationsFromJSON()
+
+
+class ProfileScraper:
+
+
+	def readFromJSON(self, processing_strategy: ReadJSONStrategy):
+		return processing_strategy.readFromJSON()
+
+	def writeToJSON(self, data, processing_strategy: WriteJSONStrategy):
+		return processing_strategy.writeToJSON(data)
+
+#	def getTrackedLocationsFromJSON():
+#		filepath = (str(sys.path[0]))+"/data/locations.json"
+#		with open(filepath) as locationsFile:
+#			try:
+#				data = json.load(locationsFile)
+#				return data
+#			except Exception as e:
+#				print(e)
+#				return None
+
+
+#	def writeLocationsToJSON(locations): 
+#		jsondump= json.dumps(locations)
+#		with open((str(sys.path[0]))+"/data/locations.json", "w") as outfile:
+#			outfile.write(jsondump)
+
+
+	def trackLocation(self, locationdict):
+		locationsFromJSON = self.readFromJSON(TrackedLocationsReadJSONStrategy)
+		print("tracking location: "+ locationdict["name"])
+		locationsFromJSON[locationdict["pk"]]=locationdict
+		#ProfileScraper.writeLocationsToJSON(locationsFromJSON)
+		self.writeToJSON(locationsFromJSON, TrackedLocationsWriteJSONStrategy)
+
+
+
+#	def writeNewUsersToJSONFile(newusers):
+#		jsondump= json.dumps(newusers)
+#		with open((str(sys.path[0]))+"/data/trackedUsers.json", "w") as outfile:
+#			outfile.write(jsondump)
+#
+#
+#	def getTrackedUsersFromJSON():
+#		filepath = (str(sys.path[0]))+"/data/trackedUsers.json"
+#		with open(filepath) as usersFile:
+#			try:
+#				data = json.load(usersFile)
+#				return data
+#			except Exception as e:
+#				print(e)
+#				return None
+
+
+
+	def isLocationTracked(self, location):
+		#data = ProfileScraper.getTrackedLocationsFromJSON()
+		data = self.readFromJSON(TrackedLocationsReadJSONStrategy)
 		if location.pk in data:
 			return True
 		else:
@@ -94,8 +156,9 @@ class ProfileScraper:
 
 
 
-	def isAlreadyTracked(user): #check if database or file already contains this user
-		data = ProfileScraper.getTrackedUsersFromJSON()
+	def isAlreadyTracked(self, user): #check if database or file already contains this user
+		#data = ProfileScraper.getTrackedUsersFromJSON()
+		data = self.readFromJSON(UsersReadJSONStrategy)
 		#print(data)
 		if user.username in data:
 			return True
@@ -103,14 +166,16 @@ class ProfileScraper:
 			return False
 
 
-	def trackUser(user, client):
+	def trackUser(self, user, client):
 		#=(client.user_info(user.pk)).username
 		#username = client.user_info_by_username_v1(username).pk
 		username = user.username
-		usersfromjson = ProfileScraper.getTrackedUsersFromJSON()
+		#usersfromjson = ProfileScraper.getTrackedUsersFromJSON()
+		usersfromjson = self.readFromJSON(UsersReadJSONStrategy)
 		print("tracking user: "+ username)
 		usersfromjson[username]=user.dict()
-		ProfileScraper.writeNewUsersToJSONFile(usersfromjson)
+		#ProfileScraper.writeNewUsersToJSONFile(usersfromjson)
+		self.writeToJSON(usersfromjson, UsersWriteJSONStrategy)
 
 
 
