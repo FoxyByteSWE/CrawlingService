@@ -166,28 +166,29 @@ class Restaurant:
 
 
 
-	def buildWebDriver(self):
-		chrome_options = webdriver.ChromeOptions()
-		chrome_options.add_experimental_option("useAutomationExtension", False)
-		chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-		driver = webdriver.Chrome(chromedriverDirectory, options=chrome_options)
-		return driver
 
-	def getMainLocationImageFromGMaps(self, locationName, driver):
-		driver.get("https://www.google.com/maps/search/?api=1&query="+locationName)
-		time.sleep(20)
-		try:
-			cover_img = driver.find_element(By.XPATH, "//img[@decoding='async']")
-		except Exception as e:
-			print(e)
-			return ""
-		src = cover_img.get_property("src")
-		return src
-
-	def getMainImageUrl(self):
-		driver = self.buildWebDriver()
-		source = self.getMainLocationImageFromGMaps(self.name + " " + str(self.address), driver)
-		return source
+#	def buildWebDriver(self):
+#		chrome_options = webdriver.ChromeOptions()
+#		chrome_options.add_experimental_option("useAutomationExtension", False)
+#		chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+#		driver = webdriver.Chrome(chromedriverDirectory, options=chrome_options)
+#		return driver
+#
+#	def getMainLocationImageFromGMaps(self, locationName, driver):
+#		driver.get("https://www.google.com/maps/search/?api=1&query="+locationName)
+#		time.sleep(20)
+#		try:
+#			cover_img = driver.find_element(By.XPATH, "//img[@decoding='async']")
+#		except Exception as e:
+#			print(e)
+#			return ""
+#		src = cover_img.get_property("src")
+#		return src
+#
+#	def getMainImageUrl(self):
+#		driver = self.buildWebDriver()
+#		source = self.getMainLocationImageFromGMaps(self.name + " " + str(self.address), driver)
+#		return source
 
 
 
