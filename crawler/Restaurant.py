@@ -146,6 +146,10 @@ class Restaurant:
 		x = 10*x
 		return x
 
+	def cubicRanking(self, x):
+		x = 5 * x*x*x + 5
+		return x
+
 	def topComments(self):
 		comprehend = ComprehendClient()
 		list = []
