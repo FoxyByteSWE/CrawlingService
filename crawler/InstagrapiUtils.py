@@ -30,6 +30,14 @@ class InstagrapiUtils:
         mediaListFromLocation = client.location_medias_recent(pkCode)
         return mediaListFromLocation
 
+    def getPostPartialURL(media):
+        return media.code
+
+
+    def getLatestPostPartialURL(userid, client):
+        InstagrapiUtils.getPostPartialURL(InstagrapiUtils.getUserPosts(userid, client)[0])
+
+
     def getMediaType(media):
         return media.media_type
 
@@ -66,8 +74,6 @@ class InstagrapiUtils:
                     list.append(item.video_url)
             return list
 
-    def getPostPartialURL(media):
-        return media.code
 
 
     def getDetailedMediaLocationInfo(media, client):  # this works and retrieves all category and other data

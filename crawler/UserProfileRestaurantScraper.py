@@ -105,6 +105,7 @@ class ProfileScraper:
 			return
 		for usersh in list[0:limit]:
 			user = InstagrapiUtils.getUserInfoByUsername((InstagrapiUtils.convertUserShortToUserv2(usersh, client).username),client)
+			user["LatestPostPartialURL"] = InstagrapiUtils.getLatestPostPartialURL(userid)
 			if InstagrapiUtils.isProfilePrivate(user) == False:
 				if self.isAlreadyTracked(user) == False:
 					self.trackUser(user, client)
@@ -115,6 +116,7 @@ class ProfileScraper:
 		for usertag in list:
 			usersh=InstagrapiUtils.convertUsertagToUser(usertag)
 			user = InstagrapiUtils.GetUserInfoByUsername((InstagrapiUtils.convertUserShortToUser(usersh, client).username),client)
+			user["LatestPostPartialURL"] = InstagrapiUtils.getLatestPostPartialURL(user.pk)
 			if InstagrapiUtils.isProfilePrivate(user) == False:
 				if self.isAlreadyTracked(user) == False:
 					self.trackUser(user, client)
@@ -125,12 +127,28 @@ class ProfileScraper:
 		list = InstagrapiUtils.getProfileTaggedPosts(userid, client)
 		for media in list[0:limit]:
 			user=InstagrapiUtils.getUserInfoByUsername(InstagrapiUtils.getUsernameFromID(userid,client),client)
+			user["LatestPostPartialURL"] = InstagrapiUtils.getLatestPostPartialURL(userid)
 			if self.isAlreadyTracked(user) == False:
 				if InstagrapiUtils.isProfilePrivate(user) == False:
 						self.trackUser(user, client)
 
 
+	def updateUserLatestPostPartialURL(self, userid, latestPURL):
+		users = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
+		targetuser = users[userid]
+		targetuser["LatestPostPartialURL"] = latestPURL
+		users[userid] = targetuser
+		self.writeToJSON(users, JSONUtils.UsersWriteJSONStrategy)
 
+	
+	def checkIfPostIsNew(indexedPURL, latestPURL):
+		if latestPURL == indexedPURL:
+			return False
+		else:
+			return True
+		
+		
+		
 	#####################
 
 	# FIND RESTAURANTS
@@ -144,7 +162,17 @@ class ProfileScraper:
 		postlist = InstagrapiUtils.getUserPosts(userid, client)
 		if nPostsAllowed > len(postlist):
 			nPostsAllowed = len(postlist)
+		latestPURL = InstagrapiUtils.getLatestPostPartialURL(userid, client)
+		if self.isAlreadyTracked(userid):
+			self.updateUserLatestPostPartialURL(userid, latestPURL) #needs user
 		for post in postlist[0:nPostsAllowed]:
+
+
+			if self.checkIfPostIsNew(InstagrapiUtils.getPostPartialURL(post), latestPURL) == False:  # check if reached a post already checked before.
+				# no need to go on
+				return
+
+
 			if InstagrapiUtils.hasTaggedLocation(post):
 				detailedLocationInfo = InstagrapiUtils.getDetailedMediaLocationInfo(post, client)
 				#print("location is a: "+str(detailedLocationInfo.category))

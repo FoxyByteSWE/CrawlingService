@@ -16,7 +16,6 @@ class JSONUtils:
 
 
 
-
     class UsersWriteJSONStrategy(WriteJSONStrategy):
         def writeToJSON(self, data): #writenewuserstojsonfile
             jsondump= json.dumps(data)
@@ -34,6 +33,8 @@ class JSONUtils:
             jsondump= json.dumps(data)
             with open((str(sys.path[0]))+"/data/locationsData.json", "w") as outfile:
                 outfile.write(jsondump)
+
+                
 
 
     class InitParenthesisWriteJSONStrategy(WriteJSONStrategy):
