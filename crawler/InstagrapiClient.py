@@ -1,6 +1,3 @@
-from InstagrapiUtils import InstagrapiUtils
-from Config import CrawlingServiceConfig
-
 
 class InstagrapiClient(type):
     """
@@ -25,26 +22,6 @@ class InstagrapiClient(type):
 
 
 class InstagrapiMainClient(metaclass=InstagrapiClient):
-
     client = None
-    config = None
-
-    def __init__(self):
-        client = InstagrapiUtils.createLoggedInClient()
-        config = CrawlingServiceConfig()
-        print("got it")
 
 
-
-if __name__ == "__main__":
-    # The client code.
-
-    s1 = InstagrapiMainClient()
-    s2 = InstagrapiMainClient()
-
-
-
-    if id(s1) == id(s2):
-        print("Singleton works, both variables contain the same instance.")
-    else:
-        print("Singleton failed, variables contain different instances.")

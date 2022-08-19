@@ -1,15 +1,25 @@
-import ProfileScraper
-import Crawler
-import Config
+from  UserProfileRestaurantScraper import ProfileScraper
+from Crawler import Crawler
+from Config import CrawlingServiceConfig
 
 
 
-def main():
-    pass
+def main(): 
+    config = CrawlingServiceConfig()
+
+    crawler = Crawler()
+    userProfileRestaurantScraper = ProfileScraper()
+    
+    print("Starting Crawling Process...")
+
+    crawler.beginCrawling(config.nPostsWantedForEachLocation)
+
+    input("Press Any Key To Begin Scraping The Locations...")
+
+    #userProfileRestaurantScraper.beginScraping(config.allowExtendUserBase,
+     #                                          config.nPostsAllowedForProfileScraping)
 
 
-# Da vedere se per un approccio serverless è meglio avere più file con più main,
-# oppure avere una sola main application che gira su Lambda.
 
 
 

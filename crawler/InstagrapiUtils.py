@@ -4,148 +4,178 @@ import instagrapi
 from typing import Dict
 import pprint
 
-    
-    
-class InstagrapiUtils:
+class InstagrapiUtilsBase(type):
+    """
+    The Singleton class can be implemented in different ways in Python. Some
+    possible methods include: base class, decorator, metaclass. We will use the
+    metaclass because it is best suited for this purpose.
+    """
 
-    def createLoggedInClient():
-        client = Client()
-        client.login("foxybyte.swe", "Swe_2022")
+    _instances = {}
+
+    
+
+    def __call__(cls, *args, **kwargs):
+        """
+        Possible changes to the value of the `__init__` argument do not affect
+        the returned instance.
+        """
+        if cls not in cls._instances:
+            instance = super().__call__(*args, **kwargs)
+            cls._instances[cls] = instance
+        return cls._instances[cls]
+
+
+
+class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
+
+    client = None
+
+    def __init__(self) -> None:
+        self.createLoggedInClient()
+
+
+
+    def createLoggedInClient(self):
+        self.client = Client()
+        self.client.login("foxybyte.swe", "Swe!2022")
         #client.dump_settings((str(sys.path[0]))+"/data/settingsdump.json")
-        #client.load_settings((str(sys.path[0]))+"/data/settingsdump.json")
-        return client
+        self.client.load_settings((str(sys.path[0]))+"/data/settingsdump.json")
 
-    def getLocationPkCodeFromName(locationName, client):
-        locList = (client.fbsearch_places(locationName)[0]).dict()
+
+
+    def getLocationPkCodeFromName(self, locationName):
+        locList = (self.client.fbsearch_places(locationName)[0]).dict()
         pkCode = locList.get("pk")
         return pkCode
 
-    def getTopMediasFromLocation(locationName, client):
-        pkCode = InstagrapiUtils.getLocationPkCodeFromName(locationName, client)
-        mediaListFromLocation = client.location_medias_top(pkCode)
+    def getTopMediasFromLocation(self, locationName):
+        print(locationName)
+        pkCode = self.getLocationPkCodeFromName(locationName)
+        mediaListFromLocation = self.client.location_medias_top(pkCode)
         return mediaListFromLocation
 
-    def getMostRecentMediasFromLocation(locationName, client):
-        pkCode = InstagrapiUtils.getLocationPkCodeFromName(locationName, client)
-        mediaListFromLocation = client.location_medias_recent(pkCode)
+    def getMostRecentMediasFromLocation(self, locationName):
+        pkCode = self.getLocationPkCodeFromName(locationName)
+        mediaListFromLocation = self.client.location_medias_recent(pkCode)
         return mediaListFromLocation
 
-    def getPostPartialURL(media):
+    def getPostPartialURL(self, media):
         return media.code
 
 
-    def getLatestPostPartialURL(userid, client):
-        InstagrapiUtils.getPostPartialURL(InstagrapiUtils.getUserPosts(userid, client)[0])
+    def getLatestPostPartialURL(self, userid):
+        self.getPostPartialURL(self.getUserPosts(userid)[0])
 
 
-    def getMediaType(media):
+    def getMediaType(self, media):
         return media.media_type
 
-    def getCaptionText(media):
+    def getCaptionText(self, media):
         return media.caption_text
 
-    def getMediaTime(media):
+    def getMediaTime(self, media):
         return media.taken_at
 
-    def getMediaLocationCoordinates(media):
+    def getMediaLocationCoordinates(self, media):
         coordinates = {'lng': (media.location).lng , 
                     'lat': (media.location).lat }
         return coordinates
 
 
-    def getMediaLocationPK(media):
+    def getMediaLocationPK(self, media):
             return media.pk
 
-    def getMediaLikeCount(media):
+    def getMediaLikeCount(self, media):
         return media.like_count
 
-    def getMediaURL(media):
-        if InstagrapiUtils.getMediaType(media)==1:
+    def getMediaURL(self, media):
+        if self.getMediaType(media)==1:
             return media.thumbnail_url
-        if InstagrapiUtils.getMediaType(media)==2:
+        if self.getMediaType(media)==2:
             return media.video_url
-        if InstagrapiUtils.getMediaType(media)==8: #album
+        if self.getMediaType(media)==8: #album
             album = media.resources
             list=[]
             for item in album:
-                if InstagrapiUtils.getMediaType(item) == 1:
+                if self.getMediaType(item) == 1:
                     list.append(item.thumbnail_url)
-                elif InstagrapiUtils.getMediaType(item) == 2:
+                elif self.getMediaType(item) == 2:
                     list.append(item.video_url)
             return list
 
 
 
-    def getDetailedMediaLocationInfo(media, client):  # this works and retrieves all category and other data
-        mediainfo = client.media_info_v1(media.pk)
+    def getDetailedMediaLocationInfo(self, media):  # this works and retrieves all category and other data
+        mediainfo = self.client.media_info_v1(media.pk)
         if mediainfo.location != None:
-            return client.location_info((mediainfo.location).pk)
+            return self.client.location_info((mediainfo.location).pk)
         else:
             return None
 
 
-    def getUsernameFromID(userid, client):
+    def getUsernameFromID(self, userid):
         #print("getUsernameFromID")
         #time.sleep(2)
-        return client.username_from_user_id(userid)
+        return self.client.username_from_user_id(userid)
 
-    def getUserIDfromUsername(username, client):
+    def getUserIDfromUsername(self, username):
         #print("getUserIDfromUsername")
-        return InstagrapiUtils.getUserInfoByUsername(username, client).pk
+        return self.getUserInfoByUsername(username).pk
         #return client.user_id_from_username(username)
 
-    def getUserInfoByUsername(username, client):
+    def getUserInfoByUsername(self, username):
         #print("getUserInfoByUsername")
         #time.sleep(2)
-        return client.user_info_by_username_v1(username)
+        return self.client.user_info_by_username_v1(username)
 
-    def getUserPosts(userid, client):
+    def getUserPosts(self, userid):
         #time.sleep(2)
-        return client.user_medias_v1(userid)
+        return self.client.user_medias_v1(userid)
 
-    def getSuggestedUsersFromFBSearch(userid, client):
+    def getSuggestedUsersFromFBSearch(self, userid):
         #time.sleep(2)
-        return client.fbsearch_suggested_profiles(userid)
+        return self.client.fbsearch_suggested_profiles(userid)
 
-    def isProfilePrivate(user):
+    def isProfilePrivate(self, user):
         return user.is_private
 
-    def getPostTaggedPeople(post):
+    def getPostTaggedPeople(self, post):
         return post.usertags
 
-    def getUserIDofTagged(userid, client):
+    def getUserIDofTagged(self, userid):
         #time.sleep(2)
-        return client.usertag_medias(userid)
+        return self.client.usertag_medias(userid)
 
-    def getProfileTaggedPosts(userid, client):
+    def getProfileTaggedPosts(self, userid):
         #time.sleep(2)
-        return client.usertag_medias(userid)
+        return self.client.usertag_medias(userid)
 
 
     ###########################################
 
     # USER CONVERTERS
 
-    def convertUsertagToUser(usertag):
+    def convertUsertagToUser(self, usertag):
         return usertag.user
 
-    def convertUserShortToUser(usershort,client):
+    def convertUserShortToUser(self, usershort):
         #print("convertUserShortToUser")
-        return client.user_info_by_username(usershort.username)
+        return self.client.user_info_by_username(usershort.username)
 
-    def convertUserShortToUserv2(usershort,client):
+    def convertUserShortToUserv2(self, usershort):
         #print("convertUserShortToUserv2")
-        return client.user_info_by_username_v1(usershort["username"])
+        return self.client.user_info_by_username_v1(usershort["username"])
 
     ########################################
 
     # LOCATION GETTERS
 
-    def getLocationFromPost(media):
+    def getLocationFromPost(self, media):
         return media.location
 
-    def getLocationPkCode(location):
+    def getLocationPkCode(self, location):
         return location.pk
 
-    def hasTaggedLocation(post):
+    def hasTaggedLocation(self, post):
         return post.location != None   # TODO: Da Testare per il != None

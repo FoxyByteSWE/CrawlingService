@@ -7,12 +7,12 @@ class CrawlingServiceConfig:
     nPostsAllowedForProfileScraping = 40
     nPostsWantedForEachLocation = 50
 
-    def readFromJSON(processing_strategy: JSONUtils.ReadJSONStrategy):
-        return processing_strategy.readFromJSON()
+    def readFromJSON(self, processing_strategy: JSONUtils.ReadJSONStrategy):
+        return processing_strategy.readFromJSON(self)
 
 
     def __init__(self):
-        config = self.readFromJSON(JSONUtils.ConfigReadJSONStrategy())
+        config = self.readFromJSON(JSONUtils.ConfigReadJSONStrategy)
         
 
         self.allowExtendUserBase = True if config["allowExtendUserBase"] == "True" else False
