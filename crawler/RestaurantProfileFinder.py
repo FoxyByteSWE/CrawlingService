@@ -22,8 +22,9 @@ def checkForRestaurantUsername(media, restaurantName):
 	normalizedL = (len(maxL) - distance)/len(maxL)
 
 	if strippedRN.find(username) != -1 or  normalizedL > 0.3:
-		print(username + " and " + strippedRN + " are similar and likely correlated. ")
+		print(username + " and " + strippedRN + " are similar with distance of:" + str(normalizedL))
 		return True
 	else:
+		print("High distance between "+username + " and " + strippedRN + " with score: " + str(normalizedL))
 		return False
 	

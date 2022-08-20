@@ -129,21 +129,26 @@ class Crawler:
 			#mediasDump = self.instagrapiUtils.getMostRecentMediasFromLocation(loc["name"], client) #returns a list of "Medias"
 			formattedMediasFromLocation = []
 			locationPk = loc["pk"]
-			for media in mediasDump[0:nPostsWanted-1]:
+			foundRestaurantProfile = False
+			for media in mediasDump:
 				if RestaurantProfileFinder.checkForRestaurantUsername(media, loc["name"]) == True:
-					
+					foundRestaurantProfile = True
+			if foundRestaurantProfile == True:
+				for media in mediasDump[0:nPostsWanted-1]:
 					uname = media.user.username
 					#propic = self.parseMediaUrl(client.user_info_by_username(uname).profile_pic_url)
 					self.parseMediaUrl(self.instagrapiUtils.getUserInfoByUsername(uname).profile_pic_url)
 					#print(propic)
 					formattedmedia = self.formatMediaToDictionaryItem(media)
 					if self.isMediaDuplicated(formattedmedia,locationPk) == False:
+							print("media appended.")
 							formattedMediasFromLocation.append(formattedmedia) 
-					if formattedMediasFromLocation != []:
-						self.saveCrawledDataFromLocation(formattedMediasFromLocation, locationPk)  # Questo dovrebbe essere solo alla fine del crawling di una location (primo ciclo for). Qui dovrebbe solo accumulare in un dizionario.
-				else:
-					print("No Profile Found, discarding restaurant.")
-					
+				if formattedMediasFromLocation != []:
+					print("saving medias...")
+					self.saveCrawledDataFromLocation(formattedMediasFromLocation, locationPk)  # Questo dovrebbe essere solo alla fine del crawling di una location (primo ciclo for). Qui dovrebbe solo accumulare in un dizionario.
+			else:
+				print("No Profile Found, discarding restaurant.")
+			
 
 			
 
