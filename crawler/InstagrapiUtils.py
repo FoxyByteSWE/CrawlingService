@@ -38,15 +38,15 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
     def createLoggedInClient(self):
         self.client = Client()
-        self.client.login("foxybyte.swe", "Swe!2022")
+        self.client.login("foxybyte.swe", "Swe!PleaseWork22")
         #client.dump_settings((str(sys.path[0]))+"/data/settingsdump.json")
-        self.client.load_settings((str(sys.path[0]))+"/data/settingsdump.json")
+        #self.client.load_settings((str(sys.path[0]))+"/data/settingsdump.json")
 
 
 
     def getLocationPkCodeFromName(self, locationName):
         locList = (self.client.fbsearch_places(locationName)[0]).dict()
-        pkCode = locList.get("pk")
+        pkCode = locList.get('pk')
         return pkCode
 
     def getTopMediasFromLocation(self, locationName):
@@ -65,8 +65,9 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
 
     def getLatestPostPartialURL(self, user):
-        self.getPostPartialURL(self.getUserPosts(user['username'])[0])
-
+        print(type(user))
+        medias = self.getUserPosts(user)
+        return self.getPostPartialURL(medias[0])
 
     def getMediaType(self, media):
         return media.media_type
@@ -131,11 +132,11 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
     def getUserPosts(self, user):
         #time.sleep(2)
-        return self.client.user_medias_v1(user.get("pk"))
+        return self.client.user_medias_v1(user.get('pk'))
 
     def getSuggestedUsersFromFBSearch(self, user):
         #time.sleep(2)
-        return self.client.fbsearch_suggested_profiles(user.get("pk"))
+        return self.client.fbsearch_suggested_profiles(user.get('pk'))
 
     def isProfilePrivate(self, user):
         return user.is_private
@@ -145,11 +146,11 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
     def getUserIDofTagged(self, user):
         #time.sleep(2)
-        return self.client.usertag_medias(user.get("pk"))
+        return self.client.usertag_medias(user.get('pk'))
 
     def getProfileTaggedPosts(self, user):
         #time.sleep(2)
-        return self.client.usertag_medias(user.get("pk"))
+        return self.client.usertag_medias(user.get('pk'))
 
 
     ###########################################

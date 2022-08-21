@@ -1,3 +1,4 @@
+from cProfile import Profile
 import os, json, sys, time
 from pprint import pprint
 from instagrapi import Client
@@ -49,7 +50,7 @@ class ProfileScraper:
 
 
 
-	def createLocation(input, coordinates):
+	def createLocation(self, input, coordinates):
 		dict = {}
 		#dict["LastChecked"]=0 # decomment this in order for time-based queueing to work
 		dict["pk"] = input["pk"]
@@ -61,7 +62,7 @@ class ProfileScraper:
 		dict["website"] = input["website"]
 		return dict;
 
-	def getMediaLocationCoordinates(media):
+	def getMediaLocationCoordinates(self, media):
 		coordinates = {'lng': (media.location).lng , 
 						'lat': (media.location).lat }
 		return coordinates
@@ -77,7 +78,7 @@ class ProfileScraper:
 		#data = ProfileScraper.getTrackedUsersFromJSON()
 		data = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
 		#print(data)
-		if user.username in data:
+		if user.get('username') in data:
 			return True
 		else:
 			return False
@@ -85,10 +86,10 @@ class ProfileScraper:
 
 	def trackUser(self, user):
 		#username = client.user_info_by_username_v1(username).pk
-		username = user.username
+		username = user.get('username')
 		usersfromjson = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
 		print("tracking user: "+ username)
-		usersfromjson[username]=user.dict()
+		usersfromjson[username]=user#.dict()
 		self.writeToJSON(usersfromjson, JSONUtils.UsersWriteJSONStrategy)
 
 
@@ -114,15 +115,17 @@ class ProfileScraper:
 					self.trackUser(user)
 
 
-	def extendFollowingUsersPoolFromPostTaggedUsers(self,post):
-		list = self.instagrapiUtils.getPostTaggedPeople(post)
-		for usertag in list:
-			usersh=self.instagrapiUtils.convertUsertagToUser(usertag)
-			user = self.instagrapiUtils.GetUserInfoByUsername((self.instagrapiUtils.convertUserShortToUser(usersh).username))
-			user["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(user)
-			if self.instagrapiUtils.isProfilePrivate(user) == False:
-				if self.isAlreadyTracked(user) == False:
-					self.trackUser(user)
+	def extendFollowingUsersPoolFromPostTaggedUsers(self,user):
+		posts = self.instagrapiUtils.getUserPosts(user)
+		for post in posts:
+			list = self.instagrapiUtils.getPostTaggedPeople(post)
+			for usertag in list:
+				usersh=self.instagrapiUtils.convertUsertagToUser(usertag)
+				user = self.instagrapiUtils.GetUserInfoByUsername((self.instagrapiUtils.convertUserShortToUser(usersh).username))
+				user["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(user)
+				if self.instagrapiUtils.isProfilePrivate(user) == False:
+					if self.isAlreadyTracked(user) == False:
+						self.trackUser(user)
 
 
 
@@ -138,13 +141,13 @@ class ProfileScraper:
 
 	def updateUserLatestPostPartialURL(self, user, latestPURL):
 		users = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
-		targetuser = users[user.pk]
+		targetuser = users[user.get('username')]
 		targetuser["LatestPostPartialURL"] = latestPURL
-		users[user.pk] = targetuser
+		users[user.get('username')] = targetuser
 		self.writeToJSON(users, JSONUtils.UsersWriteJSONStrategy)
 
 	
-	def checkIfPostIsNew(indexedPURL, latestPURL):
+	def checkIfPostIsNew(self, indexedPURL, latestPURL):
 		if latestPURL == indexedPURL:
 			return False
 		else:
@@ -165,16 +168,15 @@ class ProfileScraper:
 		postlist = self.instagrapiUtils.getUserPosts(user)
 		if nPostsAllowed > len(postlist):
 			nPostsAllowed = len(postlist)
+		print(type(user))
 		latestPURL = self.instagrapiUtils.getLatestPostPartialURL(user)
 		if self.isAlreadyTracked(user):
 			self.updateUserLatestPostPartialURL(user, latestPURL) #needs user
 		for post in postlist[0:nPostsAllowed]:
 
-
 			if self.checkIfPostIsNew(self.instagrapiUtils.getPostPartialURL(post), latestPURL) == False:  # check if reached a post already checked before.
 				# no need to go on
 				return
-
 
 			if self.instagrapiUtils.hasTaggedLocation(post):
 				detailedLocationInfo = self.instagrapiUtils.getDetailedMediaLocationInfo(post)
@@ -182,26 +184,27 @@ class ProfileScraper:
 				if detailedLocationInfo.category in restaurant_tags and self.isLocationTracked(detailedLocationInfo)==False:
 					coordinates = self.getMediaLocationCoordinates(post)
 					self.trackLocation(self.createLocation(detailedLocationInfo.dict(), coordinates))
-			
-			if allowExtendUserBase and self.instagrapiUtils.getPostTaggedPeople(post) != []:
-				#print("Now extending User Base")
-				#print(getPostTaggedPeople(post))
-				self.extendFollowingUsersPoolFromPostTaggedUsers(post)
-				#print("Finished Extending User Base")
 
 
 	def beginScraping(self, allowExtendUserBase, nPostsAllowed):
 		
 		trackedUsers = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
-		#trackedUsers = ["marcouderzo"] #tests from our account's posts.
+
+		if trackedUsers == {}:
+			self.extendFollowingUsersPoolFromSuggested("foxybyte.swe")
 		
-		for user in trackedUsers.items():
+		for userkey, user in trackedUsers.items():
 			print("MAIN LOOP: " + str(user))
+			print(type(user))
 			self.crawlRestaurantsFromProfilePosts(user, allowExtendUserBase, nPostsAllowed)
 			if allowExtendUserBase:
 				#print("Now extending User  (from main)")
-				self.extendFollowingUsersPoolFromTaggedPostsSection(user, nPostsAllowed)
-				self.extendFollowingUsersPoolFromSuggested(user, nPostsAllowed)
-				#print("Finished Extending User Base (from main)")
+				self.extendFollowingUsersPoolFromSuggested(user, 10) #follow up to 10 new users. 
+				self.extendFollowingUsersPoolFromTaggedPostsSection(user, nPostsAllowed)  #follows all possible users 
+				self.extendFollowingUsersPoolFromPostTaggedUsers(user) #follows all possible users 
 
 #########################
+
+
+#profilescraper = ProfileScraper()
+#profilescraper.beginScraping(True, 4)
