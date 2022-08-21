@@ -64,8 +64,8 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return media.code
 
 
-    def getLatestPostPartialURL(self, userid):
-        self.getPostPartialURL(self.getUserPosts(userid)[0])
+    def getLatestPostPartialURL(self, user):
+        self.getPostPartialURL(self.getUserPosts(user['username'])[0])
 
 
     def getMediaType(self, media):
@@ -129,13 +129,13 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         #time.sleep(2)
         return self.client.user_info_by_username_v1(username)
 
-    def getUserPosts(self, userid):
+    def getUserPosts(self, user):
         #time.sleep(2)
-        return self.client.user_medias_v1(userid)
+        return self.client.user_medias_v1(user.get("pk"))
 
-    def getSuggestedUsersFromFBSearch(self, userid):
+    def getSuggestedUsersFromFBSearch(self, user):
         #time.sleep(2)
-        return self.client.fbsearch_suggested_profiles(userid)
+        return self.client.fbsearch_suggested_profiles(user.get("pk"))
 
     def isProfilePrivate(self, user):
         return user.is_private
@@ -143,13 +143,13 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
     def getPostTaggedPeople(self, post):
         return post.usertags
 
-    def getUserIDofTagged(self, userid):
+    def getUserIDofTagged(self, user):
         #time.sleep(2)
-        return self.client.usertag_medias(userid)
+        return self.client.usertag_medias(user.get("pk"))
 
-    def getProfileTaggedPosts(self, userid):
+    def getProfileTaggedPosts(self, user):
         #time.sleep(2)
-        return self.client.usertag_medias(userid)
+        return self.client.usertag_medias(user.get("pk"))
 
 
     ###########################################
@@ -165,7 +165,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
     def convertUserShortToUserv2(self, usershort):
         #print("convertUserShortToUserv2")
-        return self.client.user_info_by_username_v1(usershort["username"])
+        return self.client.user_info_by_username_v1(usershort['username'])
 
     ########################################
 

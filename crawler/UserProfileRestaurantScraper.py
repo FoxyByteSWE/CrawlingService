@@ -24,11 +24,11 @@ class ProfileScraper:
 	instagrapiUtils = InstagrapiUtils()
 
 
-	def readFromJSON(processing_strategy: JSONUtils.ReadJSONStrategy):
-		return processing_strategy.readFromJSON()
+	def readFromJSON(self, processing_strategy: JSONUtils.ReadJSONStrategy):
+		return processing_strategy.readFromJSON(self)
 
-	def writeToJSON(data, processing_strategy: JSONUtils.WriteJSONStrategy):
-		return processing_strategy.writeToJSON(data)
+	def writeToJSON(self, data, processing_strategy: JSONUtils.WriteJSONStrategy):
+		return processing_strategy.writeToJSON(self, data)
 
 
 	def trackLocation(self, locationdict):
@@ -100,15 +100,15 @@ class ProfileScraper:
 
 	# EXTEND USERS POOL
 
-	def extendFollowingUsersPoolFromSuggested(self, userid, limit):
+	def extendFollowingUsersPoolFromSuggested(self, user, limit):
 		try:
-			list = self.instagrapiUtils.getSuggestedUsersFromFBSearch(userid)
+			list = self.instagrapiUtils.getSuggestedUsersFromFBSearch(user)
 		except Exception as e:
 			print(e)
 			return
 		for usersh in list[0:limit]:
 			user = self.instagrapiUtils.getUserInfoByUsername((self.instagrapiUtils.convertUserShortToUserv2(usersh).username))
-			user["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(userid)
+			user["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(user)
 			if self.instagrapiUtils.isProfilePrivate(user) == False:
 				if self.isAlreadyTracked(user) == False:
 					self.trackUser(user)
@@ -119,28 +119,28 @@ class ProfileScraper:
 		for usertag in list:
 			usersh=self.instagrapiUtils.convertUsertagToUser(usertag)
 			user = self.instagrapiUtils.GetUserInfoByUsername((self.instagrapiUtils.convertUserShortToUser(usersh).username))
-			user["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(user.pk)
+			user["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(user)
 			if self.instagrapiUtils.isProfilePrivate(user) == False:
 				if self.isAlreadyTracked(user) == False:
 					self.trackUser(user)
 
 
 
-	def extendFollowingUsersPoolFromTaggedPostsSection(self, userid, limit):
-		list = self.instagrapiUtils.getProfileTaggedPosts(userid)
+	def extendFollowingUsersPoolFromTaggedPostsSection(self, user, limit):
+		list = self.instagrapiUtils.getProfileTaggedPosts(user)
 		for media in list[0:limit]:
-			user=self.instagrapiUtils.getUserInfoByUsername(self.instagrapiUtils.getUsernameFromID(userid))
-			user["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(userid)
+			user=self.instagrapiUtils.getUserInfoByUsername(user)
+			user["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(user)
 			if self.isAlreadyTracked(user) == False:
 				if self.instagrapiUtils.isProfilePrivate(user) == False:
 						self.trackUser(user)
 
 
-	def updateUserLatestPostPartialURL(self, userid, latestPURL):
+	def updateUserLatestPostPartialURL(self, user, latestPURL):
 		users = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
-		targetuser = users[userid]
+		targetuser = users[user.pk]
 		targetuser["LatestPostPartialURL"] = latestPURL
-		users[userid] = targetuser
+		users[user.pk] = targetuser
 		self.writeToJSON(users, JSONUtils.UsersWriteJSONStrategy)
 
 	
@@ -156,18 +156,18 @@ class ProfileScraper:
 
 	# FIND RESTAURANTS
 
-	def crawlRestaurantsFromProfilePosts(self, userid, allowExtendUserBase, nPostsAllowed):
+	def crawlRestaurantsFromProfilePosts(self, user, allowExtendUserBase, nPostsAllowed):
 
 		restaurant_tags = ['Restaurant', 'Italian Restaurant','Pub', 'Bar', 'Grocery ', 'Wine', 'Diner', 'Food', 'Meal', 'Breakfast', 'Lunch',
 							'Dinner', 'Cafe', 'Tea Room', 'Hotel', 'Pizza', 'Coffee', 'Bakery', 'Dessert', 'Gastropub',
 							'Sandwich', 'Ice Cream', 'Steakhouse', 'Pizza place', 'Fast food restaurant', 'Deli']
 
-		postlist = self.instagrapiUtils.getUserPosts(userid)
+		postlist = self.instagrapiUtils.getUserPosts(user)
 		if nPostsAllowed > len(postlist):
 			nPostsAllowed = len(postlist)
-		latestPURL = self.instagrapiUtils.getLatestPostPartialURL(userid)
-		if self.isAlreadyTracked(userid):
-			self.updateUserLatestPostPartialURL(userid, latestPURL) #needs user
+		latestPURL = self.instagrapiUtils.getLatestPostPartialURL(user)
+		if self.isAlreadyTracked(user):
+			self.updateUserLatestPostPartialURL(user, latestPURL) #needs user
 		for post in postlist[0:nPostsAllowed]:
 
 
@@ -192,52 +192,16 @@ class ProfileScraper:
 
 	def beginScraping(self, allowExtendUserBase, nPostsAllowed):
 		
-		trackedUsers = ProfileScraper.readFromJSON(JSONUtils.UsersReadJSONStrategy())
+		trackedUsers = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
 		#trackedUsers = ["marcouderzo"] #tests from our account's posts.
 		
-		for user in trackedUsers:
+		for user in trackedUsers.items():
 			print("MAIN LOOP: " + str(user))
-			userid = self.instagrapiUtils.getUserIDfromUsername(user)
-			ProfileScraper.crawlRestaurantsFromProfilePosts(userid, allowExtendUserBase, nPostsAllowed)
+			self.crawlRestaurantsFromProfilePosts(user, allowExtendUserBase, nPostsAllowed)
 			if allowExtendUserBase:
 				#print("Now extending User  (from main)")
-				ProfileScraper.extendFollowingUsersPoolFromTaggedPostsSection(userid, 4)
-				ProfileScraper.extendFollowingUsersPoolFromSuggested(userid, 4)
+				self.extendFollowingUsersPoolFromTaggedPostsSection(user, nPostsAllowed)
+				self.extendFollowingUsersPoolFromSuggested(user, nPostsAllowed)
 				#print("Finished Extending User Base (from main)")
 
 #########################
-
-
-
-#################################################################
-#
-#def main():
-#	
-#	# Settings can be fetched through a JSON Config File
-#
-#	config = CrawlingServiceConfig()
-#
-#	allowExtendUserBase = config.allowExtendUserBase 
-#	nPostsAllowed = config.nPostsAllowedForProfileScraping
-#
-#	client = self.instagrapiUtils.createLoggedInClient()
-#	trackedUsers = ProfileScraper.readFromJSON(JSONUtils.UsersReadJSONStrategy())
-#	#trackedUsers = ["marcouderzo"] #tests from our account's posts.
-#	
-#	for user in trackedUsers:
-#		print("MAIN LOOP: " + str(user))
-#		userid = self.instagrapiUtils.getUserIDfromUsername(user, client)
-#		ProfileScraper.crawlRestaurantsFromProfilePosts(userid, client, allowExtendUserBase, nPostsAllowed)
-#		if allowExtendUserBase:
-#			#print("Now extending User  (from main)")
-#			ProfileScraper.extendFollowingUsersPoolFromTaggedPostsSection(userid, client, 4)
-#			ProfileScraper.extendFollowingUsersPoolFromSuggested(userid, client, 4)
-#			#print("Finished Extending User Base (from main)")
-#		
-#
-#
-#
-################################################################
-
-#if __name__ == "__main__":
-	#main()

@@ -7,17 +7,17 @@ from Config import CrawlingServiceConfig
 def main(): 
     config = CrawlingServiceConfig()
 
-    crawler = Crawler()
+    #crawler = Crawler()
     userProfileRestaurantScraper = ProfileScraper()
     
-    print("Starting Crawling Process...")
+    #print("Starting Crawling Process...")
 
-    crawler.beginCrawling(config.nPostsWantedForEachLocation)
+    #crawler.beginCrawling(config.nPostsWantedForEachLocation)
 
-    input("Press Any Key To Begin Scraping The Locations...")
+    #input("Press Any Key To Begin Scraping The Locations...")
 
-    #userProfileRestaurantScraper.beginScraping(config.allowExtendUserBase,
-     #                                          config.nPostsAllowedForProfileScraping)
+    userProfileRestaurantScraper.beginScraping(config.allowExtendUserBase,
+                                               config.nPostsAllowedForProfileScraping)
 
 
 
