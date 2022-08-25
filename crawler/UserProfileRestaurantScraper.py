@@ -3,7 +3,6 @@ import os, json, sys, time
 from pprint import pprint
 from instagrapi import Client
 import instagrapi
-from typing import Dict
 from abc import ABC, abstractmethod
 
 from InstagrapiUtils import InstagrapiUtils
@@ -108,11 +107,11 @@ class ProfileScraper:
 			print(e)
 			return
 		for usersh in list[0:limit]:
-			user = self.instagrapiUtils.getUserInfoByUsername((self.instagrapiUtils.convertUserShortToUserv2(usersh).username))
-			user["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(user)
-			if self.instagrapiUtils.isProfilePrivate(user) == False:
-				if self.isAlreadyTracked(user) == False:
-					self.trackUser(user)
+			usersugg = self.instagrapiUtils.getUserInfoByUsername((self.instagrapiUtils.convertUserShortToUserv2(usersh).username))
+			#usersugg["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(usersugg)
+			if self.instagrapiUtils.isProfilePrivate(usersugg) == False:
+				if self.isAlreadyTracked(usersugg.dict()) == False:
+					self.trackUser(usersugg.dict())
 
 
 	def extendFollowingUsersPoolFromPostTaggedUsers(self,user):
@@ -121,22 +120,22 @@ class ProfileScraper:
 			list = self.instagrapiUtils.getPostTaggedPeople(post)
 			for usertag in list:
 				usersh=self.instagrapiUtils.convertUsertagToUser(usertag)
-				user = self.instagrapiUtils.GetUserInfoByUsername((self.instagrapiUtils.convertUserShortToUser(usersh).username))
-				user["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(user)
-				if self.instagrapiUtils.isProfilePrivate(user) == False:
-					if self.isAlreadyTracked(user) == False:
-						self.trackUser(user)
+				usertagged = self.instagrapiUtils.GetUserInfoByUsername((self.instagrapiUtils.convertUserShortToUser(usersh).username))
+				#user["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(usersugg)
+				if self.instagrapiUtils.isProfilePrivate(usertagged) == False:
+					if self.isAlreadyTracked(usertagged.dict()) == False:
+						self.trackUser(usertagged.dict())
 
 
 
 	def extendFollowingUsersPoolFromTaggedPostsSection(self, user, limit):
 		list = self.instagrapiUtils.getProfileTaggedPosts(user)
 		for media in list[0:limit]:
-			user=self.instagrapiUtils.getUserInfoByUsername(user)
-			user["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(user)
-			if self.isAlreadyTracked(user) == False:
-				if self.instagrapiUtils.isProfilePrivate(user) == False:
-						self.trackUser(user)
+			userposter=self.instagrapiUtils.getUserInfoByUsername(user)
+			#user["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(user)
+			if self.isAlreadyTracked(userposter.dict()) == False:
+				if self.instagrapiUtils.isProfilePrivate(userposter.dict()) == False:
+						self.trackUser(userposter.dict())
 
 
 	def updateUserLatestPostPartialURL(self, user, latestPURL):
@@ -191,7 +190,9 @@ class ProfileScraper:
 		trackedUsers = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
 
 		if trackedUsers == {}:
-			self.extendFollowingUsersPoolFromSuggested("foxybyte.swe")
+			kickoffUser = (self.instagrapiUtils.getUserInfoByUsername("foxybyte.swe"))
+			kickoffUser = self.dict()
+			self.extendFollowingUsersPoolFromSuggested(kickoffUser, 10)
 		
 		for userkey, user in trackedUsers.items():
 			print("MAIN LOOP: " + str(user))
@@ -204,7 +205,3 @@ class ProfileScraper:
 				self.extendFollowingUsersPoolFromPostTaggedUsers(user) #follows all possible users 
 
 #########################
-
-
-#profilescraper = ProfileScraper()
-#profilescraper.beginScraping(True, 4)

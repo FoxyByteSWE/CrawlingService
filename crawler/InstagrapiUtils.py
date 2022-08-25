@@ -1,4 +1,5 @@
 import os, json, sys, time
+from re import M
 from instagrapi import Client
 import instagrapi
 from typing import Dict
@@ -38,7 +39,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
     def createLoggedInClient(self):
         self.client = Client()
-        self.client.login("foxybyte.swe", "Swe!PleaseWork22")
+        self.client.login("foxybyte.swe", "tipregofunzionaswe")
         #client.dump_settings((str(sys.path[0]))+"/data/settingsdump.json")
         #self.client.load_settings((str(sys.path[0]))+"/data/settingsdump.json")
 
@@ -91,6 +92,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return media.like_count
 
     def getMediaURL(self, media):
+        print("here")
         if self.getMediaType(media)==1:
             return media.thumbnail_url
         if self.getMediaType(media)==2:
@@ -139,7 +141,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return self.client.fbsearch_suggested_profiles(user.get('pk'))
 
     def isProfilePrivate(self, user):
-        return user.is_private
+        return user.get('is_private')
 
     def getPostTaggedPeople(self, post):
         return post.usertags
