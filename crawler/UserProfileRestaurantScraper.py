@@ -191,9 +191,10 @@ class ProfileScraper:
 
 		if trackedUsers == {}:
 			kickoffUser = (self.instagrapiUtils.getUserInfoByUsername("foxybyte.swe"))
-			kickoffUser = self.dict()
+			kickoffUser = kickoffUser.dict()
 			self.extendFollowingUsersPoolFromSuggested(kickoffUser, 10)
 		
+		print("huhuhuh")
 		for userkey, user in trackedUsers.items():
 			print("MAIN LOOP: " + str(user))
 			print(type(user))
