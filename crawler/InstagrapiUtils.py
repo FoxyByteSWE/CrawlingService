@@ -62,12 +62,14 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return mediaListFromLocation
 
     def getPostPartialURL(self, media):
+        print(media)
         return media.code
 
 
     def getLatestPostPartialURL(self, user):
         print(type(user))
         medias = self.getUserPosts(user)
+        print(medias[0])
         return self.getPostPartialURL(medias[0])
 
     def getMediaType(self, media):
@@ -134,11 +136,21 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
     def getUserPosts(self, user):
         #time.sleep(2)
-        return self.client.user_medias_v1(user.get('pk'))
+        if type(user) is dict:
+            userpk = user.get('pk')
+        else:
+            userpk = user.pk
+        return self.client.user_medias_v1(userpk)
 
     def getSuggestedUsersFromFBSearch(self, user):
         #time.sleep(2)
-        return self.client.fbsearch_suggested_profiles(user.get('pk'))
+        #userpk = user.get('pk')
+        #userpk = user['pk'];
+        #print(user.pk)
+        if type(user) is dict:
+            return self.client.fbsearch_suggested_profiles(user.get('pk'))
+        else:
+            return self.client.fbsearch_suggested_profiles(user.pk)
 
     def isProfilePrivate(self, user):
         return user.get('is_private')
@@ -148,11 +160,12 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
     def getUserIDofTagged(self, user):
         #time.sleep(2)
-        return self.client.usertag_medias(user.get('pk'))
+        userpk = user.get('pk')
+        return self.client.usertag_medias(userpk)
 
     def getProfileTaggedPosts(self, user):
-        #time.sleep(2)
-        return self.client.usertag_medias(user.get('pk'))
+        userpk = user.get('pk')
+        return self.client.usertag_medias(userpk)
 
 
     ###########################################
