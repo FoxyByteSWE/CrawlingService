@@ -37,7 +37,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
 
 
-    def createLoggedInClient(self):
+    def createLoggedInClient(self) -> None:
         try:
             self.client = Client(self.loadCookies())
             self.client.login("foxybyte.swe", "tipregofunzionaswe")
@@ -59,41 +59,39 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return json.loads(open((str(sys.path[0]))+"/data/cookie.json").read())
 
 
-    def getLocationPkCodeFromName(self, locationName):
+    def getLocationPkCodeFromName(self, locationName: str) -> int:
         locList = (self.client.fbsearch_places(locationName)[0]).dict()
         pkCode = locList.get('pk')
         return pkCode
 
-    def getTopMediasFromLocation(self, locationName):
+    def getTopMediasFromLocation(self, locationName: str) -> list:
         print(locationName)
         pkCode = self.getLocationPkCodeFromName(locationName)
         mediaListFromLocation = self.client.location_medias_top(pkCode)
         return mediaListFromLocation
 
-    def getMostRecentMediasFromLocation(self, locationName):
+    def getMostRecentMediasFromLocation(self, locationName: str) -> list:
         pkCode = self.getLocationPkCodeFromName(locationName)
         mediaListFromLocation = self.client.location_medias_recent(pkCode)
         return mediaListFromLocation
 
-    def getPostPartialURL(self, media):
-        #print("media is:")
-        #print(media)
+    def getPostPartialURL(self, media) -> str:
         return media.code
 
 
-    def getLatestPostPartialURLChecked(self, user):
+    def getLatestPostPartialURLChecked(self, user: dict) -> str:
         return user.get("LatestPostPartialURL")
 
-    def getMediaType(self, media):
+    def getMediaType(self, media) -> int:
         return media.media_type
 
-    def getCaptionText(self, media):
+    def getCaptionText(self, media) -> str:
         return media.caption_text
 
     def getMediaTime(self, media):
         return media.taken_at
 
-    def getMediaLocationCoordinates(self, media):
+    def getMediaLocationCoordinates(self, media) -> dict:
         coordinates = {'lng': (media.location).lng , 
                     'lat': (media.location).lat }
         return coordinates
@@ -102,7 +100,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
     def getMediaLocationPK(self, media):
             return media.pk
 
-    def getMediaLikeCount(self, media):
+    def getMediaLikeCount(self, media) -> int:
         return media.like_count
 
     def getMediaURL(self, media):
@@ -123,7 +121,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
 
 
-    def getDetailedMediaLocationInfo(self, media):  # this works and retrieves all category and other data
+    def getDetailedMediaLocationInfo(self, media): 
         mediainfo = self.client.media_info_v1(media.pk)
         if mediainfo.location != None:
             return self.client.location_info((mediainfo.location).pk)
@@ -158,19 +156,16 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         if type(user) is dict:
             print("WARNING: CHECK InstagrapiUtils.getSuggestedUsersFromFBSearch(user)")
             pk = user.get('pk')
-            print("casted pk to string " + pk)
             res =  self.client.fbsearch_suggested_profiles(pk)  # For some reason an exception is thrown: Not eligible for chaining. 
             return res
-        else:
-            return self.client.fbsearch_suggested_profiles(user.pk)
 
-    def isProfilePrivate(self, user):
+    def isProfilePrivate(self, user) -> bool:
         return user.get('is_private')
 
-    def getPostTaggedPeople(self, post):
+    def getPostTaggedPeople(self, post) -> list:
         return post.usertags
 
-    def getUserIDofTagged(self, user):
+    def getUserIDofTagged(self, user): 
         #time.sleep(2)
         userpk = user.get('pk')
         return self.client.usertag_medias(userpk)
@@ -206,4 +201,4 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return location.pk
 
     def hasTaggedLocation(self, post):
-        return post.location != None   # TODO: Da Testare per il != None
+        return post.location != None 

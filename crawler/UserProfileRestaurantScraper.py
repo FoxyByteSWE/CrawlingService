@@ -1,4 +1,3 @@
-from cProfile import Profile
 import os, json, sys, time
 from pprint import pprint
 from instagrapi import Client
@@ -8,14 +7,6 @@ from abc import ABC, abstractmethod
 from InstagrapiUtils import InstagrapiUtils
 from JSONUtils import JSONUtils
 from Config import CrawlingServiceConfig
-
-#proxy = 'http://46.105.142.10:7497'
-
-#os.environ['http_proxy'] = proxy 
-#os.environ['HTTP_PROXY'] = proxy
-#os.environ['https_proxy'] = proxy
-#os.environ['HTTPS_PROXY'] = proxy
-
 
 
 class ProfileScraper:
@@ -31,15 +22,14 @@ class ProfileScraper:
 		return processing_strategy.writeToJSON(self, data)
 
 
-	def trackLocation(self, locationdict):
+	def trackLocation(self, locationdict) -> None:
 		locationsFromJSON = self.readFromJSON(JSONUtils.TrackedLocationsReadJSONStrategy)
 		print("tracking location: "+ locationdict["name"])
 		locationsFromJSON[locationdict["pk"]]=locationdict
-		#ProfileScraper.writeLocationsToJSON(locationsFromJSON)
 		self.writeToJSON(locationsFromJSON, JSONUtils.TrackedLocationsWriteJSONStrategy)
 
 
-	def isLocationTracked(self, location):
+	def isLocationTracked(self, location) -> bool:
 		data = self.readFromJSON(JSONUtils.TrackedLocationsReadJSONStrategy)
 		print(data.keys())
 		if str(location.pk) in data.keys():
@@ -51,9 +41,8 @@ class ProfileScraper:
 
 
 
-	def createLocation(self, input, coordinates):
+	def createLocation(self, input, coordinates) -> dict:
 		dict = {}
-		#dict["LastChecked"]=0 # decomment this in order for time-based queueing to work
 		dict["pk"] = input["pk"]
 		dict["name"] = input["name"]
 		dict["address"] = input["address"]
@@ -63,19 +52,13 @@ class ProfileScraper:
 		dict["website"] = input["website"]
 		return dict;
 
-	def getMediaLocationCoordinates(self, media):
+	def getMediaLocationCoordinates(self, media) -> dict:
 		coordinates = {'lng': (media.location).lng , 
 						'lat': (media.location).lat }
 		return coordinates
 
 
-
-
-
-
-
-
-	def isAlreadyTracked(self, user): #check if database or file already contains this user
+	def isAlreadyTracked(self, user: dict) -> bool: #check if database or file already contains this user
 		#data = ProfileScraper.getTrackedUsersFromJSON()
 		data = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
 		#print(data)
@@ -85,7 +68,7 @@ class ProfileScraper:
 			return False
 
 
-	def trackUser(self, user):
+	def trackUser(self, user: dict) -> None:
 		#username = client.user_info_by_username_v1(username).pk
 		username = user.get('username')
 		usersfromjson = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
@@ -102,7 +85,7 @@ class ProfileScraper:
 
 	# EXTEND USERS POOL
 
-	def extendFollowingUsersPoolFromSuggested(self, user, limit):
+	def extendFollowingUsersPoolFromSuggested(self, user: dict, limit: int) -> None:
 		try:
 			list = self.instagrapiUtils.getSuggestedUsersFromFBSearch(user)
 		except Exception as e:
@@ -120,7 +103,7 @@ class ProfileScraper:
 					self.trackUser(usersugg)
 
 
-	def extendFollowingUsersPoolFromPostTaggedUsers(self,user):
+	def extendFollowingUsersPoolFromPostTaggedUsers(self,user: dict) -> None:
 		posts = self.instagrapiUtils.getUserPosts(user)
 		for post in posts:
 			list = self.instagrapiUtils.getPostTaggedPeople(post)
@@ -135,7 +118,7 @@ class ProfileScraper:
 
 
 
-	def extendFollowingUsersPoolFromTaggedPostsSection(self, user, limit):
+	def extendFollowingUsersPoolFromTaggedPostsSection(self, user: dict, limit: int) -> None:
 		list = self.instagrapiUtils.getProfileTaggedPosts(user)
 		if list == []:
 			print("No posts available in Tagged Posts Section")
@@ -147,7 +130,7 @@ class ProfileScraper:
 						self.trackUser(userposter)
 
 
-	def updateUserLatestPostPartialURL(self, user, latestPURL):
+	def updateUserLatestPostPartialURL(self, user: dict, latestPURL: str) -> None:
 		users = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
 		targetuser = users[user.get('username')]
 		targetuser["LatestPostPartialURL"] = latestPURL
@@ -155,7 +138,7 @@ class ProfileScraper:
 		self.writeToJSON(users, JSONUtils.UsersWriteJSONStrategy)
 
 	
-	def checkIfPostIsNew(self, indexedPURL, latestPURL):
+	def checkIfPostIsNew(self, indexedPURL: str, latestPURL: str) -> bool:
 		if latestPURL == indexedPURL:
 			return False
 		else:
@@ -167,28 +150,24 @@ class ProfileScraper:
 
 	# FIND RESTAURANTS
 
-	def crawlRestaurantsFromProfilePosts(self, user, allowExtendUserBase, nPostsAllowed):
+	def crawlRestaurantsFromProfilePosts(self, user: dict, nPostsAllowed: int) -> None:
 
 		restaurant_tags = ['Restaurant', 'Italian Restaurant','Pub', 'Bar', 'Grocery ', 'Wine', 'Diner', 'Food', 'Meal', 'Breakfast', 'Lunch',
 							'Dinner', 'Cafe', 'Tea Room', 'Hotel', 'Pizza', 'Coffee', 'Bakery', 'Dessert', 'Gastropub',
 							'Sandwich', 'Ice Cream', 'Steakhouse', 'Pizza place', 'Fast food restaurant', 'Deli']
 
-		postlist = self.instagrapiUtils.getUserPosts(user)
+		postlist = self.instagrapiUtils.getUserPosts(user).dict()
 		if nPostsAllowed > len(postlist):
 			nPostsAllowed = len(postlist)
-		#print(type(user))
-		print("here0")
+
 		latestCheckedPURL = self.instagrapiUtils.getLatestPostPartialURLChecked(user)
 		for post in postlist[0:nPostsAllowed]:
-			print("here1")
 			indexedPURL = self.instagrapiUtils.getPostPartialURL(post)
 			if self.checkIfPostIsNew(indexedPURL, latestCheckedPURL) == False:  # check if reached a post already checked before
-				print("notnew")
 				return
 
 			if self.isAlreadyTracked(user):
 				self.updateUserLatestPostPartialURL(user, indexedPURL) 
-				print("here2")
 
 
 			if self.instagrapiUtils.hasTaggedLocation(post):
@@ -202,7 +181,7 @@ class ProfileScraper:
 		
 
 
-	def beginScraping(self, allowExtendUserBase, nPostsAllowed):
+	def beginScraping(self, allowExtendUserBase: bool, nPostsAllowed: int) -> None:
 		
 		trackedUsers = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
 
@@ -212,18 +191,16 @@ class ProfileScraper:
 			self.extendFollowingUsersPoolFromSuggested(kickoffUser, 5)
 			trackedUsers = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
 		
-		#print("huhuhuh")
 		for user in trackedUsers.values():
 			print("MAIN LOOP: " + str(user.get('username')))
 
-			self.crawlRestaurantsFromProfilePosts(user, allowExtendUserBase, 25)
-			
+			self.crawlRestaurantsFromProfilePosts(user, 25)
+
 			if allowExtendUserBase:
 				print(" ===== Starting ExtendUsersPool referencing user: " + str(user.get('username')) + " =====")
 				#print("Extending by Suggested Users of user: " + str(user.get('username')))
-				#self.extendFollowingUsersPoolFromSuggested(user, 5) #follow up to 10 new users.
+				#self.extendFollowingUsersPoolFromSuggested(user, 5) #follow up to N new users. This throws an internal instagrapi Exception
 				print("Extending From Tagged Posts Section of user: " + str(user.get('username')))
 				self.extendFollowingUsersPoolFromTaggedPostsSection(user, nPostsAllowed)  #follows all possible users 
 				print("Extending From Users Tagged in Posts of user: " + str(user.get('username')))
 				self.extendFollowingUsersPoolFromPostTaggedUsers(user) #follows all possible users 
-#########################
