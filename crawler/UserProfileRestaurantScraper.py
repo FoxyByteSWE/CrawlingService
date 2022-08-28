@@ -41,7 +41,9 @@ class ProfileScraper:
 
 	def isLocationTracked(self, location):
 		data = self.readFromJSON(JSONUtils.TrackedLocationsReadJSONStrategy)
-		if location.pk in data.keys():
+		print(data.keys())
+		if str(location.pk) in data.keys():
+			
 			print("location is already being tracked.")
 			return True
 		else:
