@@ -33,13 +33,18 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
     client = None
 
     def __init__(self) -> None:
-        self.createLoggedInClient()
+        ret = self.createLoggedInClient()
 
 
 
     def createLoggedInClient(self):
-        self.client = Client()
-        self.client.login("foxybyte.swe", "tipregofunzionaswe")
+        try:
+            self.client = Client()
+            self.client.login("foxybyte.swe", "tipregofunzionaswe")
+            print("Client Logged-In to Instagrapi")
+        except Exception as e:
+            print("Something went wrong: " + str(e))
+            exit()
         #client.dump_settings((str(sys.path[0]))+"/data/settingsdump.json")
         #self.client.load_settings((str(sys.path[0]))+"/data/settingsdump.json")
 
@@ -62,14 +67,16 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return mediaListFromLocation
 
     def getPostPartialURL(self, media):
-        print(media)
+        #print("media is:")
+        #print(media)
         return media.code
 
 
     def getLatestPostPartialURL(self, user):
         print(type(user))
         medias = self.getUserPosts(user)
-        print(medias[0])
+        #print("medias[0] is: ")
+        #print(medias[0])
         return self.getPostPartialURL(medias[0])
 
     def getMediaType(self, media):
@@ -94,7 +101,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return media.like_count
 
     def getMediaURL(self, media):
-        print("here")
+        #print("here")
         if self.getMediaType(media)==1:
             return media.thumbnail_url
         if self.getMediaType(media)==2:

@@ -102,19 +102,23 @@ class ProfileScraper:
 
 	def extendFollowingUsersPoolFromSuggested(self, user, limit):
 		try:
-			print("fuck1")
+			#print("fuck1")
 			list = self.instagrapiUtils.getSuggestedUsersFromFBSearch(user)
-			print("fuck2")
+			#print("fuck2")
 		except Exception as e:
 			print(e)
 			return
+
+		if limit > len(list):
+			limit = len(list)
+
 		for usersh in list[0:limit]:
-			print("Fuck come on")
+			#print("Fuck come on")
 			usertmp = self.instagrapiUtils.convertUserShortToUserv2(usersh)
 			username = usertmp.username
-			print("What the fuck")
+			#print("What the fuck")
 			usersugg = self.instagrapiUtils.getUserInfoByUsername(username).dict()
-			usersugg["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(usersugg)
+			usersugg["LatestPostPartialURL"] = ''
 			if self.instagrapiUtils.isProfilePrivate(usersugg) == False:
 				if self.isAlreadyTracked(usersugg) == False:
 					self.trackUser(usersugg)
@@ -126,8 +130,9 @@ class ProfileScraper:
 			list = self.instagrapiUtils.getPostTaggedPeople(post)
 			for usertag in list:
 				usersh=self.instagrapiUtils.convertUsertagToUser(usertag)
-				usertagged = self.instagrapiUtils.GetUserInfoByUsername((self.instagrapiUtils.convertUserShortToUser(usersh).username)).dict()
-				#user["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(usersugg)
+				usertagged = (self.instagrapiUtils.getUserInfoByUsername(usersh.username)).dict()
+				#usertagged = (self.instagrapiUtils.GetUserInfoByUsername(usersh.username)).dict()
+				user["LatestPostPartialURL"] = ''
 				if self.instagrapiUtils.isProfilePrivate(usertagged) == False:
 					if self.isAlreadyTracked(usertagged) == False:
 						self.trackUser(usertagged)
@@ -137,8 +142,8 @@ class ProfileScraper:
 	def extendFollowingUsersPoolFromTaggedPostsSection(self, user, limit):
 		list = self.instagrapiUtils.getProfileTaggedPosts(user)
 		for media in list[0:limit]:
-			userposter=self.instagrapiUtils.getUserInfoByUsername(user.username).dict()
-			#user["LatestPostPartialURL"] = self.instagrapiUtils.getLatestPostPartialURL(user)
+			userposter=self.instagrapiUtils.getUserInfoByUsername(media.user.username).dict()
+			user["LatestPostPartialURL"] = ''
 			if self.isAlreadyTracked(userposter) == False:
 				if self.instagrapiUtils.isProfilePrivate(userposter) == False:
 						self.trackUser(userposter)
@@ -173,10 +178,8 @@ class ProfileScraper:
 		postlist = self.instagrapiUtils.getUserPosts(user)
 		if nPostsAllowed > len(postlist):
 			nPostsAllowed = len(postlist)
-		print(type(user))
+		#print(type(user))
 		latestPURL = self.instagrapiUtils.getLatestPostPartialURL(user)
-		if self.isAlreadyTracked(user):
-			self.updateUserLatestPostPartialURL(user, latestPURL) 
 		for post in postlist[0:nPostsAllowed]:
 
 			if self.checkIfPostIsNew(self.instagrapiUtils.getPostPartialURL(post), latestPURL) == False:  # check if reached a post already checked before.
@@ -185,17 +188,20 @@ class ProfileScraper:
 
 			if self.instagrapiUtils.hasTaggedLocation(post):
 				detailedLocationInfo = self.instagrapiUtils.getDetailedMediaLocationInfo(post)
-				#print("location is a: "+str(detailedLocationInfo.category))
+				print("post location is a: "+str(detailedLocationInfo.category))
 				if detailedLocationInfo.category in restaurant_tags and self.isLocationTracked(detailedLocationInfo)==False:
 					coordinates = self.getMediaLocationCoordinates(post)
 					self.trackLocation(self.createLocation(detailedLocationInfo.dict(), coordinates))
+		
+		if self.isAlreadyTracked(user):
+			self.updateUserLatestPostPartialURL(user, latestPURL) 
 
 
 	def beginScraping(self, allowExtendUserBase, nPostsAllowed):
 		
-		print("here0")
+		#print("here0")
 		trackedUsers = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
-		print("what in the flying fuck");
+		#print("what in the flying fuck");
 		if trackedUsers == {}:
 			print("here")
 			kickoffUser = (self.instagrapiUtils.getUserInfoByUsername("foxybyte.swe"))
@@ -203,17 +209,18 @@ class ProfileScraper:
 			kickoffUser = kickoffUser
 			print("here2")
 			self.extendFollowingUsersPoolFromSuggested(kickoffUser, 5)
+			trackedUsers = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
 			print("dio se non viene fuori questo lancio il pc dalla finestra")
 		
-		print("huhuhuh")
-		for userkey, user in trackedUsers.items():
-			print("MAIN LOOP: " + str(user))
+		#print("huhuhuh")
+		for user in trackedUsers.values():
+			print("MAIN LOOP: " + str(user.get('username')))
 			print(type(user))
-			self.crawlRestaurantsFromProfilePosts(user, allowExtendUserBase, nPostsAllowed)
-			if allowExtendUserBase:
+			self.crawlRestaurantsFromProfilePosts(user, allowExtendUserBase, 25)
+			#if allowExtendUserBase:
 				#print("Now extending User  (from main)")
-				self.extendFollowingUsersPoolFromSuggested(user, 10) #follow up to 10 new users. 
-				self.extendFollowingUsersPoolFromTaggedPostsSection(user, nPostsAllowed)  #follows all possible users 
-				self.extendFollowingUsersPoolFromPostTaggedUsers(user) #follows all possible users 
+				#self.extendFollowingUsersPoolFromSuggested(user, 5) #follow up to 10 new users. 
+				#self.extendFollowingUsersPoolFromTaggedPostsSection(user, nPostsAllowed)  #follows all possible users 
+				#self.extendFollowingUsersPoolFromPostTaggedUsers(user) #follows all possible users 
 
 #########################
