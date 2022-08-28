@@ -1,5 +1,5 @@
 from  UserProfileRestaurantScraper import ProfileScraper
-#from Crawler import Crawler
+from Crawler import Crawler
 from Config import CrawlingServiceConfig
 
 

@@ -40,9 +40,9 @@ class ProfileScraper:
 
 
 	def isLocationTracked(self, location):
-		#data = ProfileScraper.getTrackedLocationsFromJSON()
 		data = self.readFromJSON(JSONUtils.TrackedLocationsReadJSONStrategy)
-		if location.pk in data:
+		if location.pk in data.keys():
+			print("location is already being tracked.")
 			return True
 		else:
 			return False
@@ -182,13 +182,15 @@ class ProfileScraper:
 		print("here0")
 		latestCheckedPURL = self.instagrapiUtils.getLatestPostPartialURLChecked(user)
 		for post in postlist[0:nPostsAllowed]:
-			
+			print("here1")
 			indexedPURL = self.instagrapiUtils.getPostPartialURL(post)
 			if self.checkIfPostIsNew(indexedPURL, latestCheckedPURL) == False:  # check if reached a post already checked before
+				print("notnew")
 				return
 
 			if self.isAlreadyTracked(user):
 				self.updateUserLatestPostPartialURL(user, indexedPURL) 
+				print("here2")
 
 
 			if self.instagrapiUtils.hasTaggedLocation(post):
@@ -197,6 +199,7 @@ class ProfileScraper:
 				if detailedLocationInfo.category in restaurant_tags and self.isLocationTracked(detailedLocationInfo)==False:
 					coordinates = self.getMediaLocationCoordinates(post)
 					self.trackLocation(self.createLocation(detailedLocationInfo.dict(), coordinates))
+
 		
 		
 
