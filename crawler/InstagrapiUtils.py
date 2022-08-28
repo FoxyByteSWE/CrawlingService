@@ -33,7 +33,8 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
     client = None
 
     def __init__(self) -> None:
-        ret = self.createLoggedInClient()
+        self.createLoggedInClient()
+        self.save_cookies()
 
 
 
@@ -43,11 +44,17 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
             self.client.login("foxybyte.swe", "tipregofunzionaswe")
             print("Client Logged-In to Instagrapi")
         except Exception as e:
-            print("Something went wrong: " + str(e))
+            print("Something went wrong during Instagrapi Login: " + str(e))
             exit()
         #client.dump_settings((str(sys.path[0]))+"/data/settingsdump.json")
         #self.client.load_settings((str(sys.path[0]))+"/data/settingsdump.json")
 
+
+    def save_cookies(self) -> None:
+        """
+        Save the cookies of the client in a local json file called cookies.json.
+        """
+        json.dump(self.client.get_settings(), open((str(sys.path[0]))+"/data/cookie.json", 'w'))
 
 
     def getLocationPkCodeFromName(self, locationName):
@@ -72,12 +79,8 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return media.code
 
 
-    def getLatestPostPartialURL(self, user):
-        print(type(user))
-        medias = self.getUserPosts(user)
-        #print("medias[0] is: ")
-        #print(medias[0])
-        return self.getPostPartialURL(medias[0])
+    def getLatestPostPartialURLChecked(self, user):
+        return user.get("LatestPostPartialURL")
 
     def getMediaType(self, media):
         return media.media_type

@@ -179,12 +179,17 @@ class ProfileScraper:
 		if nPostsAllowed > len(postlist):
 			nPostsAllowed = len(postlist)
 		#print(type(user))
-		latestPURL = self.instagrapiUtils.getLatestPostPartialURL(user)
+		print("here0")
+		latestCheckedPURL = self.instagrapiUtils.getLatestPostPartialURLChecked(user)
 		for post in postlist[0:nPostsAllowed]:
-
-			if self.checkIfPostIsNew(self.instagrapiUtils.getPostPartialURL(post), latestPURL) == False:  # check if reached a post already checked before.
-				# no need to go on
+			
+			indexedPURL = self.instagrapiUtils.getPostPartialURL(post)
+			if self.checkIfPostIsNew(indexedPURL, latestCheckedPURL) == False:  # check if reached a post already checked before
 				return
+
+			if self.isAlreadyTracked(user):
+				self.updateUserLatestPostPartialURL(user, indexedPURL) 
+
 
 			if self.instagrapiUtils.hasTaggedLocation(post):
 				detailedLocationInfo = self.instagrapiUtils.getDetailedMediaLocationInfo(post)
@@ -193,13 +198,14 @@ class ProfileScraper:
 					coordinates = self.getMediaLocationCoordinates(post)
 					self.trackLocation(self.createLocation(detailedLocationInfo.dict(), coordinates))
 		
-		if self.isAlreadyTracked(user):
-			self.updateUserLatestPostPartialURL(user, latestPURL) 
+		
 
 
 	def beginScraping(self, allowExtendUserBase, nPostsAllowed):
 		
 		#print("here0")
+		kickoffUser = (self.instagrapiUtils.getUserInfoByUsername("foxybyte.swe")).dict()
+		self.trackUser(kickoffUser)
 		trackedUsers = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
 		#print("what in the flying fuck");
 		if trackedUsers == {}:
@@ -215,7 +221,7 @@ class ProfileScraper:
 		#print("huhuhuh")
 		for user in trackedUsers.values():
 			print("MAIN LOOP: " + str(user.get('username')))
-			print(type(user))
+			print(user)
 			self.crawlRestaurantsFromProfilePosts(user, allowExtendUserBase, 25)
 			#if allowExtendUserBase:
 				#print("Now extending User  (from main)")
