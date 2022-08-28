@@ -104,21 +104,15 @@ class ProfileScraper:
 
 	def extendFollowingUsersPoolFromSuggested(self, user, limit):
 		try:
-			#print("fuck1")
 			list = self.instagrapiUtils.getSuggestedUsersFromFBSearch(user)
-			#print("fuck2")
 		except Exception as e:
 			print(e)
 			return
-
 		if limit > len(list):
 			limit = len(list)
-
 		for usersh in list[0:limit]:
-			#print("Fuck come on")
 			usertmp = self.instagrapiUtils.convertUserShortToUserv2(usersh)
 			username = usertmp.username
-			#print("What the fuck")
 			usersugg = self.instagrapiUtils.getUserInfoByUsername(username).dict()
 			usersugg["LatestPostPartialURL"] = ''
 			if self.instagrapiUtils.isProfilePrivate(usersugg) == False:
@@ -143,6 +137,8 @@ class ProfileScraper:
 
 	def extendFollowingUsersPoolFromTaggedPostsSection(self, user, limit):
 		list = self.instagrapiUtils.getProfileTaggedPosts(user)
+		if list == []:
+			print("No posts available in Tagged Posts Section")
 		for media in list[0:limit]:
 			userposter=self.instagrapiUtils.getUserInfoByUsername(media.user.username).dict()
 			user["LatestPostPartialURL"] = ''
@@ -208,30 +204,26 @@ class ProfileScraper:
 
 	def beginScraping(self, allowExtendUserBase, nPostsAllowed):
 		
-		#print("here0")
-		kickoffUser = (self.instagrapiUtils.getUserInfoByUsername("foxybyte.swe")).dict()
-		self.trackUser(kickoffUser)
 		trackedUsers = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
-		#print("what in the flying fuck");
+
 		if trackedUsers == {}:
 			print("here")
 			kickoffUser = (self.instagrapiUtils.getUserInfoByUsername("foxybyte.swe"))
-			print("here1")
-			kickoffUser = kickoffUser
-			print("here2")
 			self.extendFollowingUsersPoolFromSuggested(kickoffUser, 5)
 			trackedUsers = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
-			print("dio se non viene fuori questo lancio il pc dalla finestra")
 		
 		#print("huhuhuh")
 		for user in trackedUsers.values():
 			print("MAIN LOOP: " + str(user.get('username')))
-			print(user)
-			self.crawlRestaurantsFromProfilePosts(user, allowExtendUserBase, 25)
-			#if allowExtendUserBase:
-				#print("Now extending User  (from main)")
-				#self.extendFollowingUsersPoolFromSuggested(user, 5) #follow up to 10 new users. 
-				#self.extendFollowingUsersPoolFromTaggedPostsSection(user, nPostsAllowed)  #follows all possible users 
-				#self.extendFollowingUsersPoolFromPostTaggedUsers(user) #follows all possible users 
 
+			self.crawlRestaurantsFromProfilePosts(user, allowExtendUserBase, 25)
+			
+			if allowExtendUserBase:
+				print(" ===== Starting ExtendUsersPool referencing user: " + str(user.get('username')) + " =====")
+				#print("Extending by Suggested Users of user: " + str(user.get('username')))
+				#self.extendFollowingUsersPoolFromSuggested(user, 5) #follow up to 10 new users.
+				print("Extending From Tagged Posts Section of user: " + str(user.get('username')))
+				self.extendFollowingUsersPoolFromTaggedPostsSection(user, nPostsAllowed)  #follows all possible users 
+				print("Extending From Users Tagged in Posts of user: " + str(user.get('username')))
+				self.extendFollowingUsersPoolFromPostTaggedUsers(user) #follows all possible users 
 #########################

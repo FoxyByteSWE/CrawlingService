@@ -34,13 +34,12 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
     def __init__(self) -> None:
         self.createLoggedInClient()
-        self.save_cookies()
 
 
 
     def createLoggedInClient(self):
         try:
-            self.client = Client()
+            self.client = Client(self.loadCookies())
             self.client.login("foxybyte.swe", "tipregofunzionaswe")
             print("Client Logged-In to Instagrapi")
         except Exception as e:
@@ -55,6 +54,9 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         Save the cookies of the client in a local json file called cookies.json.
         """
         json.dump(self.client.get_settings(), open((str(sys.path[0]))+"/data/cookie.json", 'w'))
+
+    def loadCookies(self):
+        return json.loads(open((str(sys.path[0]))+"/data/cookie.json").read())
 
 
     def getLocationPkCodeFromName(self, locationName):
@@ -153,12 +155,12 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return self.client.user_medias_v1(userpk)
 
     def getSuggestedUsersFromFBSearch(self, user):
-        #time.sleep(2)
-        #userpk = user.get('pk')
-        #userpk = user['pk'];
-        #print(user.pk)
         if type(user) is dict:
-            return self.client.fbsearch_suggested_profiles(user.get('pk'))
+            print("WARNING: CHECK InstagrapiUtils.getSuggestedUsersFromFBSearch(user)")
+            pk = user.get('pk')
+            print("casted pk to string " + pk)
+            res =  self.client.fbsearch_suggested_profiles(pk)  # For some reason an exception is thrown: Not eligible for chaining. 
+            return res
         else:
             return self.client.fbsearch_suggested_profiles(user.pk)
 
