@@ -45,13 +45,11 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         except Exception as e:
             print("Something went wrong during Instagrapi Login: " + str(e))
             exit()
-        #client.dump_settings((str(sys.path[0]))+"/data/settingsdump.json")
-        #self.client.load_settings((str(sys.path[0]))+"/data/settingsdump.json")
 
 
     def save_cookies(self) -> None:
         """
-        Save the cookies of the client in a local json file called cookies.json.
+        Save the cookies of the client in a local json file called cookie.json.
         """
         json.dump(self.client.get_settings(), open((str(sys.path[0]))+"/data/cookie.json", 'w'))
 
@@ -75,8 +73,8 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         mediaListFromLocation = self.client.location_medias_recent(pkCode)
         return mediaListFromLocation
 
-    def getPostPartialURL(self, media) -> str:
-        return media.code
+    def getPostPartialURL(self, media: dict) -> str:
+        return media.get('code')
 
 
     def getLatestPostPartialURLChecked(self, user: dict) -> str:
@@ -121,56 +119,50 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
 
 
-    def getDetailedMediaLocationInfo(self, media): 
-        mediainfo = self.client.media_info_v1(media.pk)
+    def getDetailedMediaLocationInfo(self, media:dict) -> dict: 
+        mediainfo = self.client.media_info_v1(media.get('pk'))
         if mediainfo.location != None:
-            return self.client.location_info((mediainfo.location).pk)
+            return self.client.location_info((mediainfo.location).pk).dict()
         else:
             return None
 
 
-    def getUsernameFromID(self, userid):
+    def getUsernameFromID(self, userid) -> str:
         #print("getUsernameFromID")
         #time.sleep(2)
         return self.client.username_from_user_id(userid)
 
     def getUserIDfromUsername(self, username):
-        #print("getUserIDfromUsername")
         return self.getUserInfoByUsername(username).pk
-        #return client.user_id_from_username(username)
 
-    def getUserInfoByUsername(self, username):
+    def getUserInfoByUsername(self, username: str) -> dict:
         #print("getUserInfoByUsername")
         #time.sleep(2)
         return self.client.user_info_by_username_v1(username)
 
-    def getUserPosts(self, user):
+    def getUserPosts(self, user: dict) -> list:
         #time.sleep(2)
-        if type(user) is dict:
-            userpk = user.get('pk')
-        else:
-            userpk = user.pk
+        userpk = user.get('pk')
         return self.client.user_medias_v1(userpk)
 
     def getSuggestedUsersFromFBSearch(self, user):
-        if type(user) is dict:
-            print("WARNING: CHECK InstagrapiUtils.getSuggestedUsersFromFBSearch(user)")
-            pk = user.get('pk')
-            res =  self.client.fbsearch_suggested_profiles(pk)  # For some reason an exception is thrown: Not eligible for chaining. 
-            return res
+        print("WARNING: CHECK InstagrapiUtils.getSuggestedUsersFromFBSearch(user)")
+        pk = user.get('pk')
+        res =  self.client.fbsearch_suggested_profiles(pk)  # For some reason an exception is thrown: Not eligible for chaining. 
+        return res
 
-    def isProfilePrivate(self, user) -> bool:
+    def isProfilePrivate(self, user: dict) -> bool:
         return user.get('is_private')
 
-    def getPostTaggedPeople(self, post) -> list:
+    def getPostTaggedPeople(self, post: dict) -> list:
         return post.usertags
 
-    def getUserIDofTagged(self, user): 
+    def getUserIDofTagged(self, user: dict) -> list: 
         #time.sleep(2)
         userpk = user.get('pk')
         return self.client.usertag_medias(userpk)
 
-    def getProfileTaggedPosts(self, user):
+    def getProfileTaggedPosts(self, user: dict) -> list:
         userpk = user.get('pk')
         return self.client.usertag_medias(userpk)
 
@@ -194,11 +186,11 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
     # LOCATION GETTERS
 
-    def getLocationFromPost(self, media):
-        return media.location
+    def getLocationFromPost(self, media: dict):
+        return media.get('location')
 
     def getLocationPkCode(self, location):
-        return location.pk
+        return location.get('pk')
 
-    def hasTaggedLocation(self, post):
-        return post.location != None 
+    def hasTaggedLocation(self, post: dict) -> bool:
+        return post.get('location') != None 

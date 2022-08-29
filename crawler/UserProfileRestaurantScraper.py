@@ -22,17 +22,17 @@ class ProfileScraper:
 		return processing_strategy.writeToJSON(self, data)
 
 
-	def trackLocation(self, locationdict) -> None:
+	def trackLocation(self, location: dict) -> None:
 		locationsFromJSON = self.readFromJSON(JSONUtils.TrackedLocationsReadJSONStrategy)
-		print("tracking location: "+ locationdict["name"])
-		locationsFromJSON[locationdict["pk"]]=locationdict
+		print("tracking location: "+ location["name"])
+		locationsFromJSON[location["pk"]]=location
 		self.writeToJSON(locationsFromJSON, JSONUtils.TrackedLocationsWriteJSONStrategy)
 
 
-	def isLocationTracked(self, location) -> bool:
+	def isLocationTracked(self, location: dict) -> bool:
 		data = self.readFromJSON(JSONUtils.TrackedLocationsReadJSONStrategy)
 		print(data.keys())
-		if str(location.pk) in data.keys():
+		if str(location.get('pk')) in data.keys():
 			
 			print("location is already being tracked.")
 			return True
@@ -41,7 +41,7 @@ class ProfileScraper:
 
 
 
-	def createLocation(self, input, coordinates) -> dict:
+	def createLocation(self, input: dict, coordinates: dict) -> dict:
 		dict = {}
 		dict["pk"] = input["pk"]
 		dict["name"] = input["name"]
@@ -52,9 +52,9 @@ class ProfileScraper:
 		dict["website"] = input["website"]
 		return dict;
 
-	def getMediaLocationCoordinates(self, media) -> dict:
-		coordinates = {'lng': (media.location).lng , 
-						'lat': (media.location).lat }
+	def getMediaLocationCoordinates(self, media: dict) -> dict:
+		coordinates = {'lng': (media.get('location')).get('lng') , 
+						'lat': (media.get('location')).get('lat') }
 		return coordinates
 
 
@@ -148,34 +148,44 @@ class ProfileScraper:
 		
 	#####################
 
-	# FIND RESTAURANTS
+	# FIND Trackable Places
 
-	def crawlRestaurantsFromProfilePosts(self, user: dict, nPostsAllowed: int) -> None:
+	def crawlPlacesFromProfilePosts(self, user: dict, nPostsAllowed: int) -> None:
 
-		restaurant_tags = ['Restaurant', 'Italian Restaurant','Pub', 'Bar', 'Grocery ', 'Wine', 'Diner', 'Food', 'Meal', 'Breakfast', 'Lunch',
+		places_tags = ['Restaurant', 'Italian Restaurant','Pub', 'Bar', 'Grocery ', 'Wine', 'Diner', 'Food', 'Meal', 'Breakfast', 'Lunch',
 							'Dinner', 'Cafe', 'Tea Room', 'Hotel', 'Pizza', 'Coffee', 'Bakery', 'Dessert', 'Gastropub',
 							'Sandwich', 'Ice Cream', 'Steakhouse', 'Pizza place', 'Fast food restaurant', 'Deli']
 
-		postlist = self.instagrapiUtils.getUserPosts(user).dict()
+		print("1")
+		postlist = self.instagrapiUtils.getUserPosts(user)
 		if nPostsAllowed > len(postlist):
 			nPostsAllowed = len(postlist)
-
+			print(nPostsAllowed)
+		print("2")
 		latestCheckedPURL = self.instagrapiUtils.getLatestPostPartialURLChecked(user)
+		print("3")
 		for post in postlist[0:nPostsAllowed]:
+			print("for")
+			post = post.dict()
 			indexedPURL = self.instagrapiUtils.getPostPartialURL(post)
+			print("4")
+			print(str(type(indexedPURL)) + " ---- " + str(type(latestCheckedPURL)))
+			print(str(indexedPURL) + " ---- " + str(latestCheckedPURL))
 			if self.checkIfPostIsNew(indexedPURL, latestCheckedPURL) == False:  # check if reached a post already checked before
+				print("Reached Already Crawled Post.")
 				return
-
+			print("5")
 			if self.isAlreadyTracked(user):
 				self.updateUserLatestPostPartialURL(user, indexedPURL) 
+			print("6")
 
 
 			if self.instagrapiUtils.hasTaggedLocation(post):
 				detailedLocationInfo = self.instagrapiUtils.getDetailedMediaLocationInfo(post)
-				print("post location is a: "+str(detailedLocationInfo.category))
-				if detailedLocationInfo.category in restaurant_tags and self.isLocationTracked(detailedLocationInfo)==False:
+				print("post location is a: "+str(detailedLocationInfo.get('category')))
+				if detailedLocationInfo.get('category') in places_tags and self.isLocationTracked(detailedLocationInfo)==False:
 					coordinates = self.getMediaLocationCoordinates(post)
-					self.trackLocation(self.createLocation(detailedLocationInfo.dict(), coordinates))
+					self.trackLocation(self.createLocation(detailedLocationInfo, coordinates))
 
 		
 		
@@ -194,7 +204,7 @@ class ProfileScraper:
 		for user in trackedUsers.values():
 			print("MAIN LOOP: " + str(user.get('username')))
 
-			self.crawlRestaurantsFromProfilePosts(user, 25)
+			self.crawlPlacesFromProfilePosts(user, 25)
 
 			if allowExtendUserBase:
 				print(" ===== Starting ExtendUsersPool referencing user: " + str(user.get('username')) + " =====")
