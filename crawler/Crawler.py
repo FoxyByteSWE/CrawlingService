@@ -9,8 +9,6 @@ from InstagrapiUtils import InstagrapiUtils
 from JSONUtils import JSONUtils
 from Config import CrawlingServiceConfig
 
-from InstagrapiClient import InstagrapiClient
-
 #proxy = 'http://96.9.71.18:33427'
 
 #os.environ['http_proxy'] = proxy 
@@ -123,10 +121,11 @@ class Crawler:
 
 	#MAIN CRAWLING FUNCTIONS
 
-	def crawlAllLocations(self, locationsDict, nPostsWanted):
+	def crawlAllLocations(self, locationsDict: dict, nPostsWanted: int):
 		for loc in locationsDict.values():
-			mediasDump = self.instagrapiUtils.getTopMediasFromLocation(loc["name"]) #returns a list of "Medias"
-			#mediasDump = self.instagrapiUtils.getMostRecentMediasFromLocation(loc["name"], client) #returns a list of "Medias"
+			mediasDump = self.instagrapiUtils.getMostRecentMediasFromLocation(loc["name"]) #returns a list of "Medias"
+			mediasDump = [media.dict() for media in mediasDump]
+
 			formattedMediasFromLocation = []
 			locationPk = loc["pk"]
 			foundRestaurantProfile = False

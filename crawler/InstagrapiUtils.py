@@ -81,40 +81,40 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return user.get("LatestPostPartialURL")
 
     def getMediaType(self, media) -> int:
-        return media.media_type
+        return media.get('media_type')
 
     def getCaptionText(self, media) -> str:
-        return media.caption_text
+        return media.get('caption_text')
 
     def getMediaTime(self, media):
-        return media.taken_at
+        return media.get('taken_at')
 
-    def getMediaLocationCoordinates(self, media) -> dict:
-        coordinates = {'lng': (media.location).lng , 
-                    'lat': (media.location).lat }
+    def getMediaLocationCoordinates(self, media: dict) -> dict:
+        coordinates = {'lng': (media.get('location').get('lng')) , 
+                       'lat': (media.get('location').get('lat')) }
         return coordinates
 
 
-    def getMediaLocationPK(self, media):
-            return media.pk
+    def getMediaLocationPK(self, media: dict)-> int:
+            return media.get('pk')
 
-    def getMediaLikeCount(self, media) -> int:
-        return media.like_count
+    def getMediaLikeCount(self, media:dict) -> int:
+        return media.get('like_count')
 
-    def getMediaURL(self, media):
+    def getMediaURL(self, media: dict):  #TODO: test for a multi-media (album) post
         #print("here")
         if self.getMediaType(media)==1:
-            return media.thumbnail_url
+            return media.get('thumbnail_url')
         if self.getMediaType(media)==2:
-            return media.video_url
+            return media.get('video_url')
         if self.getMediaType(media)==8: #album
-            album = media.resources
+            album = media.get('resources')
             list=[]
             for item in album:
                 if self.getMediaType(item) == 1:
-                    list.append(item.thumbnail_url)
+                    list.append(item.get('thumbnail_url'))
                 elif self.getMediaType(item) == 2:
-                    list.append(item.video_url)
+                    list.append(item.get('video_url'))
             return list
 
 
