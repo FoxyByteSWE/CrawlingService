@@ -8,6 +8,8 @@ import RestaurantProfileFinder
 from InstagrapiUtils import InstagrapiUtils
 from JSONUtils import JSONUtils
 from Config import CrawlingServiceConfig
+from media.FoxyByteMedia import FoxyByteMedia
+from media.FoxyByteMediaFactory import FoxyByteMediaFactory
 
 #proxy = 'http://96.9.71.18:33427'
 
@@ -41,17 +43,17 @@ class Crawler:
 		self.writeToJSON(locationsFromJSON,JSONUtils.CrawledDataWriteJSONStrategy)
 
 
-	def formatMediaToDictionaryItem(self, media: dict) -> dict: #need to serialize casting to primitive data types
-		formattedDictionaryMedia = {}
-		formattedDictionaryMedia["PostPartialURL"] = self.instagrapiUtils.getPostPartialURL(media)
-		formattedDictionaryMedia["MediaType"] = self.instagrapiUtils.getMediaType(media)
-		formattedDictionaryMedia["TakenAtTime"] = self.parseTakenAtTime(self.instagrapiUtils.getMediaTime(media))
-		formattedDictionaryMedia["TakenAtLocation"] = self.parseTakenAtLocation(media) #extra step necessary.
-		formattedDictionaryMedia["LikeCount"] = self.instagrapiUtils.getMediaLikeCount(media)
-		formattedDictionaryMedia["CaptionText"] = self.instagrapiUtils.getCaptionText(media)
-		formattedDictionaryMedia["MediaURL"] = self.parseMediaUrl(self.instagrapiUtils.getMediaURL(media))
-		#pprint.pprint(formattedDictionaryMedia)
-		return formattedDictionaryMedia
+#	def formatMediaToDictionaryItem(self, media: dict) -> dict: #need to serialize casting to primitive data types
+#		formattedDictionaryMedia = {}
+#		formattedDictionaryMedia["PostPartialURL"] = self.instagrapiUtils.getPostPartialURL(media)
+#		formattedDictionaryMedia["MediaType"] = self.instagrapiUtils.getMediaType(media)
+#		formattedDictionaryMedia["TakenAtTime"] = self.parseTakenAtTime(self.instagrapiUtils.getMediaTime(media))
+#		formattedDictionaryMedia["TakenAtLocation"] = self.parseTakenAtLocation(media) #extra step necessary.
+#		formattedDictionaryMedia["LikeCount"] = self.instagrapiUtils.getMediaLikeCount(media)
+#		formattedDictionaryMedia["CaptionText"] = self.instagrapiUtils.getCaptionText(media)
+#		formattedDictionaryMedia["MediaURL"] = self.parseMediaUrl(self.instagrapiUtils.getMediaURL(media))
+#		#pprint.pprint(formattedDictionaryMedia)
+#		return formattedDictionaryMedia
 
 
 
@@ -103,8 +105,11 @@ class Crawler:
 
 
 	def isMediaDuplicated(self, media: dict, locationPk: int) -> bool:
-		fromjson = self.readFromJSON(JSONUtils.CrawledDataReadJSONStrategy)
-		if fromjson == {}:  # meaning it is empty
+		print("e")
+		try:
+			fromjson = self.readFromJSON(JSONUtils.CrawledDataReadJSONStrategy)
+		except json.JSONDecodeError:
+			print("f")
 			return False
 		locationPk= str(locationPk)
 		if locationPk in fromjson.keys():
@@ -127,24 +132,30 @@ class Crawler:
 	def crawlAllLocations(self, locationsDict: dict, nPostsWanted: int) -> None:
 		for loc in locationsDict.values():
 			mediasDump = self.instagrapiUtils.getMostRecentMediasFromLocation(loc["name"]) #returns a list of "Medias"
-			mediasDump = self.instagrapiUtils.convertInstagrapiTypeToBuiltInType(mediasDump)
 
 			formattedMediasFromLocation = []
 			locationPk = loc["pk"]
 			foundRestaurantProfile = False
+
+
 			for media in mediasDump:
 				if RestaurantProfileFinder.checkForRestaurantUsername(media, loc["name"]) == True:
 					foundRestaurantProfile = True
+
 			if foundRestaurantProfile == True:
 				for media in mediasDump[0:nPostsWanted-1]:
-					uname = media.get('user').username
-					#propic = self.parseMediaUrl(client.user_info_by_username(uname).profile_pic_url)
-					self.parseMediaUrl(self.instagrapiUtils.getUserInfoByUsername(uname).profile_pic_url)
-					#print(propic)
-					formattedmedia = self.formatMediaToDictionaryItem(media)
-					if self.isMediaDuplicated(formattedmedia,locationPk) == False:
+					#print("a")
+					#uname = (media.user).username
+					#print("b")
+					##propic = self.parseMediaUrl(client.user_info_by_username(uname).profile_pic_url)
+					##self.parseMediaUrl(self.instagrapiUtils.getUserInfoByUsername(uname).profile_pic_url)
+					#print("c")
+					##print(propic)
+					newmedia = FoxyByteMediaFactory.buildFromInstagrapiMedia(media)
+
+					if self.isMediaDuplicated(newmedia,locationPk) == False: # check in database
 							print("media appended.")
-							formattedMediasFromLocation.append(formattedmedia) 
+							#formattedMediasFromLocation.append(formattedmedia) 
 				if formattedMediasFromLocation != []:
 					print("saving medias...")
 					self.saveCrawledDataFromLocation(formattedMediasFromLocation, locationPk)  # Questo dovrebbe essere solo alla fine del crawling di una location (primo ciclo for). Qui dovrebbe solo accumulare in un dizionario.
@@ -158,5 +169,5 @@ class Crawler:
 
 	def beginCrawling(self, nPostsWanted: int) -> None:
 		locationsDict = self.readFromJSON(JSONUtils.TrackedLocationsReadJSONStrategy)
-		self.crawlAllLocations(locationsDict, nPostsWanted)
+		self.crawlAllLocations(locationsDict, 2)
 

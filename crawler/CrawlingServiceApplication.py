@@ -16,8 +16,8 @@ def main():
 
     #input("Press Any Key To Begin Scraping The Locations...")
 
-    userProfileRestaurantScraper.beginScraping(config.allowExtendUserBase,
-                                               config.nPostsAllowedForProfileScraping)
+    #userProfileRestaurantScraper.beginScraping(config.allowExtendUserBase,
+     #                                          config.nPostsAllowedForProfileScraping)
 
 
 

@@ -57,111 +57,70 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return json.loads(open((str(sys.path[0]))+"/data/cookie.json").read())
 
 
-    def convertInstagrapiTypeToBuiltInType(self, inputObject):
-        if type(inputObject) is dict:
-            return inputObject
-        if type(inputObject) is list:
-            return [media.dict() for media in inputObject]
-        else:
-            return inputObject.dict()
 
 
     def getLocationPkCodeFromName(self, locationName: str) -> int:
-        locList = (self.client.fbsearch_places(locationName)[0]).dict()
-        pkCode = locList.get('pk')
+        locList = (self.client.fbsearch_places(locationName)[0])
+        pkCode = locList.pk
         return pkCode
-
-    def getTopMediasFromLocation(self, locationName: str) -> list:
-        print(locationName)
-        pkCode = self.getLocationPkCodeFromName(locationName)
-        mediaListFromLocation = self.client.location_medias_top(pkCode)
-        return mediaListFromLocation
 
     def getMostRecentMediasFromLocation(self, locationName: str) -> list:
         pkCode = self.getLocationPkCodeFromName(locationName)
         mediaListFromLocation = self.client.location_medias_recent(pkCode)
         return mediaListFromLocation
 
-    def getPostPartialURL(self, media: dict) -> str:
-        return media.get('code')
 
-
-    def getLatestPostPartialURLChecked(self, user: dict) -> str:
-        return user.get("LatestPostPartialURL")
-
-    def getMediaType(self, media) -> int:
-        return media.get('media_type')
-
-    def getCaptionText(self, media) -> str:
-        return media.get('caption_text')
-
-    def getMediaTime(self, media):
-        return media.get('taken_at')
-
-    def getMediaLocationCoordinates(self, media: dict) -> dict:
-        coordinates = {'lng': (media.get('location').get('lng')) , 
-                       'lat': (media.get('location').get('lat')) }
+    def getMediaLocationCoordinates(self, media) -> dict:
+        coordinates = {'lng': ((media.location).lng) , 
+                       'lat': ((media.location).lat) }
         return coordinates
 
-#
-#    def getMediaLocationPK(self, media: dict)-> int:
-#            return media.get('pk')
-#
-    def getMediaLikeCount(self, media:dict) -> int:
-        return media.get('like_count')
 
     def getMediaURL(self, media: dict):  #TODO: test for a multi-media (album) post
         #print("here")
         if self.getMediaType(media)==1:
-            return media.get('thumbnail_url')
+            return media.thumbnail_url
         if self.getMediaType(media)==2:
-            return media.get('video_url')
+            return media.video_url
         if self.getMediaType(media)==8: #album
-            album = media.get('resources')
+            album = media.resources
             list=[]
             for item in album:
                 if self.getMediaType(item) == 1:
-                    list.append(item.get('thumbnail_url'))
+                    list.append(item.thumbnail_url)
                 elif self.getMediaType(item) == 2:
-                    list.append(item.get('video_url'))
+                    list.append(item.video_url)
             return list
 
 
 
-    def getDetailedMediaLocationInfo(self, media:dict) -> dict: 
-        mediainfo = self.client.media_info_v1(media.get('pk'))
+    def getDetailedMediaLocationInfo(self, media): 
+        mediainfo = self.client.media_info_v1(media.pk)
         if mediainfo.location != None:
-            return self.client.location_info((mediainfo.location).pk).dict()
+            return self.client.location_info((mediainfo.location).pk)
         else:
             return None
 
-    def getUserInfoByUsername(self, username: str):
-        return self.client.user_info_by_username_v1(username)
-
-    def getUserPosts(self, user: dict) -> list:
-        #time.sleep(2)
-        userpk = user.get('pk')
+    def getUserPosts(self, user) -> list:
+        userpk = user.pk
         return self.client.user_medias_v1(userpk)
 
     def getSuggestedUsersFromFBSearch(self, user):
         print("WARNING: CHECK InstagrapiUtils.getSuggestedUsersFromFBSearch(user)")
-        pk = user.get('pk')
+        pk = user.pk
         res =  self.client.fbsearch_suggested_profiles(pk)  # For some reason an exception is thrown: Not eligible for chaining. 
         return res
 
-    def isProfilePrivate(self, user: dict) -> bool:
-        return user.get('is_private')
+    def hasTaggedLocation(self, post) -> bool:
+        return post.location != None
 
-    def getPostTaggedPeople(self, post: dict) -> list:
-        return post.usertags
-
-    def getUserIDofTagged(self, user: dict) -> list: 
+    def getUserIDofTagged(self, user) -> list: 
         #time.sleep(2)
-        userpk = user.get('pk')
+        userpk = user.pk
         return self.client.usertag_medias(userpk)
 
-    def getProfileTaggedPosts(self, user: dict) -> list:
-        userpk = user.get('pk')
+    def getProfileTaggedPosts(self, user) -> list:
+        userpk = user.pk
         return self.client.usertag_medias(userpk)
 
 
@@ -169,8 +128,8 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
     # USER CONVERTERS
 
-    def convertUsertagToUser(self, usertag):
-        return usertag.user
+ #   def convertUsertagToUser(self, usertag):
+ #       return usertag.user
 
     def convertUserShortToUserv2(self, usershort):
         #print("convertUserShortToUserv2")
@@ -179,12 +138,12 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
     ########################################
 
     # LOCATION GETTERS
-
-    def getLocationFromPost(self, media: dict):
-        return media.get('location')
-
-    def getLocationPkCode(self, location: dict) -> int:
-        return location.get('pk')
-
-    def hasTaggedLocation(self, post: dict) -> bool:
-        return post.get('location') != None 
+#
+#    def getLocationFromPost(self, media: dict):
+#        return media.get('location')
+#
+#    def getLocationPkCode(self, location: dict) -> int:
+#        return location.get('pk')
+#
+#    def hasTaggedLocation(self, post: dict) -> bool:
+#        return post.get('location') != None 

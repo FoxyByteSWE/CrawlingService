@@ -7,6 +7,8 @@ from abc import ABC, abstractmethod
 from InstagrapiUtils import InstagrapiUtils
 from JSONUtils import JSONUtils
 from Config import CrawlingServiceConfig
+from location.Location import Location
+from location.LocationFactory import LocationFactory
 
 
 class ProfileScraper:
@@ -38,24 +40,6 @@ class ProfileScraper:
 			return True
 		else:
 			return False
-
-
-
-	def createLocation(self, input: dict, coordinates: dict) -> dict:
-		dict = {}
-		dict["pk"] = input["pk"]
-		dict["name"] = input["name"]
-		dict["address"] = input["address"]
-		dict["coordinates"] = [coordinates["lng"], coordinates["lat"]]
-		dict["category"] = input["category"]
-		dict["phone"] = input["phone"]
-		dict["website"] = input["website"]
-		return dict;
-
-	def getMediaLocationCoordinates(self, media: dict) -> dict:
-		coordinates = {'lng': (media.get('location')).get('lng') , 
-						'lat': (media.get('location')).get('lat') }
-		return coordinates
 
 
 	def isAlreadyTracked(self, user: dict) -> bool: #check if database or file already contains this user
@@ -130,12 +114,12 @@ class ProfileScraper:
 						self.trackUser(userposter)
 
 
-	def updateUserLatestPostPartialURL(self, user: dict, latestPURL: str) -> None:
-		users = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
-		targetuser = users[user.get('username')]
-		targetuser["LatestPostPartialURL"] = latestPURL
-		users[user.get('username')] = targetuser
-		self.writeToJSON(users, JSONUtils.UsersWriteJSONStrategy)
+#	def updateUserLatestPostPartialURL(self, user: dict, latestPURL: str) -> None:
+#		users = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
+#		targetuser = users[user.get('username')]
+#		targetuser["LatestPostPartialURL"] = latestPURL
+#		users[user.get('username')] = targetuser
+#		self.writeToJSON(users, JSONUtils.UsersWriteJSONStrategy)
 
 	
 	def checkIfPostIsNew(self, indexedPURL: str, latestPURL: str) -> bool:
@@ -161,31 +145,38 @@ class ProfileScraper:
 		if nPostsAllowed > len(postlist):
 			nPostsAllowed = len(postlist)
 			print(nPostsAllowed)
+
 		print("2")
-		latestCheckedPURL = self.instagrapiUtils.getLatestPostPartialURLChecked(user)
+		
+		#latestCheckedPURL = self.instagrapiUtils.getLatestPostPartialURLChecked(user)
+
 		print("3")
+
 		for post in postlist[0:nPostsAllowed]:
 			print("for")
-			post = post.dict()
-			indexedPURL = self.instagrapiUtils.getPostPartialURL(post)
+			#indexedPURL = self.instagrapiUtils.getPostPartialURL(post)
 			print("4")
-			print(str(type(indexedPURL)) + " ---- " + str(type(latestCheckedPURL)))
-			print(str(indexedPURL) + " ---- " + str(latestCheckedPURL))
-			if self.checkIfPostIsNew(indexedPURL, latestCheckedPURL) == False:  # check if reached a post already checked before
-				print("Reached Already Crawled Post.")
-				return
+
+			#print(str(type(indexedPURL)) + " ---- " + str(type(latestCheckedPURL)))
+			#print(str(indexedPURL) + " ---- " + str(latestCheckedPURL))
+
+			#if self.checkIfPostIsNew(indexedPURL, latestCheckedPURL) == False:  # check if reached a post already checked before
+			#	print("Reached Already Crawled Post.")
+			#	return
+			#	
 			print("5")
-			if self.isAlreadyTracked(user):
-				self.updateUserLatestPostPartialURL(user, indexedPURL) 
+			#if self.isAlreadyTracked(user):
+				#self.updateUserLatestPostPartialURL(user, indexedPURL) 
 			print("6")
 
 
 			if self.instagrapiUtils.hasTaggedLocation(post):
 				detailedLocationInfo = self.instagrapiUtils.getDetailedMediaLocationInfo(post)
-				print("post location is a: "+str(detailedLocationInfo.get('category')))
-				if detailedLocationInfo.get('category') in places_tags and self.isLocationTracked(detailedLocationInfo)==False:
-					coordinates = self.getMediaLocationCoordinates(post)
-					self.trackLocation(self.createLocation(detailedLocationInfo, coordinates))
+				print("post location is a: "+str(detailedLocationInfo.category))
+				if detailedLocationInfo.category in places_tags and self.isLocationTracked(detailedLocationInfo)==False:
+					coordinates = self.instagrapiUtils.getMediaLocationCoordinates(post)
+					newlocation = LocationFactory.buildLocationFromInstagrapi(detailedLocationInfo, "dummy", coordinates, "dummy")
+					self.trackLocation(newlocation)
 
 		
 		
