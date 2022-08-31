@@ -7,12 +7,12 @@ from Config import CrawlingServiceConfig
 def main(): 
     config = CrawlingServiceConfig()
 
-    #crawler = Crawler()
-    userProfileRestaurantScraper = ProfileScraper()
+    crawler = Crawler()
+    #userProfileRestaurantScraper = ProfileScraper()
     
     #print("Starting Crawling Process...")
 
-    #crawler.beginCrawling(config.nPostsWantedForEachLocation)
+    crawler.beginCrawling(config.nPostsWantedForEachLocation)
 
     #input("Press Any Key To Begin Scraping The Locations...")
 

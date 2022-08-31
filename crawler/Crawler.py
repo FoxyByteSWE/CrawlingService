@@ -30,7 +30,7 @@ class Crawler:
 		return processing_strategy.writeToJSON(self, data)
 
 
-	def saveCrawledDataFromLocation(self, mediasfromloc, locationPK):
+	def saveCrawledDataFromLocation(self, mediasfromloc: dict, locationPK: dict) -> None:
 		locationsFromJSON = self.readFromJSON(JSONUtils.CrawledDataReadJSONStrategy)
 		try:
 			locobj=locationsFromJSON[locationPK] #lista di dizionari
@@ -41,7 +41,7 @@ class Crawler:
 		self.writeToJSON(locationsFromJSON,JSONUtils.CrawledDataWriteJSONStrategy)
 
 
-	def formatMediaToDictionaryItem(self, media): #need to serialize casting to primitive data types
+	def formatMediaToDictionaryItem(self, media: dict) -> dict: #need to serialize casting to primitive data types
 		formattedDictionaryMedia = {}
 		formattedDictionaryMedia["PostPartialURL"] = self.instagrapiUtils.getPostPartialURL(media)
 		formattedDictionaryMedia["MediaType"] = self.instagrapiUtils.getMediaType(media)
@@ -57,7 +57,7 @@ class Crawler:
 
 
 
-	def buildComprehendLocationDictionary(self, locationpk):
+	def buildComprehendLocationDictionary(self, locationpk: int) -> dict:
 		locationsData = self.readFromJSON(JSONUtils.CrawledDataReadJSONStrategy)
 
 		comprehendDict = {}
@@ -69,7 +69,7 @@ class Crawler:
 		return comprehendDict
 
 
-	def parseTakenAtTime(self, input):
+	def parseTakenAtTime(self, input) -> list:
 		time = []
 		time.append(input.year)
 		time.append(input.month)
@@ -79,8 +79,8 @@ class Crawler:
 		time.append(input.second)
 		return time
 
-	def parseTakenAtLocation(self, media):
-		input = self.instagrapiUtils.getDetailedMediaLocationInfo(media).dict()
+	def parseTakenAtLocation(self, media: dict) -> dict:
+		input = self.instagrapiUtils.getDetailedMediaLocationInfo(media)
 		coordinates = self.instagrapiUtils.getMediaLocationCoordinates(media)
 		dict = {}
 		dict["pk"] = input["pk"]
@@ -92,7 +92,7 @@ class Crawler:
 		dict["website"] = input["website"]
 		return dict;
 
-	def parseMediaUrl(self, input):
+	def parseMediaUrl(self, input: list) -> str:
 		url = str(input)
 		start = url.find("'") + 1
 		url = url[start:]
@@ -102,7 +102,7 @@ class Crawler:
 
 
 
-	def isMediaDuplicated(self, media, locationPk):
+	def isMediaDuplicated(self, media: dict, locationPk: int) -> bool:
 		fromjson = self.readFromJSON(JSONUtils.CrawledDataReadJSONStrategy)
 		if fromjson == {}:  # meaning it is empty
 			return False
@@ -119,12 +119,15 @@ class Crawler:
 		return False
 
 
-	#MAIN CRAWLING FUNCTIONS
 
-	def crawlAllLocations(self, locationsDict: dict, nPostsWanted: int):
+
+
+	#MAIN CRAWLING FUNCTION
+
+	def crawlAllLocations(self, locationsDict: dict, nPostsWanted: int) -> None:
 		for loc in locationsDict.values():
 			mediasDump = self.instagrapiUtils.getMostRecentMediasFromLocation(loc["name"]) #returns a list of "Medias"
-			mediasDump = [media.dict() for media in mediasDump]
+			mediasDump = self.instagrapiUtils.convertInstagrapiTypeToBuiltInType(mediasDump)
 
 			formattedMediasFromLocation = []
 			locationPk = loc["pk"]
@@ -134,7 +137,7 @@ class Crawler:
 					foundRestaurantProfile = True
 			if foundRestaurantProfile == True:
 				for media in mediasDump[0:nPostsWanted-1]:
-					uname = media.user.username
+					uname = media.get('user').username
 					#propic = self.parseMediaUrl(client.user_info_by_username(uname).profile_pic_url)
 					self.parseMediaUrl(self.instagrapiUtils.getUserInfoByUsername(uname).profile_pic_url)
 					#print(propic)
@@ -153,31 +156,7 @@ class Crawler:
 
 
 
-	def beginCrawling(self, nPostsWanted):
+	def beginCrawling(self, nPostsWanted: int) -> None:
 		locationsDict = self.readFromJSON(JSONUtils.TrackedLocationsReadJSONStrategy)
 		self.crawlAllLocations(locationsDict, nPostsWanted)
-
-
-	###########	
-
-
-
-
-
-#def main():
-#	
-#	self.beginCrawling()
-#
-#################################################################
-#
-#if __name__ == "__main__":
-#	main()
-
-
-
-
-########################################
-
-# UNIT TESTS
-
 

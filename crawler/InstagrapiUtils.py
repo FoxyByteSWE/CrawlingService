@@ -57,6 +57,15 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return json.loads(open((str(sys.path[0]))+"/data/cookie.json").read())
 
 
+    def convertInstagrapiTypeToBuiltInType(self, inputObject):
+        if type(inputObject) is dict:
+            return inputObject
+        if type(inputObject) is list:
+            return [media.dict() for media in inputObject]
+        else:
+            return inputObject.dict()
+
+
     def getLocationPkCodeFromName(self, locationName: str) -> int:
         locList = (self.client.fbsearch_places(locationName)[0]).dict()
         pkCode = locList.get('pk')
@@ -94,10 +103,10 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
                        'lat': (media.get('location').get('lat')) }
         return coordinates
 
-
-    def getMediaLocationPK(self, media: dict)-> int:
-            return media.get('pk')
-
+#
+#    def getMediaLocationPK(self, media: dict)-> int:
+#            return media.get('pk')
+#
     def getMediaLikeCount(self, media:dict) -> int:
         return media.get('like_count')
 
@@ -126,18 +135,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         else:
             return None
 
-
-    def getUsernameFromID(self, userid) -> str:
-        #print("getUsernameFromID")
-        #time.sleep(2)
-        return self.client.username_from_user_id(userid)
-
-    def getUserIDfromUsername(self, username):
-        return self.getUserInfoByUsername(username).pk
-
-    def getUserInfoByUsername(self, username: str) -> dict:
-        #print("getUserInfoByUsername")
-        #time.sleep(2)
+    def getUserInfoByUsername(self, username: str):
         return self.client.user_info_by_username_v1(username)
 
     def getUserPosts(self, user: dict) -> list:
@@ -174,10 +172,6 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
     def convertUsertagToUser(self, usertag):
         return usertag.user
 
-    def convertUserShortToUser(self, usershort):
-        #print("convertUserShortToUser")
-        return self.client.user_info_by_username(usershort.username)
-
     def convertUserShortToUserv2(self, usershort):
         #print("convertUserShortToUserv2")
         return self.client.user_info_by_username_v1(usershort['username'])
@@ -189,7 +183,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
     def getLocationFromPost(self, media: dict):
         return media.get('location')
 
-    def getLocationPkCode(self, location):
+    def getLocationPkCode(self, location: dict) -> int:
         return location.get('pk')
 
     def hasTaggedLocation(self, post: dict) -> bool:
