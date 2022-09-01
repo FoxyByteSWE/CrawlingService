@@ -9,6 +9,8 @@ from JSONUtils import JSONUtils
 from Config import CrawlingServiceConfig
 from location.Location import Location
 from location.LocationFactory import LocationFactory
+from LocationProfileFinder import LevenshteinLocationProfileFinder 
+from user.UserProfile import UserProfile
 
 
 class ProfileScraper:
@@ -134,49 +136,33 @@ class ProfileScraper:
 
 	# FIND Trackable Places
 
-	def crawlPlacesFromProfilePosts(self, user: dict, nPostsAllowed: int) -> None:
+	def crawlPlacesFromProfilePosts(self, user: UserProfile, nPostsAllowed: int) -> None:
 
-		places_tags = ['Restaurant', 'Italian Restaurant','Pub', 'Bar', 'Grocery ', 'Wine', 'Diner', 'Food', 'Meal', 'Breakfast', 'Lunch',
-							'Dinner', 'Cafe', 'Tea Room', 'Hotel', 'Pizza', 'Coffee', 'Bakery', 'Dessert', 'Gastropub',
-							'Sandwich', 'Ice Cream', 'Steakhouse', 'Pizza place', 'Fast food restaurant', 'Deli']
+		postlist = self.instagrapiUtils.getUserPosts(user, nPostsAllowed)
 
-		print("1")
-		postlist = self.instagrapiUtils.getUserPosts(user)
-		if nPostsAllowed > len(postlist):
-			nPostsAllowed = len(postlist)
-			print(nPostsAllowed)
+		lastpostcodechecked = user.getLastPostCheckedCode()
 
-		print("2")
-		
-		#latestCheckedPURL = self.instagrapiUtils.getLatestPostPartialURLChecked(user)
-
-		print("3")
-
-		for post in postlist[0:nPostsAllowed]:
-			print("for")
-			#indexedPURL = self.instagrapiUtils.getPostPartialURL(post)
-			print("4")
-
-			#print(str(type(indexedPURL)) + " ---- " + str(type(latestCheckedPURL)))
-			#print(str(indexedPURL) + " ---- " + str(latestCheckedPURL))
-
-			#if self.checkIfPostIsNew(indexedPURL, latestCheckedPURL) == False:  # check if reached a post already checked before
-			#	print("Reached Already Crawled Post.")
-			#	return
-			#	
-			print("5")
-			#if self.isAlreadyTracked(user):
-				#self.updateUserLatestPostPartialURL(user, indexedPURL) 
-			print("6")
+		for post in postlist:
+			if self.checkIfPostIsNew(post.code, lastpostcodechecked) == False:  # check if reached a post already checked before
+				return
 
 
 			if self.instagrapiUtils.hasTaggedLocation(post):
 				detailedLocationInfo = self.instagrapiUtils.getDetailedMediaLocationInfo(post)
 				print("post location is a: "+str(detailedLocationInfo.category))
 				if detailedLocationInfo.category in places_tags and self.isLocationTracked(detailedLocationInfo)==False:
-					coordinates = self.instagrapiUtils.getMediaLocationCoordinates(post)
-					newlocation = LocationFactory.buildLocationFromInstagrapi(detailedLocationInfo, "dummy", coordinates, "dummy")
-					self.trackLocation(newlocation)
+					
+					#TODO: check for its profile in location posts. if not found, discard
+					locmedias = self.instagrapiUtils.getMostRecentMediasFromLocation(detailedLocationInfo.name)
+					for media in locmedias:
+						#search through and use locationprofilefinder distance to find name of restaurant in posters.
+						if LevenshteinLocationProfileFinder.checkForRestaurantUsername(media.user.username, detailedLocationInfo.name) == True:
+							coordinates = self.instagrapiUtils.getMediaLocationCoordinates(post)
+							newlocation = LocationFactory.buildLocationFromInstagrapi(detailedLocationInfo, "dummy", coordinates, "dummy")
+							self.trackLocation(newlocation)
+			
+		if self.isAlreadyTracked(user):
+			user.setLastPostCheckedCode(postlist[0].pk)
 
 		
 		
@@ -186,16 +172,22 @@ class ProfileScraper:
 		
 		trackedUsers = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
 
-		if trackedUsers == {}:
+		# LOAD FROM DB
+
+		places_tags = ['Restaurant', 'Italian Restaurant','Pub', 'Bar', 'Grocery ', 'Wine', 'Diner', 'Food', 'Meal', 'Breakfast', 'Lunch',
+							'Dinner', 'Cafe', 'Tea Room', 'Hotel', 'Pizza', 'Coffee', 'Bakery', 'Dessert', 'Gastropub',
+							'Sandwich', 'Ice Cream', 'Steakhouse', 'Pizza place', 'Fast food restaurant', 'Deli']
+
+		if trackedUsers == []:
 			print("here")
 			kickoffUser = (self.instagrapiUtils.getUserInfoByUsername("foxybyte.swe"))
 			self.extendFollowingUsersPoolFromSuggested(kickoffUser, 5)
 			trackedUsers = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
 		
 		for user in trackedUsers.values():
-			print("MAIN LOOP: " + str(user.get('username')))
+			print("MAIN LOOP: " + str(user.username)
 
-			self.crawlPlacesFromProfilePosts(user, 25)
+			self.crawlPlacesFromProfilePosts(user, 3)
 
 			if allowExtendUserBase:
 				print(" ===== Starting ExtendUsersPool referencing user: " + str(user.get('username')) + " =====")

@@ -5,6 +5,10 @@ import instagrapi
 from typing import Dict
 import pprint
 
+from instagrapi.types import Media
+from instagrapi.types import Location
+from instagrapi.types import User
+
 class InstagrapiUtilsBase(type):
     """
     The Singleton class can be implemented in different ways in Python. Some
@@ -76,50 +80,83 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return coordinates
 
 
-    def getMediaURL(self, media: dict):  #TODO: test for a multi-media (album) post
+    def getMediaURL(self, media: Media):  #TODO: test for a multi-media (album) post
         #print("here")
-        if self.getMediaType(media)==1:
+        if media.media_type==1:
             return media.thumbnail_url
-        if self.getMediaType(media)==2:
+        if media.media_type==2:
             return media.video_url
-        if self.getMediaType(media)==8: #album
+        if media.media_type==8: #album
             album = media.resources
             list=[]
             for item in album:
-                if self.getMediaType(item) == 1:
+                if media.media_type == 1:
                     list.append(item.thumbnail_url)
-                elif self.getMediaType(item) == 2:
+                elif media.media_type == 2:
                     list.append(item.video_url)
             return list
 
 
+    def parseTakenAtTime(self, input) -> list:
+        time = []
+        time.append(input.year)
+        time.append(input.month)
+        time.append(input.day)
+        time.append(input.hour)
+        time.append(input.minute)
+        time.append(input.second)
+        return time
 
-    def getDetailedMediaLocationInfo(self, media): 
+    def parseTakenAtLocation(self, media) -> dict:
+        input = self.getDetailedMediaLocationInfo(media)
+        coordinates = self.getMediaLocationCoordinates(media)
+        dict = {}
+        dict["pk"] = input["pk"]
+        dict["name"] = input["name"]
+        dict["address"] = input["address"]
+        dict["coordinates"] = [coordinates["lng"], coordinates["lat"]]
+        dict["category"] = input["category"]
+        dict["phone"] = input["phone"]
+        dict["website"] = input["website"]
+        return dict;
+
+    def parseMediaUrl(self, input: list) -> str:
+        url = str(input)
+        start = url.find("'") + 1
+        url = url[start:]
+        end = url.find("'")
+        url = url[:end]
+        return url;
+
+
+
+
+    def getDetailedMediaLocationInfo(self, media: Media) -> Location: 
         mediainfo = self.client.media_info_v1(media.pk)
         if mediainfo.location != None:
             return self.client.location_info((mediainfo.location).pk)
         else:
             return None
 
-    def getUserPosts(self, user) -> list:
+    def getUserPosts(self, user, amount) -> list[Media]:
         userpk = user.pk
-        return self.client.user_medias_v1(userpk)
+        return self.client.user_medias_v1(userpk, amount)
 
-    def getSuggestedUsersFromFBSearch(self, user):
+    def getSuggestedUsersFromFBSearch(self, user: User):
         print("WARNING: CHECK InstagrapiUtils.getSuggestedUsersFromFBSearch(user)")
         pk = user.pk
         res =  self.client.fbsearch_suggested_profiles(pk)  # For some reason an exception is thrown: Not eligible for chaining. 
         return res
 
-    def hasTaggedLocation(self, post) -> bool:
-        return post.location != None
+    def hasTaggedLocation(self, media: Media) -> bool:
+        return media.location != None
 
-    def getUserIDofTagged(self, user) -> list: 
+    def getUserIDofTagged(self, user: User) -> list[Media]: 
         #time.sleep(2)
         userpk = user.pk
         return self.client.usertag_medias(userpk)
 
-    def getProfileTaggedPosts(self, user) -> list:
+    def getProfileTaggedPosts(self, user: User) -> list[Media]:
         userpk = user.pk
         return self.client.usertag_medias(userpk)
 

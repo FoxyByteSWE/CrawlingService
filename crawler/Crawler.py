@@ -59,52 +59,7 @@ class Crawler:
 
 
 
-	def buildComprehendLocationDictionary(self, locationpk: int) -> dict:
-		locationsData = self.readFromJSON(JSONUtils.CrawledDataReadJSONStrategy)
-
-		comprehendDict = {}
-		location = locationsData[locationpk]
-
-		for post in location:
-			comprehendDict[post["PostPartialURL"]] = post["CaptionText"]
-		pprint.pprint(comprehendDict)
-		return comprehendDict
-
-
-	def parseTakenAtTime(self, input) -> list:
-		time = []
-		time.append(input.year)
-		time.append(input.month)
-		time.append(input.day)
-		time.append(input.hour)
-		time.append(input.minute)
-		time.append(input.second)
-		return time
-
-	def parseTakenAtLocation(self, media: dict) -> dict:
-		input = self.instagrapiUtils.getDetailedMediaLocationInfo(media)
-		coordinates = self.instagrapiUtils.getMediaLocationCoordinates(media)
-		dict = {}
-		dict["pk"] = input["pk"]
-		dict["name"] = input["name"]
-		dict["address"] = input["address"]
-		dict["coordinates"] = [coordinates["lng"], coordinates["lat"]]
-		dict["category"] = input["category"]
-		dict["phone"] = input["phone"]
-		dict["website"] = input["website"]
-		return dict;
-
-	def parseMediaUrl(self, input: list) -> str:
-		url = str(input)
-		start = url.find("'") + 1
-		url = url[start:]
-		end = url.find("'")
-		url = url[:end]
-		return url;
-
-
-
-	def isMediaDuplicated(self, media: dict, locationPk: int) -> bool:
+	def isMediaDuplicated(self, media, locationPk: int) -> bool:
 		print("e")
 		try:
 			fromjson = self.readFromJSON(JSONUtils.CrawledDataReadJSONStrategy)
@@ -151,7 +106,12 @@ class Crawler:
 					##self.parseMediaUrl(self.instagrapiUtils.getUserInfoByUsername(uname).profile_pic_url)
 					#print("c")
 					##print(propic)
-					newmedia = FoxyByteMediaFactory.buildFromInstagrapiMedia(media)
+
+					parsedtakenat = self.instagrapiUtils.parseTakenAtTime(media.taken_at)
+					parsedlocation = self.instagrapiUtils.parseTakenAtLocation(media)
+					parsedmediaurl = self.instagrapiUtils.parseMediaUrl(self.instagrapiUtils.getMediaURL(media))
+
+					newmedia = FoxyByteMediaFactory.buildFromInstagrapiMediaAndLocation(media, parsedtakenat, parsedlocation, parsedmediaurl)
 
 					if self.isMediaDuplicated(newmedia,locationPk) == False: # check in database
 							print("media appended.")

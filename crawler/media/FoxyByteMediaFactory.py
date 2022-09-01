@@ -1,17 +1,16 @@
 from instagrapi.types import Media
-
 from FoxyByteMedia import FoxyByteMedia
 
 
 class FoxyByteMediaFactory:
 	
     @staticmethod
-    def buildFromInstagrapiMedia(media: Media):
+    def buildFromInstagrapiMediaAndLocation(media: Media, parsedTakenAt: list, parsedLocation: dict, parsedUrl: str):
         return FoxyByteMedia(media.code,
-							media.taken_at, #parse
-							media.location, #parse
+							parsedTakenAt, #parsed
+							parsedLocation, #parsed
 							media.like_count,
 							media.caption_text,
-							media.url # parse
+							parsedUrl) # parsed
 		
 		

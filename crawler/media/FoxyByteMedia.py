@@ -1,10 +1,9 @@
-import datetime
-	
 class FoxyByteMedia:
 
-	def __init__(self, PostPartialURL = "", MediaType = 1, TakenAtTime = [], TakenAtLocation = {}, LikeCount = 0, CaptionText = "", MediaURL = ""):
+	def __init__(self, PostPartialURL = "", MediaType = 1, authoruser = "", TakenAtTime = [], TakenAtLocation = {}, LikeCount = 0, CaptionText = "", MediaURL = ""):
 		self.PostPartialURL = PostPartialURL
 		self.MediaType = MediaType
+		self.AuthorUser = authoruser # might as well pass our own User Object
 		self.TakenAtTime = TakenAtTime
 		self.TakenAtLocation = TakenAtLocation
 		self.LikeCount = LikeCount
@@ -12,20 +11,22 @@ class FoxyByteMedia:
 		self.MediaURL = MediaURL
 
 	
-	def getPostPartialURL(self):
+	def getPostPartialURL(self) -> str:
 		return self.PostPartialURL
 
-	def getMediaType(self):
+	def getMediaType(self) -> int:
 		return self.MediaType
 	
-	def getTakenAtTIme(self):
+	def getTakenAtTIme(self) -> list:
 		return self.TakenAtTime
 
-	def getTakenAtLocation(self):
+	def getTakenAtLocation(self) -> dict:
 		return self.TakenAtLocation
 
-	def getLikeCount(self):
+	def getLikeCount(self) -> int:
 		return self.LikeCount
 
-	def getMediaURL(self):
+	def getMediaURL(self) -> str:
 		return self.MediaURL
+	
+	
