@@ -1,24 +1,13 @@
-from  UserProfileRestaurantScraper import ProfileScraper
-from Crawler import Crawler
-from Config import CrawlingServiceConfig
+from CrawlingServiceFacade import CrawlingServiceFacade
 
 
 
 def main(): 
-    config = CrawlingServiceConfig()
-
-    crawler = Crawler()
-    #userProfileRestaurantScraper = ProfileScraper()
+    crawlingService = CrawlingServiceFacade()
     
-    #print("Starting Crawling Process...")
+    crawlingService.beginScrapingProfiles(True, 3)
 
-    crawler.beginCrawling(config.nPostsWantedForEachLocation)
-
-    #input("Press Any Key To Begin Scraping The Locations...")
-
-    #userProfileRestaurantScraper.beginScraping(config.allowExtendUserBase,
-     #                                          config.nPostsAllowedForProfileScraping)
-
+    crawlingService.beginCrawlingLocations(3)
 
 
 

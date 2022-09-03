@@ -73,7 +73,7 @@ class ProfileScraper:
 
 	def extendFollowingUsersPoolFromSuggested(self, user: dict, limit: int) -> None:
 		try:
-			list = self.instagrapiUtils.getSuggestedUsersFromFBSearch(user)
+			list = self.instagrapiUtils.getSuggestedUsersFromFBSearch(user.pk)
 		except Exception as e:
 			print(e)
 			return
@@ -138,7 +138,7 @@ class ProfileScraper:
 
 	def crawlPlacesFromProfilePosts(self, user: UserProfile, nPostsAllowed: int) -> None:
 
-		postlist = self.instagrapiUtils.getUserPosts(user, nPostsAllowed)
+		postlist = self.instagrapiUtils.getUserPosts(user.pk, nPostsAllowed)
 
 		lastpostcodechecked = user.getLastPostCheckedCode()
 
@@ -167,29 +167,12 @@ class ProfileScraper:
 		
 		
 
-
-	def beginScraping(self, allowExtendUserBase: bool, nPostsAllowed: int) -> None:
-		
-		trackedUsers = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
-
-		# LOAD FROM DB
-
-		places_tags = ['Restaurant', 'Italian Restaurant','Pub', 'Bar', 'Grocery ', 'Wine', 'Diner', 'Food', 'Meal', 'Breakfast', 'Lunch',
-							'Dinner', 'Cafe', 'Tea Room', 'Hotel', 'Pizza', 'Coffee', 'Bakery', 'Dessert', 'Gastropub',
-							'Sandwich', 'Ice Cream', 'Steakhouse', 'Pizza place', 'Fast food restaurant', 'Deli']
-
-		if trackedUsers == []:
-			print("here")
+	def createKickoffUser(self):
 			kickoffUser = (self.instagrapiUtils.getUserInfoByUsername("foxybyte.swe"))
 			self.extendFollowingUsersPoolFromSuggested(kickoffUser, 5)
 			trackedUsers = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
-		
-		for user in trackedUsers.values():
-			print("MAIN LOOP: " + str(user.username)
 
-			self.crawlPlacesFromProfilePosts(user, 3)
-
-			if allowExtendUserBase:
+	def extendUserBase(policy):
 				print(" ===== Starting ExtendUsersPool referencing user: " + str(user.get('username')) + " =====")
 				#print("Extending by Suggested Users of user: " + str(user.get('username')))
 				#self.extendFollowingUsersPoolFromSuggested(user, 5) #follow up to N new users. This throws an internal instagrapi Exception
@@ -197,3 +180,8 @@ class ProfileScraper:
 				self.extendFollowingUsersPoolFromTaggedPostsSection(user, nPostsAllowed)  #follows all possible users 
 				print("Extending From Users Tagged in Posts of user: " + str(user.get('username')))
 				self.extendFollowingUsersPoolFromPostTaggedUsers(user) #follows all possible users 
+		
+
+
+
+
