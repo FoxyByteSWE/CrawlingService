@@ -4,12 +4,13 @@ import instagrapi
 from typing import Dict
 import pprint
 
-import RestaurantProfileFinder
+import LocationProfileFinder
 from InstagrapiUtils import InstagrapiUtils
 from JSONUtils import JSONUtils
 from Config import CrawlingServiceConfig
 from media.FoxyByteMedia import FoxyByteMedia
 from media.FoxyByteMediaFactory import FoxyByteMediaFactory
+from location.Location import Location
 
 #proxy = 'http://96.9.71.18:33427'
 
@@ -21,15 +22,9 @@ from media.FoxyByteMediaFactory import FoxyByteMediaFactory
 
 class Crawler:
 
-	jsonUtils = JSONUtils()
-	instagrapiUtils = InstagrapiUtils()
+	def __init__(self) -> None:
+		self.instagrapiUtils = InstagrapiUtils()
 
-
-	def readFromJSON(self, processing_strategy: JSONUtils.ReadJSONStrategy):
-		return processing_strategy.readFromJSON(self)
-
-	def writeToJSON(self, data, processing_strategy: JSONUtils.WriteJSONStrategy):
-		return processing_strategy.writeToJSON(self, data)
 
 
 	def saveCrawledDataFromLocation(self, mediasfromloc: dict, locationPK: dict) -> None:
@@ -84,26 +79,22 @@ class Crawler:
 
 	#MAIN CRAWLING FUNCTION
 
-	def crawlAllLocations(self, locationsDict: dict, nPostsWanted: int) -> None:
-		for loc in locationsDict.values():
-			mediasDump = self.instagrapiUtils.getMostRecentMediasFromLocation(loc["name"]) #returns a list of "Medias"
+	def crawlAllLocations(self, locations, nPostsWanted: int) -> None:
+		for location in locations.values():
+			mediasDump = self.instagrapiUtils.getMostRecentMediasFromLocation(location.name, nPostsWanted) #returns a list of "Medias"
 
 			formattedMediasFromLocation = []
-			locationPk = loc["pk"]
 			foundRestaurantProfile = False
 
 
-			for media in mediasDump:
-				if RestaurantProfileFinder.checkForRestaurantUsername(media, loc["name"]) == True:
-					foundRestaurantProfile = True
+			# MOVING THIS TO PROFILESCRAPER
+			# for media in mediasDump:
+			# 	if LocationProfileFinder.checkForRestaurantUsername(media, location.name) == True:
+			# 		foundRestaurantProfile = True
 
 			if foundRestaurantProfile == True:
-				for media in mediasDump[0:nPostsWanted-1]:
-					#print("a")
-					#uname = (media.user).username
-					#print("b")
-					##propic = self.parseMediaUrl(client.user_info_by_username(uname).profile_pic_url)
-					##self.parseMediaUrl(self.instagrapiUtils.getUserInfoByUsername(uname).profile_pic_url)
+				for media in mediasDump:
+
 					#print("c")
 					##print(propic)
 
@@ -127,7 +118,5 @@ class Crawler:
 
 
 
-	def beginCrawling(self, nPostsWanted: int) -> None:
-		locationsDict = self.readFromJSON(JSONUtils.TrackedLocationsReadJSONStrategy)
-		self.crawlAllLocations(locationsDict, 2)
+
 

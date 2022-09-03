@@ -60,9 +60,9 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         pkCode = locList.pk
         return pkCode
 
-    def getMostRecentMediasFromLocation(self, locationName: str) -> list:
+    def getMostRecentMediasFromLocation(self, locationName: str, amount: int) -> list:
         pkCode = self.getLocationPkCodeFromName(locationName)
-        mediaListFromLocation = self.client.location_medias_recent(pkCode)
+        mediaListFromLocation = self.client.location_medias_recent(pkCode, amount)
         return mediaListFromLocation
 
 

@@ -11,56 +11,47 @@ from location.Location import Location
 from location.LocationFactory import LocationFactory
 from LocationProfileFinder import LevenshteinLocationProfileFinder 
 from user.UserProfile import UserProfile
+from DBConnection import DBConnection
 
 
 class ProfileScraper:
 
-	jsonUtils = JSONUtils()
-	instagrapiUtils = InstagrapiUtils()
+	def __init__(self) -> None:
+		self.jsonUtils = JSONUtils()
+		self.instagrapiUtils = InstagrapiUtils()
+		self.db = DBConnection()
 
 
-	def readFromJSON(self, processing_strategy: JSONUtils.ReadJSONStrategy):
-		return processing_strategy.readFromJSON(self)
 
-	def writeToJSON(self, data, processing_strategy: JSONUtils.WriteJSONStrategy):
-		return processing_strategy.writeToJSON(self, data)
+	def trackLocation(self, location: Location) -> None:
+		print("tracking location: "+ location.name)
+		self.db.insertRestaurants(location)
 
+		
 
-	def trackLocation(self, location: dict) -> None:
-		locationsFromJSON = self.readFromJSON(JSONUtils.TrackedLocationsReadJSONStrategy)
-		print("tracking location: "+ location["name"])
-		locationsFromJSON[location["pk"]]=location
-		self.writeToJSON(locationsFromJSON, JSONUtils.TrackedLocationsWriteJSONStrategy)
-
-
-	def isLocationTracked(self, location: dict) -> bool:
-		data = self.readFromJSON(JSONUtils.TrackedLocationsReadJSONStrategy)
-		print(data.keys())
-		if str(location.get('pk')) in data.keys():
-			
+	def isLocationTracked(self, location: Location) -> bool:
+		query = "SELECT * FROM LOCATIONS WHERE Codice_Pk IS " + str(location.pk)
+		response = self.db.executeQuery(query)
+		if response != None:
 			print("location is already being tracked.")
 			return True
 		else:
 			return False
 
 
-	def isAlreadyTracked(self, user: dict) -> bool: #check if database or file already contains this user
+	def isAlreadyTracked(self, user: UserProfile) -> bool: #check if database or file already contains this user
 		#data = ProfileScraper.getTrackedUsersFromJSON()
-		data = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
-		#print(data)
-		if user.get('username') in data:
+		query = "SELECT * FROM LOCATIONS WHERE Username IS " + str(user.username)
+		response = self.db.executeQuery(query)
+		if response != None:
+			print("user is already being tracked.")
 			return True
 		else:
 			return False
 
-
-	def trackUser(self, user: dict) -> None:
+	def trackUser(self, user: UserProfile) -> None:
 		#username = client.user_info_by_username_v1(username).pk
-		username = user.get('username')
-		usersfromjson = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
-		print("tracking user: "+ username)
-		usersfromjson[username]=user#.dict()
-		self.writeToJSON(usersfromjson, JSONUtils.UsersWriteJSONStrategy)
+		self.db.insertUser(user)
 
 
 
@@ -136,7 +127,7 @@ class ProfileScraper:
 
 	# FIND Trackable Places
 
-	def crawlPlacesFromProfilePosts(self, user: UserProfile, nPostsAllowed: int) -> None:
+	def crawlPlacesFromProfilePosts(self, user: UserProfile, nPostsAllowed: int, places_tags: list) -> None:
 
 		postlist = self.instagrapiUtils.getUserPosts(user.pk, nPostsAllowed)
 
@@ -157,9 +148,11 @@ class ProfileScraper:
 					for media in locmedias:
 						#search through and use locationprofilefinder distance to find name of restaurant in posters.
 						if LevenshteinLocationProfileFinder.checkForRestaurantUsername(media.user.username, detailedLocationInfo.name) == True:
+							profilePic = self.parseMediaUrl(self.instagrapiUtils.client.user_info_by_username(media.user.username).profile_pic_url)
 							coordinates = self.instagrapiUtils.getMediaLocationCoordinates(post)
-							newlocation = LocationFactory.buildLocationFromInstagrapi(detailedLocationInfo, "dummy", coordinates, "dummy")
+							newlocation = LocationFactory.buildLocationFromInstagrapi(detailedLocationInfo, profilePic, coordinates, "")
 							self.trackLocation(newlocation)
+							break
 			
 		if self.isAlreadyTracked(user):
 			user.setLastPostCheckedCode(postlist[0].pk)
@@ -170,7 +163,6 @@ class ProfileScraper:
 	def createKickoffUser(self):
 			kickoffUser = (self.instagrapiUtils.getUserInfoByUsername("foxybyte.swe"))
 			self.extendFollowingUsersPoolFromSuggested(kickoffUser, 5)
-			trackedUsers = self.readFromJSON(JSONUtils.UsersReadJSONStrategy)
 
 	def extendUserBase(policy):
 				print(" ===== Starting ExtendUsersPool referencing user: " + str(user.get('username')) + " =====")

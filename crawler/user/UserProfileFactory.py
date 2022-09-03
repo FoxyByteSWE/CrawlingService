@@ -8,4 +8,11 @@ class UserProfileFactory:
 						    username,
 						    isprivate,
 						    lastpostcheckedcode)
+
+
+    def buildFromDatabase(pk: int, username: str, isprivate: bool, lastpostcheckedcode: str):
+        return UserProfile( pk,
+                            username,
+                            isprivate,
+                            lastpostcheckedcode)
     
