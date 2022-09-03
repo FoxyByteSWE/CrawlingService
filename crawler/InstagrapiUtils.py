@@ -1,4 +1,4 @@
-import os, json, sys, time
+import os, json, sys, datetime
 from re import M
 from instagrapi import Client
 import instagrapi
@@ -8,23 +8,15 @@ import pprint
 from instagrapi.types import Media
 from instagrapi.types import Location
 from instagrapi.types import User
+from instagrapi.types import UserShort
 
-class InstagrapiUtilsBase(type):
-    """
-    The Singleton class can be implemented in different ways in Python. Some
-    possible methods include: base class, decorator, metaclass. We will use the
-    metaclass because it is best suited for this purpose.
-    """
+
+class InstagrapiUtilsBase(type): #SINGLETON
 
     _instances = {}
 
-    
-
     def __call__(cls, *args, **kwargs):
-        """
-        Possible changes to the value of the `__init__` argument do not affect
-        the returned instance.
-        """
+
         if cls not in cls._instances:
             instance = super().__call__(*args, **kwargs)
             cls._instances[cls] = instance
@@ -74,7 +66,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return mediaListFromLocation
 
 
-    def getMediaLocationCoordinates(self, media) -> dict:
+    def getMediaLocationCoordinates(self, media: Media) -> dict:
         coordinates = {'lng': ((media.location).lng) , 
                        'lat': ((media.location).lat) }
         return coordinates
@@ -97,7 +89,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
             return list
 
 
-    def parseTakenAtTime(self, input) -> list:
+    def parseTakenAtTime(self, input: datetime) -> list:
         time = []
         time.append(input.year)
         time.append(input.month)
@@ -107,7 +99,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         time.append(input.second)
         return time
 
-    def parseTakenAtLocation(self, media) -> dict:
+    def parseTakenAtLocation(self, media: Media) -> dict:
         input = self.getDetailedMediaLocationInfo(media)
         coordinates = self.getMediaLocationCoordinates(media)
         dict = {}
@@ -126,7 +118,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         url = url[start:]
         end = url.find("'")
         url = url[:end]
-        return url;
+        return url
 
 
 
@@ -138,26 +130,23 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         else:
             return None
 
-    def getUserPosts(self, user, amount) -> list[Media]:
-        userpk = user.pk
+    def getUserPosts(self, userpk: int, amount) -> list[Media]:
         return self.client.user_medias_v1(userpk, amount)
 
-    def getSuggestedUsersFromFBSearch(self, user: User):
+    def getSuggestedUsersFromFBSearch(self, userpk: int):
         print("WARNING: CHECK InstagrapiUtils.getSuggestedUsersFromFBSearch(user)")
-        pk = user.pk
-        res =  self.client.fbsearch_suggested_profiles(pk)  # For some reason an exception is thrown: Not eligible for chaining. 
+        res =  self.client.fbsearch_suggested_profiles(userpk)  # For some reason an exception is thrown: Not eligible for chaining. 
         return res
 
     def hasTaggedLocation(self, media: Media) -> bool:
         return media.location != None
 
-    def getUserIDofTagged(self, user: User) -> list[Media]: 
-        #time.sleep(2)
-        userpk = user.pk
-        return self.client.usertag_medias(userpk)
+    #def getUserIDofTagged(self, user: User) -> list[Media]: 
+    #    #time.sleep(2)
+    #    userpk = user.pk
+    #    return self.client.usertag_medias(userpk)
 
-    def getProfileTaggedPosts(self, user: User) -> list[Media]:
-        userpk = user.pk
+    def getProfileTaggedPosts(self, userpk: int) -> list[Media]:
         return self.client.usertag_medias(userpk)
 
 
@@ -168,7 +157,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
  #   def convertUsertagToUser(self, usertag):
  #       return usertag.user
 
-    def convertUserShortToUserv2(self, usershort):
+    def convertUserShortToUserv2(self, usershort: UserShort):
         #print("convertUserShortToUserv2")
         return self.client.user_info_by_username_v1(usershort['username'])
 
