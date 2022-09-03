@@ -24,6 +24,9 @@ class Location:
 		self.latest_post_partial_url_checked = latest_post_partial_url_checked
 
 
+	def convertToDict(self):
+		pass
+
 	def getPk(self):
 		return self.pk
 	

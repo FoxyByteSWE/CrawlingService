@@ -3,14 +3,17 @@ class FoxyByteMedia:
 	def __init__(self, PostPartialURL = "", MediaType = 1, authoruser = "", TakenAtTime = [], TakenAtLocation = {}, LikeCount = 0, CaptionText = "", MediaURL = ""):
 		self.PostPartialURL = PostPartialURL
 		self.MediaType = MediaType
-		self.AuthorUser = authoruser # might as well pass our own User Object
-		self.TakenAtTime = TakenAtTime
+		self.AuthorUsername = authoruser # might as well pass our own User Object
+		self.TakenAtTime = TakenAtTime # media
 		self.TakenAtLocation = TakenAtLocation
 		self.LikeCount = LikeCount
 		self.CaptionText = CaptionText
 		self.MediaURL = MediaURL
 
 	
+	def convertToDict():
+		pass
+
 	def getPostPartialURL(self) -> str:
 		return self.PostPartialURL
 
