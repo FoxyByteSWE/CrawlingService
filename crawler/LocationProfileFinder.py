@@ -1,10 +1,22 @@
+from msilib.schema import Media
 import sys, time, os, json
 import Levenshtein
 
-class LevenshteinLocationProfileFinder:
+from InstagrapiUtils import Media
+
+
+class LocationProfileFinder:
+
 
 	@staticmethod
-	def checkForRestaurantUsername(username, restaurantName: str) -> bool:
+	def getLocationUserProfile(self, locmedias: list[Media], locname):
+		for media in locmedias:
+			if self.checkForRestaurantUsername(media.user.username, locname) == True:
+				return media
+		return None
+
+	@staticmethod
+	def checkForRestaurantUsername(self, username, restaurantName: str) -> bool:
 		#does instagrapi have some name based search method? shall we use Selenium instead?
 		# 1. scrape restaurant location
 		# 2. compare username of profiles to restaurant location name: need to find a way to find SIMILAR names, not exact matches, which would be uncommon.

@@ -2,10 +2,7 @@
 import sys, os
 import mysql.connector
 from mysql.connector import Error
-import pandas as pd
 
-# packages written as part of the project
-from S3Connection import S3Connection
 
 sys.path.insert(1, (str(sys.path[0]))+"/../IGCrawlerService/crawler/")
 
@@ -133,6 +130,7 @@ class DBConnection:
 			Immagine VARCHAR(1500),
 			Longitudine FLOAT,
 			Latitudine FLOAT,
+			LatestPostPartialUrlChecked VARCHAR(30)
 			Ranking FLOAT
 		)"""
 
@@ -191,9 +189,8 @@ class DBConnection:
 	def insertMedia(self, parameter):
         #TODO: implement
 		pass
-
-	def createS3Connection(self):
-		self.s3 = S3Connection(BUCKET_NAME)
+	
+	
 
 	def uploadDB(self, db, fileDirectory = None):
 

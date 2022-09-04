@@ -11,6 +11,7 @@ from Config import CrawlingServiceConfig
 from media.FoxyByteMedia import FoxyByteMedia
 from media.FoxyByteMediaFactory import FoxyByteMediaFactory
 from location.Location import Location
+from DBConnection import DBConnection
 
 #proxy = 'http://96.9.71.18:33427'
 
@@ -24,19 +25,13 @@ class Crawler:
 
 	def __init__(self) -> None:
 		self.instagrapiUtils = InstagrapiUtils()
+		self.db = DBConnection()
 
 
 
 	def saveCrawledDataFromLocation(self, mediasfromloc: dict, locationPK: dict) -> None:
-		locationsFromJSON = self.readFromJSON(JSONUtils.CrawledDataReadJSONStrategy)
-		try:
-			locobj=locationsFromJSON[locationPK] #lista di dizionari
-			locobj.append(mediasfromloc)
-			locationsFromJSON[locationPK]=locobj
-		except KeyError:
-			locationsFromJSON[locationPK] = mediasfromloc
-		self.writeToJSON(locationsFromJSON,JSONUtils.CrawledDataWriteJSONStrategy)
-
+		for media in mediasfromloc:
+			self.db.insertMedia(media)
 
 #	def formatMediaToDictionaryItem(self, media: dict) -> dict: #need to serialize casting to primitive data types
 #		formattedDictionaryMedia = {}
@@ -54,24 +49,13 @@ class Crawler:
 
 
 
-	def isMediaDuplicated(self, media, locationPk: int) -> bool:
-		print("e")
-		try:
-			fromjson = self.readFromJSON(JSONUtils.CrawledDataReadJSONStrategy)
-		except json.JSONDecodeError:
-			print("f")
+	def isMediaDuplicated(self, media) -> bool:
+		query = "SELECT * FROM Media WHERE CODE == " + str(media.code)
+		response = self.db.executeQuery(query)
+		if response != None:
+			return True
+		else:
 			return False
-		locationPk= str(locationPk)
-		if locationPk in fromjson.keys():
-			singlelocationdata=fromjson[locationPk]  #lista di dizionari
-			for item in singlelocationdata:	
-				if media["PostPartialURL"] == item["PostPartialURL"]:
-					#print("dup")
-					return True
-				else:
-					print(str(media["PostPartialURL"]) + " is not a dup of " + str(item["PostPartialURL"]))
-			return False
-		return False
 
 
 
@@ -83,35 +67,23 @@ class Crawler:
 		for location in locations.values():
 			mediasDump = self.instagrapiUtils.getMostRecentMediasFromLocation(location.name, nPostsWanted) #returns a list of "Medias"
 
-			formattedMediasFromLocation = []
-			foundRestaurantProfile = False
+			mediasFromLocation = []
 
+			for media in mediasDump:
 
-			# MOVING THIS TO PROFILESCRAPER
-			# for media in mediasDump:
-			# 	if LocationProfileFinder.checkForRestaurantUsername(media, location.name) == True:
-			# 		foundRestaurantProfile = True
+				parsedtakenat = self.instagrapiUtils.parseTakenAtTime(media.taken_at)
+				parsedlocation = self.instagrapiUtils.parseTakenAtLocation(media)
+				parsedmediaurl = self.instagrapiUtils.parseMediaUrl(self.instagrapiUtils.getMediaURL(media))
 
-			if foundRestaurantProfile == True:
-				for media in mediasDump:
+				newmedia = FoxyByteMediaFactory.buildFromInstagrapiMediaAndLocation(media, parsedtakenat, parsedlocation, parsedmediaurl)
 
-					#print("c")
-					##print(propic)
+				if self.isMediaDuplicated(newmedia) == False: # check in database
+						print("media appended.")
+						mediasFromLocation.append(mediasFromLocation) 
 
-					parsedtakenat = self.instagrapiUtils.parseTakenAtTime(media.taken_at)
-					parsedlocation = self.instagrapiUtils.parseTakenAtLocation(media)
-					parsedmediaurl = self.instagrapiUtils.parseMediaUrl(self.instagrapiUtils.getMediaURL(media))
-
-					newmedia = FoxyByteMediaFactory.buildFromInstagrapiMediaAndLocation(media, parsedtakenat, parsedlocation, parsedmediaurl)
-
-					if self.isMediaDuplicated(newmedia,locationPk) == False: # check in database
-							print("media appended.")
-							#formattedMediasFromLocation.append(formattedmedia) 
-				if formattedMediasFromLocation != []:
-					print("saving medias...")
-					self.saveCrawledDataFromLocation(formattedMediasFromLocation, locationPk)  # Questo dovrebbe essere solo alla fine del crawling di una location (primo ciclo for). Qui dovrebbe solo accumulare in un dizionario.
-			else:
-				print("No Profile Found, discarding restaurant.")
+			if mediasFromLocation != []:
+				print("saving medias...")
+				self.saveCrawledDataFromLocation(mediasFromLocation, location.pk)
 			
 
 			
