@@ -60,17 +60,29 @@ class Crawler:
 
 
 
+	def checkIfPostIsNew(self, indexedPURL: str, latestPURL: str) -> bool:
+		if latestPURL == indexedPURL:
+			return False
+		else:
+			return True
+
 
 	#MAIN CRAWLING FUNCTION
 
 	def crawlAllLocations(self, locations, nPostsWanted: int) -> None:
 		for location in locations.values():
+
 			mediasDump = self.instagrapiUtils.getMostRecentMediasFromLocation(location.name, nPostsWanted) #returns a list of "Medias"
 
 			mediasFromLocation = []
+			lastpostcodechecked = location.getLastPostCheckedCode()
+
 
 			for media in mediasDump:
 
+				if self.checkIfPostIsNew(media.code, lastpostcodechecked) == False:  # check if reached a post already checked before
+					return
+				
 				parsedtakenat = self.instagrapiUtils.parseTakenAtTime(media.taken_at)
 				parsedlocation = self.instagrapiUtils.parseTakenAtLocation(media)
 				parsedmediaurl = self.instagrapiUtils.parseMediaUrl(self.instagrapiUtils.getMediaURL(media))
