@@ -66,7 +66,7 @@ class ProfileScraper:
 
 	# FIND Trackable Places
 
-	def crawlPlacesFromProfilePosts(self, user: UserProfile, nPostsAllowed: int, places_tags: list) -> None:
+	def crawlLocationsFromProfilePosts(self, user: UserProfile, nPostsAllowed: int, places_tags: list) -> None:
 
 		postlist = self.instagrapiUtils.getUserPosts(user.pk, nPostsAllowed)
 
