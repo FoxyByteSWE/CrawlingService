@@ -6,7 +6,6 @@ import pprint
 
 import LocationProfileFinder
 from InstagrapiUtils import InstagrapiUtils
-from JSONUtils import JSONUtils
 from Config import CrawlingServiceConfig
 from media.FoxyByteMedia import FoxyByteMedia
 from media.FoxyByteMediaFactory import FoxyByteMediaFactory
@@ -59,22 +58,22 @@ class Crawler:
 	#MAIN CRAWLING FUNCTION
 
 	def crawlLocation(self, location, nPostsWanted: int) -> None:
-			mediasDump = self.instagrapiUtils.getMostRecentMediasFromLocation(location.name, nPostsWanted) #returns a list of "Medias"
+		mediasDump = self.instagrapiUtils.getMostRecentMediasFromLocation(location.name, nPostsWanted) #returns a list of "Medias"
 
-			mediasFromLocation = []
-			lastpostcodechecked = location.getLastPostCheckedCode()
+		mediasFromLocation = []
+		lastpostcodechecked = location.getLastPostCheckedCode()
 
 
-			for media in mediasDump:
+		for media in mediasDump:
 
-				if self.checkIfPostIsNew(media.code, lastpostcodechecked) == False:  # check if reached a post already checked before
-					return
-				
-				parsedMediaData = self.parseNonPrimitiveMediaData(media)
-				newmedia = FoxyByteMediaFactory.buildFromInstagrapiMediaAndLocation(media, parsedMediaData[0], parsedMediaData[1], parsedMediaData[2])
+			if self.checkIfPostIsNew(media.code, lastpostcodechecked) == False:  # check if reached a post already checked before
+				return
+			
+			parsedMediaData = self.parseNonPrimitiveMediaData(media)
+			newmedia = FoxyByteMediaFactory.buildFromInstagrapiMediaAndLocation(media, parsedMediaData[0], parsedMediaData[1], parsedMediaData[2])
 
-				if self.isMediaDuplicated(newmedia) == False:
-						self.saveMediaFromLocation(mediasFromLocation, location.pk)
+			if self.isMediaDuplicated(newmedia) == False:
+					self.saveMediaFromLocation(mediasFromLocation, location.pk)
 
 				
 			

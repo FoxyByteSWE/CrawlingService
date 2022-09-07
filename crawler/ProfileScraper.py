@@ -84,7 +84,7 @@ class ProfileScraper:
 
 					locmedias = self.instagrapiUtils.getMostRecentMediasFromLocation(detailedLocationInfo.name)
 
-					mediafound = LocationProfileFinder.getLocationUserProfile(locmedias, detailedLocationInfo.name)
+					mediafound = LocationProfileFinder.getMediaOfLocationUserProfileIfExists(locmedias, detailedLocationInfo.name)
 					if mediafound != None:
 						coordinates = self.instagrapiUtils.getMediaLocationCoordinates(post)
 						profilePic = self.parseMediaUrl(self.instagrapiUtils.client.user_info_by_username(mediafound.user.username).profile_pic_url)

@@ -23,7 +23,7 @@ class CrawlingServiceFacade:
         trackedUsers = DBConnection.readFromDB("SELECT * FROM USERS") # either pass a query as string or make it a strategy pattern.
 
         if trackedUsers == []:
-            self.crawler.createKickoffUser()
+            self.profileScraper.findKickoffUsers()
 
         # LOAD FROM DB or JSON
         places_tags = self.db.readFromDB("SELECT * FROM PLACES_TAGS")

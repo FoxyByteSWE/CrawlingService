@@ -9,7 +9,7 @@ class LocationProfileFinder:
 
 
 	@staticmethod
-	def getLocationUserProfile(self, locmedias: list[Media], locname):
+	def getMediaOfLocationUserProfileIfExists(self, locmedias: list[Media], locname):
 		for media in locmedias:
 			if self.checkForRestaurantUsername(media.user.username, locname) == True:
 				return media
