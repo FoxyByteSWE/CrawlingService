@@ -1,17 +1,38 @@
 import unittest
-
+from unittest.mock import patch
 
 from crawler.InstagrapiUtils import InstagrapiUtils
 from crawler.media.FoxyByteMedia import FoxyByteMedia
+import instagrapi
 from instagrapi import types
+from instagrapi.types import HttpUrl
+
+
+import datetime
 
 
 class TestInstagrapi(unittest.TestCase):
     def setUp(self) -> None:
-        self.instagrapi = InstagrapiUtils()
+        self.instagrapiUtils = InstagrapiUtils()
+
+        self.media = types.Media("111", 
+                            "222", 
+                            "33A",
+                            datetime(2022, 9, 9, 17, 20, 0),
+                            "aaa",
+                            HttpUrl("www.google.it", "asd", "asd"),
+                            types.Location,
+                            types.UserShort,
+                            10,
+                            11,
+                            "asd",
+                            [],
+                            None,
+                            None)
+
 
     def test_loadCookies(self):
-        self.assertEqual(self.instagrapi.loadCookies(),
+        self.assertEqual(self.instagrapiUtils.loadCookies(),
             {"uuids": {"phone_id": "19fd873a-165b-49ce-8fd7-822571400339", 
                         "uuid": "cb5be7f9-5a34-457e-9fbc-bd8583539415", 
                         "client_session_id": "a5583b19-210a-447d-ba35-c71daa196ad0", 
@@ -42,10 +63,35 @@ class TestInstagrapi(unittest.TestCase):
             "locale": "en_US", 
             "timezone_offset": -14400})
 
-    def getLocationPkCodeFromName(self):
-        self.assertEqual(self.instagrapi.getLocationPkCodeFromName("Farina del mio sacco"),1788391034730029)
 
-    def getMostRecentMediasFromLocation(self):
-        self.assertEqual(type(self.instagrapi.getMostRecentMediasFromLocation()), list[types.Media])
+
+
+    
+    def test_parseTakenAtTime(self):
+        dt = datetime(2022, 9, 9, 17, 20, 0)
+        self.assertEquals(self.instagrapiUtils.parseTakenAtTime(dt), [2022, 9, 9, 17, 20, 0])  # define the expected output by hand
+        
+
+    def test_parseMediaUrl(self):
+        self.assertEquals(self.instagrapiUtils.parseMediaUrl(self.media.thumbnail_url), "www.google.com")  # define the expected output by hand
+
+    def test_parseTakenAtLocation(self):
+        self.assertEquals(self.instagrapiUtils.parseMediaUrl(self.media.location), {}) # define the expected output by hand
+
+    def test_getLocationPkCodeFromName(self):
+        self.assertEqual(self.instagrapiUtils.getLocationPkCodeFromName("Farina del mio sacco"),1788391034730029)
+
+    def test_getMostRecentMediasFromLocation(self):
+        #maybe use a mock patch here
+        self.assertEqual(type(self.instagrapiUtils.getMostRecentMediasFromLocation()), list[types.Media])
+
+    def test_getMediaLocationCoordinates(self):
+        self.assertEqual(self.instagrapiUtils.getMediaLocationCoordinates(self.media.location.lat, self.media.location.lng), {})
+
+    def test_getMediaURL(self):
+        self.assertEqual(self.instagrapiUtils.getMediaURL(self.media), "")
+
+    def hasTaggedLocation(self):
+        self.assertTrue(self.instagrapiUtils.hasTaggedLocation(self.media), True)
 
 
