@@ -121,8 +121,6 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return url
 
 
-
-
     def getDetailedMediaLocationInfo(self, media: Media) -> Location: 
         mediainfo = self.client.media_info_v1(media.pk)
         if mediainfo.location != None:
@@ -141,35 +139,11 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
     def hasTaggedLocation(self, media: Media) -> bool:
         return media.location != None
 
-    #def getUserIDofTagged(self, user: User) -> list[Media]: 
-    #    #time.sleep(2)
-    #    userpk = user.pk
-    #    return self.client.usertag_medias(userpk)
-
     def getProfileTaggedPosts(self, userpk: int) -> list[Media]:
         return self.client.usertag_medias(userpk)
 
 
-    ###########################################
-
-    # USER CONVERTERS
-
- #   def convertUsertagToUser(self, usertag):
- #       return usertag.user
 
     def convertUserShortToUserv2(self, usershort: UserShort):
         #print("convertUserShortToUserv2")
         return self.client.user_info_by_username_v1(usershort['username'])
-
-    ########################################
-
-    # LOCATION GETTERS
-#
-#    def getLocationFromPost(self, media: dict):
-#        return media.get('location')
-#
-#    def getLocationPkCode(self, location: dict) -> int:
-#        return location.get('pk')
-#
-#    def hasTaggedLocation(self, post: dict) -> bool:
-#        return post.get('location') != None 

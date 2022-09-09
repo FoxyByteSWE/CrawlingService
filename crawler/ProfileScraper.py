@@ -5,7 +5,6 @@ import instagrapi
 from abc import ABC, abstractmethod
 
 from InstagrapiUtils import InstagrapiUtils
-from JSONUtils import JSONUtils
 from Config import CrawlingServiceConfig
 from location.Location import Location
 from location.LocationFactory import LocationFactory
@@ -17,7 +16,6 @@ from DBConnection import DBConnection
 class ProfileScraper:
 
 	def __init__(self) -> None:
-		self.jsonUtils = JSONUtils()
 		self.instagrapiUtils = InstagrapiUtils()
 		self.db = DBConnection()
 
