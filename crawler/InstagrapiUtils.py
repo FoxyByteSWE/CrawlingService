@@ -147,8 +147,3 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
     def convertUserShortToUserv2(self, usershort: UserShort):
         #print("convertUserShortToUserv2")
         return self.client.user_info_by_username_v1(usershort['username'])
-
-
-
-instagrapiUt = InstagrapiUtils()
-print(instagrapiUt.getMostRecentMediasFromLocation("lunaelaltro",1))

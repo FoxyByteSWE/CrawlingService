@@ -1,10 +1,12 @@
 import unittest
 from unittest.mock import patch
+import os
+
 import sys
 
 
 from crawler.InstagrapiUtils import InstagrapiUtils
-from crawler.media.FoxyByteMedia import FoxyByteMedia
+
 
 import instagrapi
 from instagrapi import types
@@ -19,7 +21,7 @@ class TestInstagrapi(unittest.TestCase):
         self.instagrapiUtils = InstagrapiUtils()
 
 
-####################################  TEST MEDIA ###############################
+####################################  TEST MEDIA #################################
 
         self.media = types.Media(pk='2919305163060880463', 
                                 id='2919305163060880463_281443894', 
@@ -89,7 +91,7 @@ class TestInstagrapi(unittest.TestCase):
                                 clips_metadata={})
 
 
-############################################################
+################################################################
 
 
 
