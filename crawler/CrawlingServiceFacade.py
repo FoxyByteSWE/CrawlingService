@@ -42,6 +42,7 @@ class CrawlingServiceFacade:
         for location in locationsFromQuery: # list of dicts?
             loc = LocationFactory.buildLocationFromDB(location)
             self.crawler.crawlLocation(loc, 2)
+            
 
 
 
