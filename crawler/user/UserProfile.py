@@ -7,7 +7,7 @@ class UserProfile:
         self.lastPostCheckedCode = lastpostcheckedcode
 
 
-    def convertToDict():
+    def convertToDict(self):
         pass
 
     def getPk(self) -> int:
