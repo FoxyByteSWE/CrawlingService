@@ -1,7 +1,10 @@
 import unittest
 from unittest.mock import patch
+import sys,os
 
 from crawler.user.UserProfile import UserProfile
+
+
 
 class TestUserProfile(unittest.TestCase):
     def setUp(self):
@@ -17,3 +20,27 @@ class TestUserProfile(unittest.TestCase):
                                                      "username": "marcouderzo",
                                                      "isPrivate": False,
                                                      "lastPostCheckedCode": "12AB34CD" })
+
+
+    def test_getPk(self):
+        self.assertEqual(self.user.getPk(), 12345)
+
+    def test_getUsername(self):
+        self.assertEqual(self.user.getUsername(), "marcouderzo")
+
+    def test_getIsPrivate(self):
+        self.assertFalse(self.user.getIsPrivate())
+    
+    def test_getLastPostCheckedCode(self):
+        self.assertEqual(self.user.getLastPostCheckedCode(), "12AB34CD")
+
+    def test_setLastPostCheckedCode(self):
+        self.user.setLastPostCheckedCode("newcode")
+        self.assertTrue(self.user.getLastPostCheckedCode() == "newcode")
+
+    
+
+
+
+    
+

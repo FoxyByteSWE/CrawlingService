@@ -133,15 +133,14 @@ class TestInstagrapi(unittest.TestCase):
 
     
     def test_parseTakenAtTime(self):
-        dt = datetime(2022, 9, 9, 17, 20, 0)
-        self.assertEquals(self.instagrapiUtils.parseTakenAtTime(dt), [2022, 9, 9, 17, 20, 0])  # define the expected output by hand
+        self.assertEquals(self.instagrapiUtils.parseTakenAtTime(self.media.taken_at), [2022, 9, 9, 17, 20, 0])  # TODO: change
         
 
     def test_parseMediaUrl(self):
         self.assertEquals(self.instagrapiUtils.parseMediaUrl(self.media.thumbnail_url), "www.google.com")  # define the expected output by hand
 
     def test_parseTakenAtLocation(self):
-        self.assertEquals(self.instagrapiUtils.parseMediaUrl(self.media.location), []) # define the expected output by hand
+        self.assertEquals(self.instagrapiUtils.parseTakenAtLocation(self.media.location), []) # define the expected output by hand
 
     def test_getLocationPkCodeFromName(self):
         self.assertEqual(self.instagrapiUtils.getLocationPkCodeFromName("Farina del mio sacco"),1788391034730029)

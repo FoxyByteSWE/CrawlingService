@@ -19,6 +19,12 @@ class FoxyByteMedia:
 
 	def getMediaType(self) -> int:
 		return self.MediaType
+
+	def getAuthorUsername(self) -> str:
+		return self.AuthorUsername
+
+	def getCaptionText(self) -> str:
+		return self.CaptionText
 	
 	def getTakenAtTIme(self) -> list:
 		return self.TakenAtTime
