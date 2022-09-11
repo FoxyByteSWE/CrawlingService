@@ -4,15 +4,13 @@ import datetime
 from math import exp
 from pprint import pprint
 
-from Media import Media
-
-sys.path.insert(1, (str(sys.path[0]))+"/../../RankingService/")
+from crawler.location.Location import Location
 
 
 
 class Location:
 
-	def __init__(self, pk = 0, name = "", category = "", address = "", website = "", phone = "", main_image_url = "", coordinates = "", latest_post_partial_url_checked = ""):
+	def __init__(self, pk = 0, name = "", category = "", address = "", website = "", phone = "", main_image_url = "", coordinates = {}, latest_post_partial_url_checked = ""):
 		self.pk = pk
 		self.name = name
 		self.category = category
@@ -38,6 +36,9 @@ class Location:
 
 	def getAddress(self):
 		return self.address
+
+	def getCoordinates(self):
+		return self.coordinates
 
 	def getWebsite(self):
 		return self.website

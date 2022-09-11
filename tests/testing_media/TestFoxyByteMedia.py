@@ -5,7 +5,7 @@ import sys,os
 from crawler.media.FoxyByteMedia import FoxyByteMedia
 
 
-class TestUserProfile(unittest.TestCase):
+class TestFoxyByteMedia(unittest.TestCase):
     def setUp(self):
 
         self.media = FoxyByteMedia("ABCDE123",
