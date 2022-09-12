@@ -1,9 +1,11 @@
 import logging
 import pymysql
 
+from pprint import pprint
 class DBConnection:
 
-	def __init__(self, hostname = "michelinsocial.ctr0m4f2rgau.eu-west-1.rds.amazonaws.com", user = "admin", password = "#g7ct=MD", server_connection = None, database_connection = None):
+	#def __init__(self, hostname = "michelinsocial.ctr0m4f2rgau.eu-west-1.rds.amazonaws.com", user = "admin", password = "#g7ct=MD", server_connection = None, database_connection = None):
+	def __init__(self, hostname = "localhost", user = "root", password = "root", server_connection = None, database_connection = None):
 		self.hostname = hostname
 		self.user = user
 		self.password = password
@@ -104,10 +106,19 @@ class DBConnection:
 
 	
 	def insertItem(self, item: dict, table: str):
-		placeholders = ', '.join(['%s'] * len(item))
+
+		for k,v in item.items():
+			item[k] = str(item[k])
+			item[k] = item[k].replace('"', "'")
+			item[k] = '"' + item[k] + '"'
+			if item[k] == '""' or item[k] == '"None"':
+				item[k] = '"NULL"'
+
+		placeholders = ', '.join(item.values())
 		columns = ', '.join(item.keys())
 		sql = "INSERT INTO %s ( %s ) VALUES ( %s )" % (table, columns, placeholders)
-		self.executeQuery(item.values())
+		print(sql)
+		self.executeQuery(sql)
 
 	def readItem(self, query:str):
 		connection = self.database_connection
@@ -115,15 +126,29 @@ class DBConnection:
 		desc.execute(query)
 		connection.commit()
 
-		column_names = [col[0] for col in desc]
-		data = [dict(zip(column_names, row))  
-				for row in desc.fetchall()]
-		return data
+		list = []
+		for row in desc.fetchall():
+			dict = {}
+			for i in range(len(desc.description)):
+				dict[desc.description[i][0]] = row[i]
+			list.append(dict)
+
+		return list
 
 
 
 
 db = DBConnection()
 db.createServerConnection()
-db.createDatabaseConnection()
-db.readItem("SELECT * FROM RESTAURANTS")
+db.createDatabaseConnection("michelinsocial")
+dict = {'Categoria': 'CIAO',
+  'Codice_pk': '000000',
+  'Immagine': '',
+  'Indirizzo': 'VIA"CIAO',
+  'Latitudine': 11.1111,
+  'Longitudine': 22.2222,
+  'Nome': 'Farina del TUO sacco',
+  'Ranking': 10,
+  'Sito': 'https://www.farinadelmiosaccoferrara.it',
+  'Telefono': '0532474303'}
+db.insertItem(dict, "restaurants")
