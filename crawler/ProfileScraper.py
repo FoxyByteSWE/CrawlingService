@@ -23,7 +23,7 @@ class ProfileScraper:
 
 	def trackLocation(self, location: Location) -> None:
 		print("tracking location: "+ location.name)
-		self.db.insertRestaurants(location)
+		self.db.insertItem(location)
 
 		
 

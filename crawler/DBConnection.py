@@ -110,15 +110,22 @@ class DBConnection:
 		self.executeQuery(item.values())
 
 	def readItem(self, query:str):
-		connection = self.database_connection
-		desc = connection.cursor()
-		desc.execute(query)
-		connection.commit()
+			connection = self.database_connection
+			desc = connection.cursor()
+			desc.execute(query)
+			connection.commit()
 
-		column_names = [col[0] for col in desc]
-		data = [dict(zip(column_names, row))  
-				for row in desc.fetchall()]
-		return data
+			list = []
+			for row in desc.fetchall():
+				dict = {}
+				for i in range(len(desc.description)):
+					dict[desc.description[i][0]] = row[i]
+				list.append(dict)
+
+			print(list)
+
+			#pprint(vars(desc))
+
 
 
 
