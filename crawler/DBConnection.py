@@ -1,26 +1,14 @@
-# standard packages
-import sys, os
-import mysql.connector
-from mysql.connector import Error
-
-
-sys.path.insert(1, (str(sys.path[0]))+"/../IGCrawlerService/crawler/")
-
-from media.FoxyByteMedia import FoxyByteMedia
-from location.Location import Location
-
-# S3 bucket name
-BUCKET_NAME = "foxybyteswe"
+import logging
+import pymysql
 
 class DBConnection:
 
-	def __init__(self, hostname = "localhost", user = "root", password = "root", server_connection = None, database_connection = None, s3 = None):
+	def __init__(self, hostname = "michelinsocial.ctr0m4f2rgau.eu-west-1.rds.amazonaws.com", user = "admin", password = "#g7ct=MD", server_connection = None, database_connection = None):
 		self.hostname = hostname
 		self.user = user
 		self.password = password
 		self.server_connection = server_connection
 		self.database_connection = database_connection
-		self.s3 = s3
 
 	def createServerConnection(self, host_name = None, user_name = None, user_password = None):
 
@@ -35,13 +23,13 @@ class DBConnection:
 
 		connection = None
 		try:
-			connection = mysql.connector.connect(
-				host=host_name,
-				user=user_name,
-				passwd=user_password
+			connection = pymysql.connect(
+				host = host_name,
+				user = user_name,
+				passwd = user_password
 			)
 			print("Successfully connected to MySQL server")
-		except Error as err:
+		except pymysql.Error as err:
 			print(f"Error: '{err}'")
 
 		self.server_connection = connection
@@ -52,7 +40,7 @@ class DBConnection:
 		if connection is None:
 			connection = self.server_connection
 
-		cursor = connection.cursor(buffered=True)
+		cursor = connection.cursor()
 
 		"""
 		query = "DROP DATABASE IF EXISTS " + name + ";"
@@ -66,8 +54,9 @@ class DBConnection:
 		query = "CREATE DATABASE IF NOT EXISTS " + name + ";"
 		try:
 			cursor.execute(query)
+			connection.commit()
 			print("Successfully created database " + name)
-		except Error as err:
+		except pymysql.Error as err:
 			print(f"Error: '{err}'")
 
 	def createDatabaseConnection(self, db_name, host_name = None, user_name = None, user_password = None):
@@ -83,14 +72,14 @@ class DBConnection:
 
 		connection = None
 		try:
-			connection = mysql.connector.connect(
-				host=host_name,
-				user=user_name,
-				passwd=user_password,
-				database=db_name
+			connection = pymysql.connect(
+				host = host_name,
+				user = user_name,
+				passwd = user_password,
+				database = db_name
 			)
 			print("Successfully connected to database " + db_name)
-		except Error as err:
+		except pymysql.Error as err:
 			print(f"Error: '{err}'")
 
 		self.database_connection = connection
@@ -101,134 +90,40 @@ class DBConnection:
 		if connection is None:
 			connection = self.database_connection
 
-		cursor = connection.cursor(buffered=True)
+		cursor = connection.cursor()
 		try:
 			cursor.execute(query)
 			connection.commit()
 			print("Successfully executed " + query)
-			#print("\nResult:")
-			#result = cursor.fetchall();
-			#for row in result:
-				#print(row)
-		except Error as err:
+			print("\nResult:")
+			result = cursor.fetchall();
+			for row in result:
+				print(row)
+		except pymysql.Error as err:
 			print(f"Error: '{err}'")
 
-	def insertRestaurants(self, restaurants, connection = None):
-
-		if connection is None:
-			connection = self.database_connection
-
-		drop_restaurants = "DROP TABLE IF EXISTS restaurants;"
-
-		create_restaurants = """CREATE TABLE IF NOT EXISTS restaurants(
-			Codice_pk VARCHAR(20) PRIMARY KEY,
-			Nome VARCHAR(50) NOT NULL,
-			Categoria  VARCHAR(20),
-			Indirizzo VARCHAR(150),
-			Sito VARCHAR(70),
-			Telefono VARCHAR(16),
-			Immagine VARCHAR(1500),
-			Longitudine FLOAT,
-			Latitudine FLOAT,
-			LatestPostPartialUrlChecked VARCHAR(30)
-			Ranking FLOAT
-		)"""
-
-		self.executeQuery(drop_restaurants)
-
-		self.executeQuery(create_restaurants)
-
-		for r in restaurants:
-			#print(r.pk)
-			#print(r.name)
-			#r.printRanking()
-			#print('\n')
-			pk = '"' + str(r.pk) + '", '
-			if pk == '""' or pk == '"None", ':
-				pk = 'NULL, '
-			name = str(r.name)
-			name = name.replace('"', "'")
-			name = '"' + name + '", '
-			if name == '""' or name == '"None", ':
-				name = 'NULL, '
-			category = '"' + str(r.category) + '", '
-			if category == '""' or category == '"None", ':
-				category = 'NULL, '
-			address = '"' + str(r.address) + '", '
-			#print(address)
-			if address == '""' or address == '"None", ':
-				address = 'NULL, '
-			website = '"' + str(r.website) + '", '
-			if website == '""' or website == '"None", ':
-				website = 'NULL, '
-			phone = '"' + str(r.phone) + '", '
-			if phone == '""' or phone == '"None", ':
-				phone = 'NULL, '
-			main_image_url = '"' + str(r.main_image_url) + '", '
-			if main_image_url == '""' or main_image_url == '"None", ':
-				main_image_url = 'NULL, '
-			lng = '"' + str(r.coordinates[0]) + '", '
-			if lng == '""' or lng == '"None", ':
-				lng = 'NULL, '
-			lat = '"' + str(r.coordinates[1]) + '", '
-			if lat == '""' or lat == '"None", ':
-				lat = 'NULL, '
-			ranking = '"' + str(r.returnFormattedRanking()) + '"'
-			if ranking == '""' or ranking == '"None", ':
-				ranking = 'NULL, '
-
-			insert_restaurant = "INSERT INTO restaurants VALUES (" + pk + name + category + address + website + phone + main_image_url + lng + lat + ranking + ');'
-			#print(insert_restaurant)
-			self.executeQuery(insert_restaurant)
-
-
-	def insertUser(self, parameter):
-        #TODO: implement
-		pass
-
-	def insertMedia(self, parameter):
-        #TODO: implement
-		pass
 	
-	
+	def insertItem(self, item: dict, table: str):
+		placeholders = ', '.join(['%s'] * len(item))
+		columns = ', '.join(item.keys())
+		sql = "INSERT INTO %s ( %s ) VALUES ( %s )" % (table, columns, placeholders)
+		self.executeQuery(item.values())
 
-	def uploadDB(self, db, fileDirectory = None):
+	def readItem(self, query:str):
+		connection = self.database_connection
+		desc = connection.cursor()
+		desc.execute(query)
+		connection.commit()
 
-		if fileDirectory is None:
-			fileDirectory = str(sys.path[0]) + "/"
+		column_names = [col[0] for col in desc]
+		data = [dict(zip(column_names, row))  
+				for row in desc.fetchall()]
+		return data
 
-		self.createS3Connection()
-		command = 'mysqldump -u "root" -proot "' + db + '" > '  + fileDirectory + db + '_database.sql'
-		os.system(command)
-		file = fileDirectory + db + "_database.sql"
-		self.s3.uploadFile(file)
 
-	def downloadDB(self, db, fileDirectory = None):
 
-		if fileDirectory is None:
-			fileDirectory = str(sys.path[0]) + "/"
 
-		self.createS3Connection()
-		object = db + "_database.sql"
-		file = fileDirectory + db + "_database.sql"
-		self.s3.downloadFile(object, file)
-		self.createServerConnection()
-		self.createDatabase(db)
-		command = 'mysql -u root -proot ' + db + ' < ' + fileDirectory + db + '_database.sql'
-		os.system(command)
-
-def main():
-
-	db = DBConnection()
-
-	#db.createServerConnection()
-	#db.createDatabase("michelinsocial")
-
-	#db.createDatabaseConnection("michelinsocial")
-	#db.insertRestaurants()
-
-	#db.uploadDB("michelinsocial")
-	#db.downloadDB("michelinsocial")
-
-if __name__ == "__main__":
-	main()
+db = DBConnection()
+db.createServerConnection()
+db.createDatabaseConnection()
+db.readItem("SELECT * FROM RESTAURANTS")

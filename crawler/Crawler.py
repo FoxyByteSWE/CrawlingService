@@ -29,7 +29,7 @@ class Crawler:
 
 
 	def saveMediaFromLocation(self, media: dict, locationPK: dict) -> None:
-			self.db.insertMedia(media)
+			self.db.insertItem(media)
 
 
 	def isMediaDuplicated(self, media) -> bool:
