@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 import sys,os
-
+sys.path.insert(1, (str(sys.path[0]))+"/../../")
 from crawler.media.FoxyByteMedia import FoxyByteMedia
 
 
