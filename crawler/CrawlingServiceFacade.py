@@ -20,13 +20,14 @@ class CrawlingServiceFacade:
 
     def beginScrapingProfiles(self, allowExtendUserBase: bool, nPostsAllowed: int) -> None:
         
-        trackedUsers = DBConnection.executeQuery("SELECT * FROM USERS") # either pass a query as string or make it a strategy pattern.
+        trackedUsers = self.db.readItem("SELECT * FROM USERS")
+
 
         if trackedUsers == []:
             self.profileScraper.findKickoffUsers()
 
         # LOAD FROM DB or JSON
-        places_tags = self.db.executeQuery("SELECT * FROM PLACES_TAGS")
+        places_tags = self.db.readItem("SELECT * FROM PLACES_TAGS")
         places_tags = ['Restaurant', 'Italian Restaurant','Pub', 'Bar', 'Grocery ', 'Wine', 'Diner', 'Food', 'Meal', 'Breakfast', 'Lunch',
                             'Dinner', 'Cafe', 'Tea Room', 'Hotel', 'Pizza', 'Coffee', 'Bakery', 'Dessert', 'Gastropub',
                             'Sandwich', 'Ice Cream', 'Steakhouse', 'Pizza place', 'Fast food restaurant', 'Deli']
@@ -37,7 +38,7 @@ class CrawlingServiceFacade:
 
 
     def beginCrawlingLocations(self, nPostsWanted: int) -> None:
-        locationsFromQuery = self.db.executeQuery("SELECT * FROM LOCATIONS") # either pass a query as string or make it a strategy pattern.
+        locationsFromQuery = self.db.readItem("SELECT * FROM LOCATIONS") # either pass a query as string or make it a strategy pattern.
 
         for location in locationsFromQuery: # list of dicts?
             loc = LocationFactory.buildLocationFromDB(location)

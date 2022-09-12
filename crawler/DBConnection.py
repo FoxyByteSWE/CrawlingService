@@ -121,22 +121,21 @@ class DBConnection:
 		self.executeQuery(sql)
 
 	def readItem(self, query:str):
-		connection = self.database_connection
-		desc = connection.cursor()
-		desc.execute(query)
-		connection.commit()
+			connection = self.database_connection
+			desc = connection.cursor()
+			desc.execute(query)
+			connection.commit()
 
-		list = []
-		for row in desc.fetchall():
-			dict = {}
-			for i in range(len(desc.description)):
-				dict[desc.description[i][0]] = row[i]
-			list.append(dict)
+			list = []
+			for row in desc.fetchall():
+				dict = {}
+				for i in range(len(desc.description)):
+					dict[desc.description[i][0]] = row[i]
+				list.append(dict)
 
-		return list
+			print(list)
 
-
-
+			#pprint(vars(desc))
 
 db = DBConnection()
 db.createServerConnection()
