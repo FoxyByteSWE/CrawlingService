@@ -11,8 +11,17 @@ class FoxyByteMedia:
 		self.MediaURL = MediaURL
 
 	
-	def convertToDict():
-		pass
+	def convertToDict(self):
+		item = {}
+		item['PostPartialURL']=self.PostPartialURL
+		item['MediaType']=self.MediaType
+		item['AuthorUsername']=self.AuthorUsername
+		item['TakenAtTime']=self.TakenAtTime
+		item['TakenAtLocation']=self.TakenAtLocation
+		item['LikeCount']=self.LikeCount
+		item['CaptionText']=self.CaptionText
+		item['MediaURL']=self.MediaURL
+		return item
 
 	def getPostPartialURL(self) -> str:
 		return self.PostPartialURL

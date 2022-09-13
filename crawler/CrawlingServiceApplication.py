@@ -7,7 +7,7 @@ def main():
     
     crawlingService.beginScrapingProfiles(True, 3)
 
-    crawlingService.beginCrawlingLocations(3)
+    #crawlingService.beginCrawlingLocations(3)
 
 
 

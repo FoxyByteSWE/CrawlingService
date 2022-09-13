@@ -1,3 +1,6 @@
+import sys
+
+
 from Location import Location
 from instagrapi.types import Location as InstagrapiLocation
 

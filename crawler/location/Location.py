@@ -1,7 +1,6 @@
 import json
 import sys, os
 import datetime
-from math import exp
 from pprint import pprint
 
 
@@ -20,7 +19,17 @@ class Location:
 
 
 	def convertToDict(self):
-		pass
+		item = {}
+		item['pk'] = self.pk
+		item['name'] = self.name
+		item['category'] = self.category
+		item['address'] = self.address
+		item['website'] = self.website
+		item['phone'] = self.phone
+		item['main_image_url'] = self.main_image_url
+		item['coordinates'] = self.coordinates
+		item['latest_post_partial_url_checked'] = self.latest_post_partial_url_checked
+		return item
 
 	def getPk(self):
 		return self.pk

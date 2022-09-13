@@ -23,14 +23,14 @@ class TestLocation(unittest.TestCase):
     
     def test_convertToDict(self):
         self.assertEqual(self.location.convertToDict(),({"pk": 12345,
-                                                    "name": "Lunaelaltro",
-                                                    "category": "Pizzeria",
-                                                    "address": "Corso della Ceramica, 33, 36063 Marostica VI",
-                                                    "website": "www.lunaelaltro.it",
-                                                    "phone": "123456789",
-                                                    "main_image_url": "www.thisissomelink.to/imageurl",
-                                                    "coordinates": {"lng": 1.111, "lat": 2.222},
-                                                    "latest_post_partial_url_checked": "12AB34CD"}))
+                                                        "name": "Lunaelaltro",
+                                                        "category": "Pizza",
+                                                        "address": "Corso della Ceramica, 33, 36063 Marostica VI",
+                                                        "website": "www.lunaelaltro.it",
+                                                        "phone": "123456789",
+                                                        "main_image_url": "www.thisissomelink.to/imageurl",
+                                                        "coordinates": {"lng": 1.111, "lat": 2.222},
+                                                        "latest_post_partial_url_checked": "12AB34CD"}))
 
 
 
@@ -41,7 +41,10 @@ class TestLocation(unittest.TestCase):
         return self.assertEqual(self.location.name, "Lunaelaltro")
 
     def test_getCategory(self):
-        return self.assertEqual(self.location.category, "Pizzeria")
+        return self.assertEqual(self.location.category, "Pizza")
+
+    def test_getCategory_fail(self):
+        return self.assertFalse(self.location.category, "Pizzeria")
 
     def test_getAddress(self):
         return self.assertEqual(self.location.address, "Corso della Ceramica, 33, 36063 Marostica VI")

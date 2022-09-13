@@ -8,7 +8,12 @@ class UserProfile:
 
 
     def convertToDict(self):
-        pass
+        item={}
+        item['pk']=self.pk
+        item['username']=self.username
+        item['isPrivate']=self.isPrivate
+        item['lastPostCheckedCode']=self.lastPostCheckedCode
+        return item
 
     def getPk(self) -> int:
         return self.pk

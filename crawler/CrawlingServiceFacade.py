@@ -6,6 +6,8 @@ from location.LocationFactory import LocationFactory
 from user.UserProfileFactory import UserProfileFactory
 from media.FoxyByteMediaFactory import FoxyByteMediaFactory
 
+from user.UserProfile import UserProfile
+
 class CrawlingServiceFacade:
 
     def __init__(self) -> None:
@@ -20,27 +22,35 @@ class CrawlingServiceFacade:
 
     def beginScrapingProfiles(self, allowExtendUserBase: bool, nPostsAllowed: int) -> None:
         
-        trackedUsers = self.db.readItem("SELECT * FROM USERS")
+        #trackedUsers = self.db.readItem("SELECT * FROM USERS")
+
+        #convert to UserProfile objects
+
+        trackedUsers = [UserProfile(12345,
+                                "marcouderzo",
+                                False,
+                                "12AB34CD")]
+
 
 
         if trackedUsers == []:
             self.profileScraper.findKickoffUsers()
 
         # LOAD FROM DB or JSON
-        places_tags = self.db.readItem("SELECT * FROM PLACES_TAGS")
+        #places_tags = self.db.readItem("SELECT * FROM PLACES_TAGS")
         places_tags = ['Restaurant', 'Italian Restaurant','Pub', 'Bar', 'Grocery ', 'Wine', 'Diner', 'Food', 'Meal', 'Breakfast', 'Lunch',
                             'Dinner', 'Cafe', 'Tea Room', 'Hotel', 'Pizza', 'Coffee', 'Bakery', 'Dessert', 'Gastropub',
                             'Sandwich', 'Ice Cream', 'Steakhouse', 'Pizza place', 'Fast food restaurant', 'Deli']
 
         for user in trackedUsers: #.values():
-            UserProfileFactory.buildFromDatabase(user) # TODO: pass parameters
+            UserProfileFactory.buildFromDatabase(user.pk, user.username, user.isPrivate, user.lastPostCheckedCode) # TODO: pass parameters
             self.profileScraper.crawlLocationsFromProfilePosts(user, 3, places_tags)
 
 
     def beginCrawlingLocations(self, nPostsWanted: int) -> None:
-        locationsFromQuery = self.db.readItem("SELECT * FROM LOCATIONS") # either pass a query as string or make it a strategy pattern.
+        locationsFromQuery = self.db.readItem("SELECT * FROM LOCATIONS")
 
-        for location in locationsFromQuery: # list of dicts?
+        for location in locationsFromQuery:
             loc = LocationFactory.buildLocationFromDB(location)
             self.crawler.crawlLocation(loc, 2)
             

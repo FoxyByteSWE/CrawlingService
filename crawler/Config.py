@@ -1,18 +1,21 @@
-from JSONUtils import JSONUtils
+import sys, json
+
 
 class CrawlingServiceConfig:
 
-
-    allowExtendUserBase = True   
-    nPostsAllowedForProfileScraping = 40
-    nPostsWantedForEachLocation = 50
-
-    def readFromJSON(self, processing_strategy: JSONUtils.ReadJSONStrategy):
-        return processing_strategy.readFromJSON(self)
+    def readFromJSON(self):
+        filepath = (str(sys.path[0]))+"/data/config.json"
+        with open(filepath) as usersFile:
+            try:
+                data = json.load(usersFile)
+                return data
+            except Exception as e:
+                print(e)
+                return {}
 
 
     def __init__(self):
-        config = self.readFromJSON(JSONUtils.ConfigReadJSONStrategy)
+        config = self.readFromJSON()
         
         self.sleepTime = config["sleepTime"]
         self.allowExtendUserBase = True if config["allowExtendUserBase"] == "True" else False
