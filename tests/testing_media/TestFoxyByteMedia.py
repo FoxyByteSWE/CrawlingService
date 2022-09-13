@@ -12,7 +12,15 @@ class TestFoxyByteMedia(unittest.TestCase):
                                     1,
                                     "marcouderzo",
                                     [2022, 9, 9, 17, 20, 0],
-                                    {1: "TODO LOCATION"},
+                                    {"pk": 12345,
+                                    "name":  "Lunaelaltro",
+                                    "category": "Pizzeria",
+                                    "address": "Corso della Ceramica, 33, 36063 Marostica VI",
+                                    "website": "www.lunaelaltro.it",
+                                    "phone": "123456789",
+                                    "main_image_url": "www.thisissomelink.to/imageurl",
+                                    "coordinates": {"lng": 1.111, "lat": 2.222},
+                                    "latest_post_partial_url_checked": "12AB34CD"},
                                     123,
                                     "this is a caption text",
                                     "somelinktomedia/aaaaaaaa")
@@ -24,7 +32,15 @@ class TestFoxyByteMedia(unittest.TestCase):
                                                         "MediaType": 1,
                                                         "AuthorUsername": "marcouderzo",
                                                         "TakenAtTime": [2022, 9, 9, 17, 20, 0],
-                                                        "TakenAtLocation": {1: "TODO LOCATION"},
+                                                        "TakenAtLocation": {"pk": 12345,
+                                                                            "name": "Lunaelaltro",
+                                                                            "category": "Pizzeria",
+                                                                            "address": "Corso della Ceramica, 33, 36063 Marostica VI",
+                                                                            "website": "www.lunaelaltro.it",
+                                                                            "phone": "123456789",
+                                                                            "main_image_url": "www.thisissomelink.to/imageurl",
+                                                                            "coordinates": {"lng": 1.111, "lat": 2.222},
+                                                                            "latest_post_partial_url_checked": "12AB34CD"},
                                                         "LikeCount": 123,
                                                         "CaptionText": "this is a caption text",
                                                         "MediaURL": "somelinktomedia/aaaaaaaa"})
@@ -45,7 +61,15 @@ class TestFoxyByteMedia(unittest.TestCase):
         self.assertEqual(self.media.getMediaType(), 1)
 
     def test_getTakenAtLocation(self):
-        self.assertEqual(self.media.getTakenAtLocation(), {1: "TODO LOCATION"})
+        self.assertEqual(self.media.getTakenAtLocation(), {"pk": 12345,
+                                                            "name": "Lunaelaltro",
+                                                            "category": "Pizzeria",
+                                                            "address": "Corso della Ceramica, 33, 36063 Marostica VI",
+                                                            "website": "www.lunaelaltro.it",
+                                                            "phone": "123456789",
+                                                            "main_image_url": "www.thisissomelink.to/imageurl",
+                                                            "coordinates": {"lng": 1.111, "lat": 2.222},
+                                                            "latest_post_partial_url_checked": "12AB34CD"})
 
     def test_getLikeCount(self):
         self.assertEqual(self.media.getLikeCount(), 123)

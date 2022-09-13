@@ -12,13 +12,6 @@ from media.FoxyByteMediaFactory import FoxyByteMediaFactory
 from location.Location import Location
 from DBConnection import DBConnection
 
-#proxy = 'http://96.9.71.18:33427'
-
-#os.environ['http_proxy'] = proxy 
-#os.environ['HTTP_PROXY'] = proxy
-#os.environ['https_proxy'] = proxy
-#os.environ['HTTPS_PROXY'] = proxy
-
 
 class Crawler:
 
@@ -28,8 +21,8 @@ class Crawler:
 
 
 
-	def saveMediaFromLocation(self, media: dict, locationPK: dict) -> None:
-			self.db.insertItem(media)
+	def saveMediaFromLocation(self, media: FoxyByteMedia, locationPK: dict) -> None:
+			self.db.insertItem(media.convertToDict())
 
 
 	def isMediaDuplicated(self, media) -> bool:
@@ -73,7 +66,7 @@ class Crawler:
 			newmedia = FoxyByteMediaFactory.buildFromInstagrapiMediaAndLocation(media, parsedMediaData[0], parsedMediaData[1], parsedMediaData[2])
 
 			if self.isMediaDuplicated(newmedia) == False:
-					self.saveMediaFromLocation(mediasFromLocation, location.pk)
+					self.saveMediaFromLocation(newmedia, location.pk)
 
 				
 			

@@ -4,9 +4,6 @@ import datetime
 from math import exp
 from pprint import pprint
 
-from crawler.location.Location import Location
-
-
 
 class Location:
 

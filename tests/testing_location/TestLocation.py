@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch
-import sys,os
+import sys
+
 sys.path.insert(1, (str(sys.path[0]))+"/../../")
 from crawler.location.Location import Location
 
@@ -11,7 +12,7 @@ class TestLocation(unittest.TestCase):
 
         self.location = Location(12345,
                             "Lunaelaltro",
-                            "Pizzeria",
+                            "Pizza",
                             "Corso della Ceramica, 33, 36063 Marostica VI",
                             "www.lunaelaltro.it",
                             "123456789",

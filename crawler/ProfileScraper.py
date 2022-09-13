@@ -23,7 +23,7 @@ class ProfileScraper:
 
 	def trackLocation(self, location: Location) -> None:
 		print("tracking location: "+ location.name)
-		self.db.insertItem(location)
+		self.db.insertItem(location.convertToDict())
 
 		
 
@@ -48,8 +48,8 @@ class ProfileScraper:
 			return False
 
 	def trackUser(self, user: UserProfile) -> None:
-		#username = client.user_info_by_username_v1(username).pk
-		self.db.insertUser(user)
+		
+		self.db.insertItem(user.convertToDict())
 
 
 	def checkIfPostIsNew(self, indexedPURL: str, latestPURL: str) -> bool:

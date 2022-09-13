@@ -1,7 +1,5 @@
 import unittest
 from unittest.mock import patch
-import os
-
 import sys
 
 sys.path.insert(1, (str(sys.path[0]))+"/../../")

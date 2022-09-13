@@ -4,8 +4,6 @@ import sys,os
 
 
 sys.path.insert(1, (str(sys.path[0]))+"/../../")
-
-
 from crawler.user.UserProfile import UserProfile
 
 
