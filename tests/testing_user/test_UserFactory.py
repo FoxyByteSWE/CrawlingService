@@ -11,7 +11,7 @@ from crawler.user.UserProfileFactory import UserProfileFactory
 
 
 
-class TestUserProfile(unittest.TestCase):
+class TestUserProfileFactory(unittest.TestCase):
     def setUp(self):
 
         self.testUser = UserProfile(1234, "testuser", False, "somecode")

@@ -27,7 +27,8 @@ class Location:
 		item['website'] = self.website
 		item['phone'] = self.phone
 		item['main_image_url'] = self.main_image_url
-		item['coordinates'] = self.coordinates
+		item['coordinates_lng'] = self.coordinates['lng']
+		item['coordinates_lat'] = self.coordinates['lat']
 		item['latest_post_partial_url_checked'] = self.latest_post_partial_url_checked
 		return item
 
