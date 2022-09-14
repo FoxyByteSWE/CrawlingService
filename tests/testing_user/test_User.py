@@ -44,5 +44,5 @@ class TestUserProfile(unittest.TestCase):
 
 
 
-    
+unittest.main()
 
