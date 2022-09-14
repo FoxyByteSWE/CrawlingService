@@ -35,7 +35,7 @@ class FoxyByteMedia:
 	def getCaptionText(self) -> str:
 		return self.CaptionText
 	
-	def getTakenAtTIme(self) -> list:
+	def getTakenAtTime(self) -> list:
 		return self.TakenAtTime
 
 	def getTakenAtLocation(self) -> dict:

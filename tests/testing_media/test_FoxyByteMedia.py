@@ -66,7 +66,7 @@ class TestFoxyByteMedia(unittest.TestCase):
                                                             "category": "Pizzeria",
                                                             "address": "Corso della Ceramica, 33, 36063 Marostica VI",
                                                             "website": "www.lunaelaltro.it",
-                                                            "phone": "123456789",
+                                                            "phone": "123456789", 
                                                             "main_image_url": "www.thisissomelink.to/imageurl",
                                                             "coordinates": {"lng": 1.111, "lat": 2.222},
                                                             "latest_post_partial_url_checked": "12AB34CD"})
@@ -79,3 +79,4 @@ class TestFoxyByteMedia(unittest.TestCase):
     
 
     
+unittest.main()

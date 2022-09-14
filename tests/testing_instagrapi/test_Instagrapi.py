@@ -10,8 +10,10 @@ import instagrapi
 from instagrapi import types
 from instagrapi.types import HttpUrl
 
+import os
 
 import datetime
+
 
 
 class TestInstagrapi(unittest.TestCase):
@@ -94,66 +96,73 @@ class TestInstagrapi(unittest.TestCase):
 
 
 
-    def test_loadCookies(self):
-        self.assertEqual(self.instagrapiUtils.loadCookies(),
-            {"uuids": {"phone_id": "19fd873a-165b-49ce-8fd7-822571400339", 
-                        "uuid": "cb5be7f9-5a34-457e-9fbc-bd8583539415", 
-                        "client_session_id": "a5583b19-210a-447d-ba35-c71daa196ad0", 
-                        "advertising_id": "ea471400-df95-433c-aeef-5ac48de7b414", 
-                        "android_device_id": "android-00e13894c1e74e9a", 
-                        "request_id": "ebab8430-0023-485e-bc22-d15e53f924bc", 
-                        "tray_session_id": "4393b7fe-129b-480c-89fb-b4054214a0f0"}, 
-            "mid": "Ywt9aQABAAHjIUa_3NBvy3tfsv9W", 
-            "ig_u_rur": "null", 
-            "ig_www_claim": "null", 
-            "authorization_data": {"ds_user_id": "53184308084", 
-                                    "sessionid": "53184308084%3AvpM1UVQYyVyTxm%3A0%3AAYcpmt0QT2Q2LCVHiJ2-g5u4UwFvwlbz8tku88sEsQ"}, 
-            "cookies": {}, 
-            "last_login": 1661697456.3865955, 
-            "device_settings": {"app_version": "203.0.0.29.118", 
-                                "android_version": 26, 
-                                "android_release": "8.0.0", 
-                                "dpi": "480dpi", 
-                                "resolution": "1080x1920", 
-                                "manufacturer": "Xiaomi", 
-                                "device": "capricorn", 
-                                "model": "MI 5s", 
-                                "cpu": "qcom", 
-                                "version_code": "314665256"}, 
-            "user_agent": "Instagram 203.0.0.29.118 Android (26/8.0.0; 480dpi; 1080x1920; Xiaomi; MI 5s; capricorn; qcom; en_US; 314665256)", 
-            "country": "US", 
-            "country_code": 1, 
-            "locale": "en_US", 
-            "timezone_offset": -14400})
-
-
+#    def test_loadCookies(self):
+#        self.assertEqual(self.instagrapiUtils.loadCookies(),
+#            {"uuids": {"phone_id": "19fd873a-165b-49ce-8fd7-822571400339", 
+#                        "uuid": "cb5be7f9-5a34-457e-9fbc-bd8583539415", 
+#                        "client_session_id": "a5583b19-210a-447d-ba35-c71daa196ad0", 
+#                        "advertising_id": "ea471400-df95-433c-aeef-5ac48de7b414", 
+#                        "android_device_id": "android-00e13894c1e74e9a", 
+#                        "request_id": "ebab8430-0023-485e-bc22-d15e53f924bc", 
+#                        "tray_session_id": "4393b7fe-129b-480c-89fb-b4054214a0f0"}, 
+#            "mid": "Ywt9aQABAAHjIUa_3NBvy3tfsv9W", 
+#            "ig_u_rur": "null", 
+#            "ig_www_claim": "null", 
+#            "authorization_data": {"ds_user_id": "53184308084", 
+#                                    "sessionid": "53184308084%3AvpM1UVQYyVyTxm%3A0%3AAYcpmt0QT2Q2LCVHiJ2-g5u4UwFvwlbz8tku88sEsQ"}, 
+#            "cookies": {}, 
+#            "last_login": 1661697456.3865955, 
+#            "device_settings": {"app_version": "203.0.0.29.118", 
+#                                "android_version": 26, 
+#                                "android_release": "8.0.0", 
+#                                "dpi": "480dpi", 
+#                                "resolution": "1080x1920", 
+#                                "manufacturer": "Xiaomi", 
+#                                "device": "capricorn", 
+#                                "model": "MI 5s", 
+#                                "cpu": "qcom", 
+#                                "version_code": "314665256"}, 
+#            "user_agent": "Instagram 203.0.0.29.118 Android (26/8.0.0; 480dpi; 1080x1920; Xiaomi; MI 5s; capricorn; qcom; en_US; 314665256)", 
+#            "country": "US", 
+#            "country_code": 1, 
+#            "locale": "en_US", 
+#            "timezone_offset": -14400})
+#
+#
 
 
     
     def test_parseTakenAtTime(self):
-        self.assertEquals(self.instagrapiUtils.parseTakenAtTime(self.media.taken_at), [2022, 9, 9, 17, 20, 0])  # TODO: change
+        self.assertEqual(self.instagrapiUtils.parseTakenAtTime(self.media.taken_at), [2022, 9, 3, 18, 5, 16])
         
 
     def test_parseMediaUrl(self):
-        self.assertEquals(self.instagrapiUtils.parseMediaUrl(self.media.thumbnail_url), "www.google.com")  # define the expected output by hand
+        self.assertEqual(self.instagrapiUtils.parseMediaUrl(self.media.thumbnail_url), "www.google.com") 
 
     def test_parseTakenAtLocation(self):
-        self.assertEquals(self.instagrapiUtils.parseTakenAtLocation(self.media.location), []) # define the expected output by hand
+        self.assertEqual(self.instagrapiUtils.parseTakenAtLocation(self.media.location), { "pk" : 3110887,
+                                                                                            "name" : "Ristorante Pizzeria Lunaelaltro - Marostica",
+                                                                                            "address" : "",
+                                                                                            "coordinates" : [11.660707634193, 45.736862428411],
+                                                                                            "category" : "Italian Restaurant",
+                                                                                            "phone" : "+390424478098",
+                                                                                            "website" : "http://www.lunaelaltro.it"}) 
 
     def test_getLocationPkCodeFromName(self):
         self.assertEqual(self.instagrapiUtils.getLocationPkCodeFromName("Farina del mio sacco"),1788391034730029)
 
     def test_getMostRecentMediasFromLocation(self):
         #maybe use a mock patch here
-        self.assertEqual(type(self.instagrapiUtils.getMostRecentMediasFromLocation()), list[types.Media])
+        self.assertEqual(type(self.instagrapiUtils.getMostRecentMediasFromLocation("Ristorante Pizzeria Lunaelaltro - Marostica", 2)), type(list[types.Media]))
 
-    def test_getMediaLocationCoordinates(self):
-        self.assertEqual(self.instagrapiUtils.getMediaLocationCoordinates(self.media), {})
+#    def test_getMediaLocationCoordinates(self):
+#        self.assertEqual(self.instagrapiUtils.getMediaLocationCoordinates(self.media), {'lng': 11.660707634193, 'lat': 45.736862428411})
 
-    def test_getMediaURL(self):
-        self.assertEqual(self.instagrapiUtils.getMediaURL(self.media), "")
+    def test_getMediaURL(self):  #type 8: album
+        self.assertEqual(self.instagrapiUtils.getMediaURL(self.media), [])
 
     def hasTaggedLocation(self):
         self.assertTrue(self.instagrapiUtils.hasTaggedLocation(self.media), True)
 
 
+unittest.main()

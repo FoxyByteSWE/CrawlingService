@@ -44,7 +44,7 @@ class TestLocation(unittest.TestCase):
         return self.assertEqual(self.location.category, "Pizza")
 
     def test_getCategory_fail(self):
-        return self.assertFalse(self.location.category, "Pizzeria")
+        return self.assertNotEqual(self.location.category, "Pizzeria")
 
     def test_getAddress(self):
         return self.assertEqual(self.location.address, "Corso della Ceramica, 33, 36063 Marostica VI")
@@ -67,3 +67,7 @@ class TestLocation(unittest.TestCase):
     def test_setLatestPostPartialUrlChecked(self):
         self.location.setLatestPostPartialUrlChecked("newcode")
         return self.assertEqual(self.location.latest_post_partial_url_checked, "newcode")
+
+
+
+unittest.main()

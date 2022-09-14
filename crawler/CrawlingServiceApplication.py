@@ -8,9 +8,9 @@ def main():
     crawlingService.beginScrapingProfiles(crawlingService.crawlingServiceConfig.allowExtendUserBase, 
                                         crawlingService.crawlingServiceConfig.extendUserBasePolicyNumber, 
                                         crawlingService.crawlingServiceConfig.nMaxUsersToAdd,
-                                        crawlingService.crawlingServiceConfig.nPostsWantedForEachLocation)
+                                        crawlingService.crawlingServiceConfig.nPostsAllowedForProfileScraping)
 
-    #crawlingService.beginCrawlingLocations(3)
+    crawlingService.beginCrawlingLocations(crawlingService.crawlingServiceConfig.nPostsWantedForEachLocation)
 
 
 
