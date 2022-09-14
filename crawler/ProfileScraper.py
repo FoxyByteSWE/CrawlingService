@@ -1,7 +1,7 @@
 import os, json, sys, time
 from pprint import pprint
 from instagrapi import Client
-import instagrapi
+from instagrapi import types
 from abc import ABC, abstractmethod
 
 from InstagrapiUtils import InstagrapiUtils
@@ -11,6 +11,7 @@ from location.LocationFactory import LocationFactory
 from LocationProfileFinder import LocationProfileFinder 
 from user.UserProfile import UserProfile
 from DBConnection import DBConnection
+from UserBaseExtender import UserBaseExtender
 
 
 class ProfileScraper:
@@ -18,6 +19,15 @@ class ProfileScraper:
 	def __init__(self) -> None:
 		self.instagrapiUtils = InstagrapiUtils()
 		self.db = DBConnection()
+		self.policies = {1 : UserBaseExtender.ExtendUserBaseBySuggestedUsers,
+						 2 : UserBaseExtender.ExtendUserBaseByTaggedPostsSection,
+						 3 : UserBaseExtender.ExtendUserBaseByTaggedUsers}
+
+
+
+
+	def extendUserBaseByPolicy(self, user, limit, processing_strategy: UserBaseExtender.ExtendUserBasePolicy) -> list[UserProfile]:
+		return processing_strategy.extendUserBaseByPolicy(self, user, limit)
 
 
 
@@ -52,6 +62,11 @@ class ProfileScraper:
 		self.db.insertItem(user.convertToDict())
 
 
+	def untrackUser(self, user: UserProfile) -> None:
+
+		self.db.removeItem(user.convertToDict())
+
+
 	def checkIfPostIsNew(self, indexedPURL: str, latestPURL: str) -> bool:
 		if latestPURL == indexedPURL:
 			return False
@@ -66,6 +81,7 @@ class ProfileScraper:
 
 	def crawlLocationsFromProfilePosts(self, user: UserProfile, nPostsAllowed: int, places_tags: list) -> None:
 
+		keepUser = False
 		postlist = self.instagrapiUtils.getUserPosts(user.pk, nPostsAllowed)
 
 		lastpostcodechecked = user.getLastPostCheckedCode()
@@ -86,10 +102,14 @@ class ProfileScraper:
 					if mediafound != None:
 						coordinates = self.instagrapiUtils.getMediaLocationCoordinates(post)
 						profilePic = self.parseMediaUrl(self.instagrapiUtils.client.user_info_by_username(mediafound.user.username).profile_pic_url)
-						newlocation = LocationFactory.buildLocationFromInstagrapi(detailedLocationInfo, profilePic, coordinates, "")
+						newlocation = LocationFactory.buildFromInstagrapi(detailedLocationInfo, profilePic, coordinates, "")
 						self.trackLocation(newlocation)
-			
-		if self.isAlreadyTracked(user): #this should not be necessary as user comes from DB to begin with
+						keepUser=True
+
+		
+		if keepUser == False:
+			self.untrackUser(user)
+		else:
 			user.setLastPostCheckedCode(postlist[0].pk)
 
 		
@@ -97,11 +117,10 @@ class ProfileScraper:
 
 	def findKickoffUsers(self):
 			kickoffUser = (self.instagrapiUtils.getUserInfoByUsername("foxybyte.swe"))
-			self.extendFollowingUsersPoolFromSuggested(kickoffUser, 5)
-
-	def extendUserBase(policy):
-		pass
-		
+			newusers = self.extendUserBaseByPolicy(kickoffUser, 5, UserBaseExtender.ExtendUserBaseBySuggestedUsers)
+			
+			for u in newusers:
+				self.db.insertItem(u.convertToDict())
 
 
 

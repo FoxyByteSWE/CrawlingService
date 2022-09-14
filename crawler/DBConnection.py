@@ -120,6 +120,10 @@ class DBConnection:
 		print(sql)
 		self.executeQuery(sql)
 
+
+	def removeItem(self, item: dict):
+		pass
+
 	def readItem(self, query:str):
 			connection = self.database_connection
 			desc = connection.cursor()

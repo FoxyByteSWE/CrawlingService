@@ -20,7 +20,7 @@ class CrawlingServiceFacade:
 
 
 
-    def beginScrapingProfiles(self, allowExtendUserBase: bool, nPostsAllowed: int) -> None:
+    def beginScrapingProfiles(self, allowExtendUserBase: bool, extendUserBasePolicy: int, extendUserBaseLimit: int, nPostsAllowed: int) -> None:
         
         #trackedUsers = self.db.readItem("SELECT * FROM USERS")
 
@@ -42,9 +42,15 @@ class CrawlingServiceFacade:
                             'Dinner', 'Cafe', 'Tea Room', 'Hotel', 'Pizza', 'Coffee', 'Bakery', 'Dessert', 'Gastropub',
                             'Sandwich', 'Ice Cream', 'Steakhouse', 'Pizza place', 'Fast food restaurant', 'Deli']
 
-        for user in trackedUsers: #.values():
-            UserProfileFactory.buildFromDatabase(user.pk, user.username, user.isPrivate, user.lastPostCheckedCode) # TODO: pass parameters
+
+
+        for user in trackedUsers:
+            UserProfileFactory.buildFromDatabase(user)
             self.profileScraper.crawlLocationsFromProfilePosts(user, 3, places_tags)
+            if allowExtendUserBase == True:
+                newusers = self.profileScraper.extendUserBaseByPolicy(user, extendUserBaseLimit, self.profileScraper.policies[extendUserBasePolicy])
+                self.db.insertItem()
+
 
 
     def beginCrawlingLocations(self, nPostsWanted: int) -> None:

@@ -2,6 +2,7 @@
 from abc import ABC, abstractmethod
 import os, json, sys, time
 from InstagrapiUtils import InstagrapiUtils
+from user.UserProfileFactory import UserProfileFactory
 
 
 
@@ -32,7 +33,9 @@ class UserBaseExtender:
                 usersugg = InstagrapiUtils.getUserInfoByUsername(username).dict()
                 usersugg["LatestPostPartialURL"] = ''
                 if InstagrapiUtils.isProfilePrivate(usersugg) == False:
-                    uncheckedUserList.append(usersugg)
+                    uncheckedUserList.append(UserProfileFactory.buildFromInstagrapi(usersugg, ""))
+            return uncheckedUserList
+
                     
 
 
@@ -45,12 +48,16 @@ class UserBaseExtender:
             for post in posts:
                 list = InstagrapiUtils.getPostTaggedPeople(post)
                 for usertag in list:
+                    if limit == 0:
+                        return
                     usersh=InstagrapiUtils.convertUsertagToUser(usertag)
                     usertagged = (InstagrapiUtils.getUserInfoByUsername(usersh.username)).dict()
                     #usertagged = (InstagrapiUtils.GetUserInfoByUsername(usersh.username)).dict()
                     user["LatestPostPartialURL"] = ''
                     if InstagrapiUtils.isProfilePrivate(usertagged) == False:
-                        uncheckedUserList.append(usertagged)
+                        uncheckedUserList.append(UserProfileFactory.buildFromInstagrapi(usertagged, ""))
+                        limit = limit-1
+            return uncheckedUserList
 
 
 
@@ -66,7 +73,8 @@ class UserBaseExtender:
                 user["LatestPostPartialURL"] = ''
                 if self.isAlreadyTracked(userposter) == False:
                     if InstagrapiUtils.isProfilePrivate(userposter) == False:
-                            uncheckedUserList.append(userposter)
+                        uncheckedUserList.append(UserProfileFactory.buildFromInstagrapi(userposter, ""))
+            return uncheckedUserList
 
 
 

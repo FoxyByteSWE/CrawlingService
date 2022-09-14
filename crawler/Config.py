@@ -16,9 +16,9 @@ class CrawlingServiceConfig:
 
     def __init__(self):
         config = self.readFromJSON()
-        
-        self.sleepTime = config["sleepTime"]
+    
         self.allowExtendUserBase = True if config["allowExtendUserBase"] == "True" else False
+        self.extendUserBasePolicyNumber = config["extendUserBasePolicyNumber"]
         self.extendUserBasePolicy = config["extendUserBasePolicy"]
         self.nMaxUsersToAdd = config["nMaxUsersToAdd"]
         self.nPostsAllowedForProfileScraping = config["nPostsAllowedForProfileScraping"]

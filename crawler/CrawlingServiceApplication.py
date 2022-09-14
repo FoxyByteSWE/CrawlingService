@@ -5,7 +5,10 @@ from CrawlingServiceFacade import CrawlingServiceFacade
 def main(): 
     crawlingService = CrawlingServiceFacade()
     
-    crawlingService.beginScrapingProfiles(True, 3)
+    crawlingService.beginScrapingProfiles(crawlingService.crawlingServiceConfig.allowExtendUserBase, 
+                                        crawlingService.crawlingServiceConfig.extendUserBasePolicyNumber, 
+                                        crawlingService.crawlingServiceConfig.nMaxUsersToAdd,
+                                        crawlingService.crawlingServiceConfig.nPostsWantedForEachLocation)
 
     #crawlingService.beginCrawlingLocations(3)
 
