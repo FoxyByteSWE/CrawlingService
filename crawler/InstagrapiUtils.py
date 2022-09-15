@@ -114,7 +114,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         dict["website"] = input["website"]
         return dict;
 
-    def parseMediaUrl(self, input: list) -> str:
+    def parseMediaUrl(self, input: list) -> str: #TODO: Check end
         url = str(input)
         start = url.find("'") + 1
         url = url[start:]

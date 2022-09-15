@@ -6,36 +6,28 @@ from instagrapi import types
 
 
 sys.path.insert(1, (str(sys.path[0]))+"/../../")
-from crawler.location.LocationFactory import LocationFactory
-from crawler.location.Location import Location
+from crawler.media.FoxyByteMediaFactory import FoxyByteMediaFactory
+from crawler.media.FoxyByteMedia import FoxyByteMedia
 
 
 
-class TestLocationFactory(unittest.TestCase):
+class TestFoxyByteMediaFactory(unittest.TestCase):
     def setUp(self):
-        self.testLocation = Location(3110887,
-                                    'Ristorante Pizzeria Lunaelaltro - Marostica',
-                                    "Italian Restaurant",
-                                    "",
-                                    "",
-                                    "",
-                                    "www.someimageurl.com/path/to/image",
-                                    {'lng' : 11.660707634193, 'lat': 45.736862428411},
-                                    "somecode")
-
-        self.testInstagrapiLocation = types.Location(pk=3110887, 
-                                                    name='Ristorante Pizzeria Lunaelaltro - Marostica', 
-                                                    phone='', 
-                                                    website='', 
-                                                    category='', 
-                                                    hours={}, 
-                                                    address=None, 
-                                                    city=None, 
-                                                    zip=None, 
-                                                    lng=11.660707634193, lat=45.736862428411, 
-                                                    external_id=77610911328, 
-                                                    external_id_source='facebook_places')
-
+        self.testFoxyByteMedia = FoxyByteMedia("CiDdJQjNSRP",
+                                                1, 
+                                                "william_lucchin", 
+                                                [2022, 9, 3, 18, 5, 16],
+                                                { "pk" : 3110887,
+                                                "name" : "Ristorante Pizzeria Lunaelaltro - Marostica",
+                                                "address" : "",
+                                                "coordinates" : [11.660707634193, 45.736862428411],
+                                                "category" : "Italian Restaurant",
+                                                "phone" : "+390424478098",
+                                                "website" : "http://www.lunaelaltro.it"},
+                                                4,
+                                                "",
+                                                "https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968")
+        
         self.testInstagrapiMedia = types.Media(pk='2919305163060880463', 
                                 id='2919305163060880463_281443894', 
                                 code='CiDdJQjNSRP', 
@@ -99,15 +91,31 @@ class TestLocationFactory(unittest.TestCase):
                                                                             media_type=1)],
                                 clips_metadata={})
 
-        self.testDBDictLocation =  {} # TODO: pass params
+        self.testDBDictMedia = {'PostPartialURL' : "CiDdJQjNSRP",
+                                'MediaType' : 1,
+                                'AuthorUsername' : "william_lucchin", 
+                                'TakenAtTime'    : [2022, 9, 3, 18, 5, 16],
+                                'TakenAtLocation' : { "pk" : 3110887,
+                                                        "Name" : "Ristorante Pizzeria Lunaelaltro - Marostica",
+                                                        "Address" : "",
+                                                        "Coordinates" : [11.660707634193, 45.736862428411],
+                                                        "Category" : "Italian Restaurant",
+                                                        "Phone" : "+390424478098",
+                                                        "Website" : "http://www.lunaelaltro.it"},
+                                "LikeCount": 4,
+                                "CaptionText" : "",
+                                "MediaURL" :"https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968"}
+
+                                                
+                                                
 
 
     def test_buildFromInstagrapiMediaAndLocation(self):
-        self.assertEqual(LocationFactory.buildFromInstagrapi(self.testInstagrapiLocation, "www.someimageurl.com/path/to/image", {'lng': 11.660707634193, 'lat' : 45.736862428411}, "somecode"), self.testLocation)
+        self.assertEqual(FoxyByteMediaFactory.buildFromInstagrapiMediaAndLocation(self.testInstagrapiMedia, ["parsedTakenAt"], {1: "parsedlocation"}, "parsedurl"), self.testFoxyByteMedia) # TODO: pass params
 
 
     def test_buildFromDB(self):
-        self.assertEqual(LocationFactory.buildFromDB(self.testDBDictLocation), self.testLocation)
+        self.assertEqual(FoxyByteMediaFactory.buildFromDB(self.testDBDictMedia), self.testFoxyByteMedia)
 
 
 unittest.main()
