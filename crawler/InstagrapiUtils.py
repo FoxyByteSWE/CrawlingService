@@ -29,7 +29,9 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
     client = None
 
     def __init__(self) -> None:
-        self.createLoggedInClient()
+        value = self.createLoggedInClient()
+        if value == -1:
+            exit(-1)
 
 
 
@@ -40,7 +42,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
             print("Client Logged-In to Instagrapi")
         except Exception as e:
             print("Something went wrong during Instagrapi Login: " + str(e))
-            exit()
+            return -1
 
 
     def save_cookies(self) -> None:

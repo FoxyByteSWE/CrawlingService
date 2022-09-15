@@ -27,9 +27,16 @@ class TestInstagrapi(unittest.TestCase):
                                 id='2919305163060880463_281443894', 
                                 code='CiDdJQjNSRP', 
                                 taken_at=datetime.datetime(2022, 9, 3, 18, 5, 16, tzinfo=datetime.timezone.utc), 
-                                media_type=8, 
+                                media_type=1, 
                                 product_type='carousel_container', 
-                                thumbnail_url=None, 
+                                thumbnail_url= HttpUrl('https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968', 
+                                                        scheme='https', 
+                                                        host='instagram.fmxp5-1.fna.fbcdn.net', 
+                                                        tld='net', 
+                                                        host_type='domain', 
+                                                        port='443', 
+                                                        path='/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg', 
+                                                        query='stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968'), 
                                 location=types.Location(pk=3110887, 
                                                         name='Ristorante Pizzeria Lunaelaltro - Marostica', 
                                                         phone='', 
@@ -76,18 +83,7 @@ class TestInstagrapi(unittest.TestCase):
                                                                             port='443', 
                                                                             path='/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg', 
                                                                             query='stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968'), 
-                                                                            media_type=1), 
-                                            types.Resource(pk='2919305148590466507', 
-                                                            video_url=None,       
-                                                            thumbnail_url=HttpUrl('https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302556896_10225220452969777_3934992198777190024_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=QiQIp85aTTUAX8nCifb&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0ODU5MDQ2NjUwNw%3D%3D.2-ccb7-5&oh=00_AT_1fUR5fEttm5S-Rl31TjChM9k1qslnFC3hWJc3KDUELQ&oe=6323D4B5&_nc_sid=bcb968', 
-                                                                                    scheme='https',
-                                                                                    host='instagram.fmxp5-1.fna.fbcdn.net', 
-                                                                                    tld='net', 
-                                                                                    host_type='domain', 
-                                                                                    port='443', 
-                                                                                    path='/v/t39.30808-6/302556896_10225220452969777_3934992198777190024_n.jpg', 
-                                                                                    query='stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=QiQIp85aTTUAX8nCifb&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0ODU5MDQ2NjUwNw%3D%3D.2-ccb7-5&oh=00_AT_1fUR5fEttm5S-Rl31TjChM9k1qslnFC3hWJc3KDUELQ&oe=6323D4B5&_nc_sid=bcb968'), 
-                                                            media_type=1)], 
+                                                                            media_type=1)],
                                 clips_metadata={})
 
 
@@ -131,38 +127,43 @@ class TestInstagrapi(unittest.TestCase):
 #
 
 
+    def test_createLoggedInClient(self):
+        with patch('instagrapi.Client.login') as mock_login:
+            mock_login.side_effect = Exception("This is broken")
+            with self.assertRaises(Exception) as context:
+                self.instagrapiUtils.createLoggedInClient()
+                self.assertTrue('This is broken' in context.exception)
+                
+
     
     def test_parseTakenAtTime(self):
         self.assertEqual(self.instagrapiUtils.parseTakenAtTime(self.media.taken_at), [2022, 9, 3, 18, 5, 16])
         
 
     def test_parseMediaUrl(self):
-        self.assertEqual(self.instagrapiUtils.parseMediaUrl(self.media.thumbnail_url), "www.google.com") 
+        self.assertEqual(self.instagrapiUtils.parseMediaUrl(self.media.thumbnail_url), "https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968") 
 
-    def test_parseTakenAtLocation(self):
-        self.assertEqual(self.instagrapiUtils.parseTakenAtLocation(self.media.location), { "pk" : 3110887,
-                                                                                            "name" : "Ristorante Pizzeria Lunaelaltro - Marostica",
-                                                                                            "address" : "",
-                                                                                            "coordinates" : [11.660707634193, 45.736862428411],
-                                                                                            "category" : "Italian Restaurant",
-                                                                                            "phone" : "+390424478098",
-                                                                                            "website" : "http://www.lunaelaltro.it"}) 
+#    def test_parseTakenAtLocation(self):
+#        self.assertEqual(self.instagrapiUtils.parseTakenAtLocation(self.media.location), { "pk" : 3110887,
+#                                                                                            "name" : "Ristorante Pizzeria Lunaelaltro - Marostica",
+#                                                                                            "address" : "",
+#                                                                                            "coordinates" : [11.660707634193, 45.736862428411],
+#                                                                                            "category" : "Italian Restaurant",
+#                                                                                            "phone" : "+390424478098",
+#                                                                                            "website" : "http://www.lunaelaltro.it"}) 
 
     def test_getLocationPkCodeFromName(self):
         self.assertEqual(self.instagrapiUtils.getLocationPkCodeFromName("Farina del mio sacco"),1788391034730029)
 
-    def test_getMostRecentMediasFromLocation(self):
-        #maybe use a mock patch here
-        self.assertEqual(type(self.instagrapiUtils.getMostRecentMediasFromLocation("Ristorante Pizzeria Lunaelaltro - Marostica", 2)), type(list[types.Media]))
+    def test_getMediaLocationCoordinates(self):
+        self.assertEqual(self.instagrapiUtils.getMediaLocationCoordinates(self.media), {'lng': 11.660707634193, 'lat': 45.736862428411})
 
-#    def test_getMediaLocationCoordinates(self):
-#        self.assertEqual(self.instagrapiUtils.getMediaLocationCoordinates(self.media), {'lng': 11.660707634193, 'lat': 45.736862428411})
-
-    def test_getMediaURL(self):  #type 8: album
-        self.assertEqual(self.instagrapiUtils.getMediaURL(self.media), [])
+    def test_getMediaURL(self):  #type 1: photo
+        self.assertAlmostEqual(self.instagrapiUtils.getMediaURL(self.media), 'https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968')
 
     def hasTaggedLocation(self):
         self.assertTrue(self.instagrapiUtils.hasTaggedLocation(self.media), True)
+
 
 
 unittest.main()
