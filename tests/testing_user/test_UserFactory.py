@@ -5,9 +5,14 @@ import sys,os
 from instagrapi import types
 
 
-sys.path.insert(1, (str(sys.path[0]))+"/../../")
-from crawler.user.UserProfile import UserProfile
-from crawler.user.UserProfileFactory import UserProfileFactory
+#sys.path.insert(1, (str(sys.path[0]))+"/../../")
+#from crawler.user.UserProfile import UserProfile
+#from crawler.user.UserProfileFactory import UserProfileFactory
+
+
+sys.path.insert(1, (str(sys.path[0]))+"/../../crawler/user/")
+from UserProfile import UserProfile
+from UserProfileFactory import UserProfileFactory
 
 
 

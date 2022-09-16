@@ -1,9 +1,12 @@
 import unittest
 from unittest.mock import patch
 
-from crawler.Crawler import Crawler
-from crawler.InstagrapiUtils import InstagrapiUtils
-from crawler.user.UserProfile import UserProfile
+
+import sys
+sys.path.insert(1, (str(sys.path[0]))+"/../../crawler/")
+sys.path.insert(1, (str(sys.path[0]))+"/../../crawler/media")
+from Crawler import Crawler
+
 
 
 

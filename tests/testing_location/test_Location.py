@@ -2,8 +2,12 @@ import unittest
 from unittest.mock import patch
 import sys
 
-sys.path.insert(1, (str(sys.path[0]))+"/../../")
-from crawler.location.Location import Location
+#sys.path.insert(1, (str(sys.path[0]))+"/../../")
+#from crawler.location.Location import Location
+
+
+sys.path.insert(1, (str(sys.path[0]))+"/../../crawler/location/")
+from Location import Location
 
 
 
@@ -29,7 +33,8 @@ class TestLocation(unittest.TestCase):
                                                         "website": "www.lunaelaltro.it",
                                                         "phone": "123456789",
                                                         "main_image_url": "www.thisissomelink.to/imageurl",
-                                                        "coordinates": {"lng": 1.111, "lat": 2.222},
+                                                        "coordinates_lng": 1.111, 
+                                                        "coordinates_lat": 2.222,
                                                         "latest_post_partial_url_checked": "12AB34CD"}))
 
 

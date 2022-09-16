@@ -2,11 +2,10 @@ import unittest
 from unittest.mock import patch
 import sys
 
-sys.path.insert(1, (str(sys.path[0]))+"/../../")
+sys.path.insert(1, (str(sys.path[0]))+"/../../crawler/")
 
-from crawler.ProfileScraper import ProfileScraper
-from crawler.InstagrapiUtils import InstagrapiUtils
-from crawler.user.UserProfile import UserProfile
+from ProfileScraper import ProfileScraper
+from InstagrapiUtils import InstagrapiUtils
 
 
 

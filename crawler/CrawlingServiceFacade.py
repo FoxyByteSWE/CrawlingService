@@ -2,8 +2,12 @@ from ProfileScraper import ProfileScraper
 from Crawler import Crawler
 from Config import CrawlingServiceConfig
 from DBConnection import DBConnection
+
+from location.Location import Location
 from location.LocationFactory import LocationFactory
+from user.UserProfile import UserProfile
 from user.UserProfileFactory import UserProfileFactory
+from media.FoxyByteMedia import FoxyByteMedia
 from media.FoxyByteMediaFactory import FoxyByteMediaFactory
 
 from user.UserProfile import UserProfile

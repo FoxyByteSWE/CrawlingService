@@ -3,8 +3,8 @@ from unittest.mock import patch
 import sys,os
 
 
-sys.path.insert(1, (str(sys.path[0]))+"/../../")
-from crawler.user.UserProfile import UserProfile
+sys.path.insert(1, (str(sys.path[0]))+"/../../crawler/user/")
+from UserProfile import UserProfile
 
 
 

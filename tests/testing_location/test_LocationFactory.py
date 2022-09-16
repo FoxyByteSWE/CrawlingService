@@ -5,10 +5,10 @@ import sys,os, datetime
 from instagrapi import types
 
 
-sys.path.insert(1, (str(sys.path[0]))+"/../../")
+sys.path.insert(1, (str(sys.path[0]))+"/../../crawler/location/")
 
-from crawler.location.LocationFactory import LocationFactory
-from crawler.location.Location import Location
+from LocationFactory import LocationFactory
+from Location import Location
 
 
 

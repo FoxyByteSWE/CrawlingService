@@ -1,8 +1,9 @@
 import unittest
 from unittest.mock import patch
 import sys,os
-sys.path.insert(1, (str(sys.path[0]))+"/../../")
-from crawler.media.FoxyByteMedia import FoxyByteMedia
+
+sys.path.insert(1, (str(sys.path[0]))+"/../../crawler/media/")
+from FoxyByteMedia import FoxyByteMedia
 
 
 class TestFoxyByteMedia(unittest.TestCase):

@@ -5,9 +5,9 @@ import sys,os, datetime
 from instagrapi import types
 
 
-sys.path.insert(1, (str(sys.path[0]))+"/../../")
-from crawler.media.FoxyByteMediaFactory import FoxyByteMediaFactory
-from crawler.media.FoxyByteMedia import FoxyByteMedia
+sys.path.insert(1, (str(sys.path[0]))+"/../../crawler/media/")
+from FoxyByteMediaFactory import FoxyByteMediaFactory
+from FoxyByteMedia import FoxyByteMedia
 
 
 
