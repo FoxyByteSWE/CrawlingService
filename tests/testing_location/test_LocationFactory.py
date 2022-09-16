@@ -6,6 +6,7 @@ from instagrapi import types
 
 
 sys.path.insert(1, (str(sys.path[0]))+"/../../")
+
 from crawler.location.LocationFactory import LocationFactory
 from crawler.location.Location import Location
 

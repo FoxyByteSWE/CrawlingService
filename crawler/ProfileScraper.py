@@ -57,14 +57,12 @@ class ProfileScraper:
 		else:
 			return False
 
-	def trackUser(self, user: UserProfile) -> None:
-		
+	def trackUser(self, user: UserProfile) -> None:	
 		self.db.insertItem(user.convertToDict())
 
 
 	def untrackUser(self, user: UserProfile) -> None:
-
-		self.db.removeItem(user.convertToDict())
+		self.db.removeUser(user.convertToDict())
 
 
 	def checkIfPostIsNew(self, indexedPURL: str, latestPURL: str) -> bool:
@@ -101,7 +99,7 @@ class ProfileScraper:
 					mediafound = LocationProfileFinder.getMediaOfLocationUserProfileIfExists(locmedias, detailedLocationInfo.name)
 					if mediafound != None:
 						coordinates = self.instagrapiUtils.getMediaLocationCoordinates(post)
-						profilePic = self.parseMediaUrl(self.instagrapiUtils.client.user_info_by_username(mediafound.user.username).profile_pic_url)
+						profilePic = self.instagrapiUtils.parseMediaUrl(self.instagrapiUtils.client.user_info_by_username(mediafound.user.username).profile_pic_url)
 						newlocation = LocationFactory.buildFromInstagrapi(detailedLocationInfo, profilePic, coordinates, "")
 						self.trackLocation(newlocation)
 						keepUser=True
@@ -117,8 +115,7 @@ class ProfileScraper:
 
 	def findKickoffUsers(self):
 			kickoffUser = (self.instagrapiUtils.getUserInfoByUsername("foxybyte.swe"))
-			newusers = self.extendUserBaseByPolicy(kickoffUser, 5, UserBaseExtender.ExtendUserBaseBySuggestedUsers)
-			
+			newusers = self.extendUserBaseByPolicy(kickoffUser, 5, UserBaseExtender.ExtendUserBaseBySuggestedUsers)		
 			for u in newusers:
 				self.db.insertItem(u.convertToDict())
 

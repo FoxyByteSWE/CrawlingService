@@ -121,8 +121,9 @@ class DBConnection:
 		self.executeQuery(sql)
 
 
-	def removeItem(self, item: dict):
-		pass
+	def removeUser(self, item: dict):
+		sql = "DELETE FROM users WHERE pk == " + item['pk']
+		self.executeQuery(sql)
 
 	def readItem(self, query:str):
 			connection = self.database_connection

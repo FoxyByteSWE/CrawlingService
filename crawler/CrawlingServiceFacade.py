@@ -35,6 +35,8 @@ class CrawlingServiceFacade:
 
         if trackedUsers == []:
             self.profileScraper.findKickoffUsers()
+            trackedUsers = self.db.readItem("SELECT * FROM USERS")
+
 
         # LOAD FROM DB or JSON
         #places_tags = self.db.readItem("SELECT * FROM PLACES_TAGS")
@@ -47,9 +49,11 @@ class CrawlingServiceFacade:
         for user in trackedUsers:
             UserProfileFactory.buildFromDatabase(user)
             self.profileScraper.crawlLocationsFromProfilePosts(user, 3, places_tags)
-            if allowExtendUserBase == True:
+
+            if allowExtendUserBase == True: # will be fetched from DB during the next crawling session.
                 newusers = self.profileScraper.extendUserBaseByPolicy(user, extendUserBaseLimit, self.profileScraper.policies[extendUserBasePolicy])
-                self.db.insertItem()
+                for u in newusers:
+                    self.db.insertItem(u.convertToDict())
 
 
 
@@ -58,7 +62,7 @@ class CrawlingServiceFacade:
 
         for location in locationsFromQuery:
             loc = LocationFactory.buildLocationFromDB(location)
-            self.crawler.crawlLocation(loc, 2)
+            self.crawler.crawlLocation(loc, nPostsWanted)
             
 
 

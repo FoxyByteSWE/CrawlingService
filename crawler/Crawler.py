@@ -48,13 +48,15 @@ class Crawler:
 		parsedmediaurl = self.instagrapiUtils.parseMediaUrl(self.instagrapiUtils.getMediaURL(media))
 		return [parsedtakenat, parsedlocation, parsedmediaurl]
 
+
+
 	#MAIN CRAWLING FUNCTION
 
-	def crawlLocation(self, location, nPostsWanted: int) -> None:
+	def crawlLocation(self, location: Location, nPostsWanted: int) -> None:
 		mediasDump = self.instagrapiUtils.getMostRecentMediasFromLocation(location.name, nPostsWanted) #returns a list of "Medias"
 
 		mediasFromLocation = []
-		lastpostcodechecked = location.getLastPostCheckedCode()
+		lastpostcodechecked = location.getLatestPostPartialURLChecked()
 
 
 		for media in mediasDump:
