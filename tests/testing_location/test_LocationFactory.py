@@ -4,7 +4,6 @@ import sys,os, datetime
 
 from instagrapi import types
 
-
 sys.path.insert(1, (str(sys.path[0]))+"/../../crawler/location/")
 
 from LocationFactory import LocationFactory
@@ -14,25 +13,16 @@ from Location import Location
 
 class TestLocationFactory(unittest.TestCase):
     def setUp(self):
-        self.testLocation = Location(3110887,
-                                    'Ristorante Pizzeria Lunaelaltro - Marostica',
-                                    "Italian Restaurant",
-                                    "",
-                                    "",
-                                    "",
-                                    "www.someimageurl.com/path/to/image",
-                                    {'lng' : 11.660707634193, 'lat': 45.736862428411},
-                                    "somecode")
 
         self.testInstagrapiLocation = types.Location(pk=3110887, 
                                                     name='Ristorante Pizzeria Lunaelaltro - Marostica', 
                                                     phone='', 
                                                     website='', 
-                                                    category='', 
+                                                    category='Italian Restaurant', 
                                                     hours={}, 
-                                                    address=None, 
-                                                    city=None, 
-                                                    zip=None, 
+                                                    address='', 
+                                                    city='', 
+                                                    zip='', 
                                                     lng=11.660707634193, lat=45.736862428411, 
                                                     external_id=77610911328, 
                                                     external_id_source='facebook_places')
@@ -100,15 +90,48 @@ class TestLocationFactory(unittest.TestCase):
                                                                             media_type=1)],
                                 clips_metadata={})
 
-        self.testDBDictLocation =  {} # TODO: pass params
+        self.testDBDictLocation =  {'pk': 3110887,
+                                    'name': 'Ristorante Pizzeria Lunaelaltro - Marostica',
+                                    'category': "Italian Restaurant",
+                                    'address': "",
+                                    'website': "",
+                                    'phone': "",
+                                    'main_image_url': "www.someimageurl.com/path/to/image",
+                                    'coordinates': {'lng' : 11.660707634193, 'lat': 45.736862428411},
+                                    'latest_post_partial_url_checked': "somecode"} # TODO: pass params
 
 
     def test_buildFromInstagrapiMediaAndLocation(self):
-        self.assertEqual(LocationFactory.buildFromInstagrapi(self.testInstagrapiLocation, "www.someimageurl.com/path/to/image", {'lng': 11.660707634193, 'lat' : 45.736862428411}, "somecode"), self.testLocation)
+        loc = LocationFactory.buildFromInstagrapi(self.testInstagrapiLocation, "www.someimageurl.com/path/to/image", {'lng': 11.660707634193, 'lat' : 45.736862428411}, "somecode")
+        self.assertEqual(loc.getPk(), 3110887)
+        self.assertEqual(loc.getName(), "Ristorante Pizzeria Lunaelaltro - Marostica")
+        self.assertEqual(loc.getCategory(),"Italian Restaurant")
+        self.assertEqual(loc.getAddress(), "")
+        self.assertEqual(loc.getCoordinates(), {'lng' : 11.660707634193, 'lat': 45.736862428411})
+        self.assertEqual(loc.getWebsite(), "")
+        self.assertEqual(loc.getPhone(), "")
+        self.assertEqual(loc.getMainImageUrl(), "www.someimageurl.com/path/to/image")
+        self.assertEqual(loc.getLatestPostPartialURLChecked(), "somecode")
+        loc.setLatestPostPartialUrlChecked("newCode")
+        loc.setLatestPostPartialUrlChecked("newCode")
+        self.assertEqual(loc.getLatestPostPartialURLChecked(), "newCode")
+
 
 
     def test_buildFromDB(self):
-        self.assertEqual(LocationFactory.buildFromDB(self.testDBDictLocation), self.testLocation)
+        loc = LocationFactory.buildFromDB(self.testDBDictLocation)
+        self.assertEqual(loc.getPk(), 3110887)
+        self.assertEqual(loc.getName(), "Ristorante Pizzeria Lunaelaltro - Marostica")
+        self.assertEqual(loc.getCategory(),"Italian Restaurant")
+        self.assertEqual(loc.getAddress(), "")
+        self.assertEqual(loc.getCoordinates(), {'lng' : 11.660707634193, 'lat': 45.736862428411})
+        self.assertEqual(loc.getWebsite(), "")
+        self.assertEqual(loc.getPhone(), "")
+        self.assertEqual(loc.getMainImageUrl(), "www.someimageurl.com/path/to/image")
+        self.assertEqual(loc.getLatestPostPartialURLChecked(), "somecode")
+        loc.setLatestPostPartialUrlChecked("newCode")
+        loc.setLatestPostPartialUrlChecked("newCode")
+        self.assertEqual(loc.getLatestPostPartialURLChecked(), "newCode")
 
 
 unittest.main()

@@ -51,7 +51,7 @@ class CrawlingServiceFacade:
 
 
         for user in trackedUsers:
-            UserProfileFactory.buildFromDatabase(user)
+            UserProfileFactory.buildFromDB(user)
             self.profileScraper.crawlLocationsFromProfilePosts(user, 3, places_tags)
 
             if allowExtendUserBase == True: # will be fetched from DB during the next crawling session.

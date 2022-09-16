@@ -9,7 +9,7 @@ from instagrapi.types import Location as InstagrapiLocation
 class LocationFactory:
 
     @staticmethod
-    def buildFromInstagrapi(self, instagrapiLocation: InstagrapiLocation, main_image_url, coordinates, latest_post_partial_url_checked) -> Location:
+    def buildFromInstagrapi(instagrapiLocation: InstagrapiLocation, main_image_url, coordinates, latest_post_partial_url_checked) -> Location:
         return Location(instagrapiLocation.pk,
                         instagrapiLocation.name,
                         instagrapiLocation.category,
@@ -22,7 +22,7 @@ class LocationFactory:
 
 
     @staticmethod
-    def buildFromDB(self, dbLocation: dict) -> Location:
+    def buildFromDB(dbLocation: dict) -> Location:
         return Location(dbLocation["pk"],
                         dbLocation["name"],
                         dbLocation["category"],

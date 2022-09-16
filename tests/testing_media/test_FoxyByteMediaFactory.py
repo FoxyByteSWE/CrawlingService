@@ -13,20 +13,8 @@ from FoxyByteMedia import FoxyByteMedia
 
 class TestFoxyByteMediaFactory(unittest.TestCase):
     def setUp(self):
-        self.testFoxyByteMedia = FoxyByteMedia("CiDdJQjNSRP",
-                                                1, 
-                                                "william_lucchin", 
-                                                [2022, 9, 3, 18, 5, 16],
-                                                { "pk" : 3110887,
-                                                "name" : "Ristorante Pizzeria Lunaelaltro - Marostica",
-                                                "address" : "",
-                                                "coordinates" : [11.660707634193, 45.736862428411],
-                                                "category" : "Italian Restaurant",
-                                                "phone" : "+390424478098",
-                                                "website" : "http://www.lunaelaltro.it"},
-                                                4,
-                                                "",
-                                                "https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968")
+
+        self.maxDiff = None
         
         self.testInstagrapiMedia = types.Media(pk='2919305163060880463', 
                                 id='2919305163060880463_281443894', 
@@ -55,8 +43,8 @@ class TestFoxyByteMediaFactory(unittest.TestCase):
                                                         external_id=77610911328, 
                                                         external_id_source='facebook_places'), 
                                 user=types.UserShort(pk='281443894', 
-                                                    username='william_lucchin', 
-                                                    full_name='William Lucchin', 
+                                                    username='testuser', 
+                                                    full_name='testuser', 
                                                     profile_pic_url=types.HttpUrl('https://instagram.fmxp5-1.fna.fbcdn.net/v/t51.2885-19/220791469_538148194288015_175587587912182841_n.jpg?stp=dst-jpg_s150x150&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=107&_nc_ohc=N-9Qp0Nq5zkAX8jLkC7&edm=AKmAybEBAAAA&ccb=7-5&oh=00_AT-EZH5KaZ0dPby9NKaiSqPKArXsucUFLUuuNDIU5RI5Qg&oe=63229251&_nc_sid=bcb968', 
                                                                             scheme='https', 
                                                                             host='instagram.fmxp5-1.fna.fbcdn.net', 
@@ -71,7 +59,7 @@ class TestFoxyByteMediaFactory(unittest.TestCase):
                                 comment_count=0, 
                                 like_count=4, 
                                 has_liked=False, 
-                                caption_text='', 
+                                caption_text='testcaption', 
                                 accessibility_caption=None, 
                                 usertags=[], 
                                 video_url=None, 
@@ -93,7 +81,7 @@ class TestFoxyByteMediaFactory(unittest.TestCase):
 
         self.testDBDictMedia = {'PostPartialURL' : "CiDdJQjNSRP",
                                 'MediaType' : 1,
-                                'AuthorUsername' : "william_lucchin", 
+                                'AuthorUsername' : "testuser", 
                                 'TakenAtTime'    : [2022, 9, 3, 18, 5, 16],
                                 'TakenAtLocation' : { "pk" : 3110887,
                                                         "Name" : "Ristorante Pizzeria Lunaelaltro - Marostica",
@@ -103,7 +91,7 @@ class TestFoxyByteMediaFactory(unittest.TestCase):
                                                         "Phone" : "+390424478098",
                                                         "Website" : "http://www.lunaelaltro.it"},
                                 "LikeCount": 4,
-                                "CaptionText" : "",
+                                "CaptionText" : "testcaption",
                                 "MediaURL" :"https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968"}
 
                                                 
@@ -111,11 +99,50 @@ class TestFoxyByteMediaFactory(unittest.TestCase):
 
 
     def test_buildFromInstagrapiMediaAndLocation(self):
-        self.assertEqual(FoxyByteMediaFactory.buildFromInstagrapiMediaAndLocation(self.testInstagrapiMedia, ["parsedTakenAt"], {1: "parsedlocation"}, "parsedurl"), self.testFoxyByteMedia) # TODO: pass params
+        media = FoxyByteMediaFactory.buildFromInstagrapiMediaAndLocation(self.testInstagrapiMedia, [2022, 9, 3, 18, 5, 16], { "pk" : 3110887,
+                                                                                                                                        "Name" : "Ristorante Pizzeria Lunaelaltro - Marostica",
+                                                                                                                                        "Address" : "",
+                                                                                                                                        "Coordinates" : [11.660707634193, 45.736862428411],
+                                                                                                                                        "Category" : "Italian Restaurant",
+                                                                                                                                        "Phone" : "+390424478098",
+                                                                                                                                        "Website" : "http://www.lunaelaltro.it"}, 
+                                                                                                                                        "https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968") 
+        self.assertEqual(media.getPostPartialURL(), "CiDdJQjNSRP")
+        self.assertEqual(media.getMediaType(), 1)
+        self.assertEqual(media.getAuthorUsername(), "testuser")
+        self.assertEqual(media.getCaptionText(), "testcaption")
+        self.assertEqual(media.getTakenAtTime(), [2022, 9, 3, 18, 5, 16])
+        self.assertEqual(media.getTakenAtLocation(), { "pk" : 3110887,
+                                                        "Name" : "Ristorante Pizzeria Lunaelaltro - Marostica",
+                                                        "Address" : "",
+                                                        "Coordinates" : [11.660707634193, 45.736862428411],
+                                                        "Category" : "Italian Restaurant",
+                                                        "Phone" : "+390424478098",
+                                                        "Website" : "http://www.lunaelaltro.it"}),
+                                                        
+        self.assertEqual(media.getLikeCount(), 4)
+        self.assertEqual(media.getMediaURL(), "https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968")                                                                                                                                  
+
+
 
 
     def test_buildFromDB(self):
-        self.assertEqual(FoxyByteMediaFactory.buildFromDB(self.testDBDictMedia), self.testFoxyByteMedia)
+        media = FoxyByteMediaFactory.buildFromDB(self.testDBDictMedia)
+        self.assertEqual(media.getPostPartialURL(), "CiDdJQjNSRP")
+        self.assertEqual(media.getMediaType(), 1)
+        self.assertEqual(media.getAuthorUsername(), "testuser")
+        self.assertEqual(media.getCaptionText(), "testcaption")
+        self.assertEqual(media.getTakenAtTime(), [2022, 9, 3, 18, 5, 16])
+        self.assertEqual(media.getTakenAtLocation(), { "pk" : 3110887,
+                                                        "Name" : "Ristorante Pizzeria Lunaelaltro - Marostica",
+                                                        "Address" : "",
+                                                        "Coordinates" : [11.660707634193, 45.736862428411],
+                                                        "Category" : "Italian Restaurant",
+                                                        "Phone" : "+390424478098",
+                                                        "Website" : "http://www.lunaelaltro.it"}),
+                                                        
+        self.assertEqual(media.getLikeCount(), 4)
+        self.assertEqual(media.getMediaURL(), "https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968")                                                                                                                                   
 
 
 unittest.main()
