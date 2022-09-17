@@ -7,8 +7,6 @@ from user.UserProfileFactory import UserProfileFactory
 
 
 class UserBaseExtender:
-    ##################### WRITING TO JSON ##########################
-
 
     class ExtendUserBasePolicy(ABC):
         @abstractmethod
@@ -20,7 +18,8 @@ class UserBaseExtender:
     class ExtendUserBaseBySuggestedUsers(ExtendUserBasePolicy):
         def extendUserBaseByPolicy(self, user, limit): 
             try:
-                list = InstagrapiUtils.getSuggestedUsersFromFBSearch(user.pk)
+                instagrapiUtils = InstagrapiUtils()
+                list = instagrapiUtils.getSuggestedUsersFromFBSearch(user.pk)
             except Exception as e:
                 print(e)
                 return
@@ -28,9 +27,9 @@ class UserBaseExtender:
                 limit = len(list)
             uncheckedUserList = []
             for usersh in list[0:limit]:
-                usertmp = InstagrapiUtils.convertUserShortToUserv2(usersh)
+                usertmp = instagrapiUtils.convertUserShortToUserv2(usersh)
                 username = usertmp.username
-                usersugg = InstagrapiUtils.getUserInfoByUsername(username).dict()
+                usersugg = instagrapiUtils.getUserInfoByUsername(username).dict()
                 usersugg["LatestPostPartialURL"] = ''
                 if InstagrapiUtils.isProfilePrivate(usersugg) == False:
                     uncheckedUserList.append(UserProfileFactory.buildFromInstagrapi(usersugg, ""))
@@ -42,19 +41,20 @@ class UserBaseExtender:
                     
 
     class ExtendUserBaseByTaggedUsers(ExtendUserBasePolicy):
-        def extendUserBaseByPolicy(self, user, limit): 
-            posts = InstagrapiUtils.getUserPosts(user)
+        def extendUserBaseByPolicy(self, user, limit):
+            instagrapiUtils = InstagrapiUtils() 
+            posts = instagrapiUtils.getUserPosts(user)
             uncheckedUserList = []
             for post in posts:
-                list = InstagrapiUtils.getPostTaggedPeople(post)
+                list = instagrapiUtils.getPostTaggedPeople(post)
                 for usertag in list:
                     if limit == 0:
                         return
-                    usersh=InstagrapiUtils.convertUsertagToUser(usertag)
-                    usertagged = (InstagrapiUtils.getUserInfoByUsername(usersh.username)).dict()
+                    usersh=instagrapiUtils.convertUsertagToUser(usertag)
+                    usertagged = (instagrapiUtils.getUserInfoByUsername(usersh.username)).dict()
                     #usertagged = (InstagrapiUtils.GetUserInfoByUsername(usersh.username)).dict()
                     user["LatestPostPartialURL"] = ''
-                    if InstagrapiUtils.isProfilePrivate(usertagged) == False:
+                    if instagrapiUtils.isProfilePrivate(usertagged) == False:
                         uncheckedUserList.append(UserProfileFactory.buildFromInstagrapi(usertagged, ""))
                         limit = limit-1
             return uncheckedUserList
@@ -64,15 +64,16 @@ class UserBaseExtender:
 
     class ExtendUserBaseByTaggedPostsSection(ExtendUserBasePolicy):
         def extendUserBaseByPolicy(self, user, limit): 
-            list = InstagrapiUtils.getProfileTaggedPosts(user)
+            instagrapiUtils = InstagrapiUtils() 
+            list = instagrapiUtils.getProfileTaggedPosts(user.pk)
             if list == []:
                 print("No posts available in Tagged Posts Section")
             uncheckedUserList = []
             for media in list[0:limit]:
-                userposter=InstagrapiUtils.getUserInfoByUsername(media.user.username).dict()
+                userposter=instagrapiUtils.getUserInfoByUsername(media.user.username).dict()
                 user["LatestPostPartialURL"] = ''
                 if self.isAlreadyTracked(userposter) == False:
-                    if InstagrapiUtils.isProfilePrivate(userposter) == False:
+                    if instagrapiUtils.isProfilePrivate(userposter) == False:
                         uncheckedUserList.append(UserProfileFactory.buildFromInstagrapi(userposter, ""))
             return uncheckedUserList
 
