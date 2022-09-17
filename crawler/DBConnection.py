@@ -4,8 +4,8 @@ import pymysql
 from pprint import pprint
 class DBConnection:
 
-	def __init__(self, hostname = "michelinsocial.ctr0m4f2rgau.eu-west-1.rds.amazonaws.com", user = "admin", password = "#g7ct=MD", server_connection = None, database_connection = None):
-	#def __init__(self, hostname = "localhost", user = "root", password = "root", server_connection = None, database_connection = None):
+	#def __init__(self, hostname = "michelinsocial.ctr0m4f2rgau.eu-west-1.rds.amazonaws.com", user = "admin", password = "#g7ct=MD", server_connection = None, database_connection = None):
+	def __init__(self, hostname = "localhost", user = "root", password = "root", server_connection = None, database_connection = None):
 		self.hostname = hostname
 		self.user = user
 		self.password = password
@@ -90,7 +90,13 @@ class DBConnection:
 	def executeQuery(self, query, connection = None):
 
 		if connection is None:
-			connection = self.database_connection
+			#connection = self.database_connection
+			connection = pymysql.connect(
+				host = self.hostname,
+				user = self.user,
+				passwd = self.password,
+				database = "michelinsocial"
+			)
 
 		cursor = connection.cursor()
 		try:
@@ -101,8 +107,11 @@ class DBConnection:
 			result = cursor.fetchall();
 			for row in result:
 				print(row)
+			return result
 		except pymysql.Error as err:
 			print(f"Error: '{err}'")
+			print("Query: " + query)
+			return None
 
 	
 	def insertItem(self, item: dict, table: str):
@@ -122,7 +131,7 @@ class DBConnection:
 
 
 	def removeUser(self, item: dict):
-		sql = "DELETE FROM users WHERE pk == " + item['pk']
+		sql = "DELETE FROM users WHERE pk = " + str(item['pk'])
 		self.executeQuery(sql)
 
 	def readItem(self, query:str):
@@ -138,9 +147,9 @@ class DBConnection:
 					dict[desc.description[i][0]] = row[i]
 				list.append(dict)
 
-			print(list)
-
+			#print(list)
 			#pprint(vars(desc))
+			return list
 
 #db = DBConnection()
 #db.createServerConnection()

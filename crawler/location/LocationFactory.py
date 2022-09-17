@@ -1,7 +1,7 @@
 import sys
 
-
 sys.path.insert(1, (str(sys.path[0]))+"/location/")
+
 from Location import Location
 from instagrapi.types import Location as InstagrapiLocation
 

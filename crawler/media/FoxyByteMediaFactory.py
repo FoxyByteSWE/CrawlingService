@@ -1,3 +1,7 @@
+import sys
+
+sys.path.insert(1, (str(sys.path[0]))+"/media/")
+
 from instagrapi.types import Media
 from FoxyByteMedia import FoxyByteMedia
 
