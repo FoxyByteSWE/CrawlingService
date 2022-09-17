@@ -30,8 +30,6 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
     def __init__(self) -> None:
         value = self.createLoggedInClient()
-        if value == -1:
-            exit(-1)
 
 
 

@@ -4,8 +4,8 @@ import pymysql
 from pprint import pprint
 class DBConnection:
 
-	#def __init__(self, hostname = "michelinsocial.ctr0m4f2rgau.eu-west-1.rds.amazonaws.com", user = "admin", password = "#g7ct=MD", server_connection = None, database_connection = None):
-	def __init__(self, hostname = "localhost", user = "root", password = "root", server_connection = None, database_connection = None):
+	def __init__(self, hostname = "michelinsocial.ctr0m4f2rgau.eu-west-1.rds.amazonaws.com", user = "admin", password = "#g7ct=MD", server_connection = None, database_connection = None):
+	#def __init__(self, hostname = "localhost", user = "root", password = "root", server_connection = None, database_connection = None):
 		self.hostname = hostname
 		self.user = user
 		self.password = password
@@ -142,17 +142,17 @@ class DBConnection:
 
 			#pprint(vars(desc))
 
-db = DBConnection()
-db.createServerConnection()
-db.createDatabaseConnection("michelinsocial")
-dict = {'Categoria': 'CIAO',
-  'Codice_pk': '000000',
-  'Immagine': '',
-  'Indirizzo': 'VIA"CIAO',
-  'Latitudine': 11.1111,
-  'Longitudine': 22.2222,
-  'Nome': 'Farina del TUO sacco',
-  'Ranking': 10,
-  'Sito': 'https://www.farinadelmiosaccoferrara.it',
-  'Telefono': '0532474303'}
-db.insertItem(dict, "restaurants")
+#db = DBConnection()
+#db.createServerConnection()
+#db.createDatabaseConnection("michelinsocial")
+#dict = {'Categoria': 'CIAO',
+#  'Codice_pk': '000000',
+#  'Immagine': '',
+#  'Indirizzo': 'VIA"CIAO',
+#  'Latitudine': 11.1111,
+#  'Longitudine': 22.2222,
+#  'Nome': 'Farina del TUO sacco',
+#  'Ranking': 10,
+#  'Sito': 'https://www.farinadelmiosaccoferrara.it',
+#  'Telefono': '0532474303'}
+#db.insertItem(dict, "restaurants")
