@@ -38,7 +38,7 @@ class ProfileScraper:
 		
 
 	def isLocationTracked(self, location: Location) -> bool:
-		query = "SELECT * FROM LOCATIONS WHERE Codice_Pk IS " + str(location.pk)
+		query = "SELECT * FROM restaurants WHERE Codice_pk = " + str(location.pk)
 		response = self.db.executeQuery(query)
 		if response != None:
 			print("location is already being tracked.")

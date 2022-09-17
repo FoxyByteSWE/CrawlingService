@@ -1,4 +1,3 @@
-from msilib.schema import Media
 import sys, time, os, json
 import Levenshtein
 

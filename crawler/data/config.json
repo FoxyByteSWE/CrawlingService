@@ -1,5 +1,8 @@
 {
     "allowExtendUserBase": "True",
+    "extendUserBasePolicyNumber": 2,
+    "extendUserBasePolicy": 2,
+    "nMaxUsersToAdd": 10,
     "nPostsAllowedForProfileScraping": 40,
     "nPostsWantedForEachLocation": 50
 }
