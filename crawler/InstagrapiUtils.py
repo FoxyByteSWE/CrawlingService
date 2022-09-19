@@ -75,16 +75,16 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
     def getMediaURL(self, media: Media):  #TODO: test for a multi-media (album) post
         #print("here")
         if media.media_type==1:
-            return media.thumbnail_url
+            return [media.thumbnail_url]
         if media.media_type==2:
-            return media.video_url
+            return [media.video_url]
         if media.media_type==8: #album
             album = media.resources
             list=[]
             for item in album:
-                if media.media_type == 1:
+                if item.media_type == 1:
                     list.append(item.thumbnail_url)
-                elif media.media_type == 2:
+                elif item.media_type == 2:
                     list.append(item.video_url)
             return list
 
@@ -112,7 +112,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         dict["website"] = input["website"]
         return dict;
 
-    def parseMediaUrl(self, input: list) -> str: #TODO: Check end
+    def parseMediaUrl(self, input: list) -> list[str]: #TODO: RETURN A LIST OF PARSED MEDIAS
         url = str(input)
         start = url.find("'") + 1
         url = url[start:]

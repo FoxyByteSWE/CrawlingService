@@ -96,12 +96,11 @@ class TestFoxyByteMediaFactory(unittest.TestCase):
                                                         "Website" : "http://www.lunaelaltro.it"},
                                 "LikeCount": 4,
                                 "CaptionText" : "testcaption",
-                                "MediaURL" :"https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968"}
+                                "MediaURLs" :"https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968"}
 
 
 
         self.testAlbumInstagrapiPost = types.Media(pk='2922888195445339045', id='2922888195445339045_244861834', code='CiQL1Pfs7Ol', taken_at=datetime.datetime(2022, 9, 8, 16, 44, 6, tzinfo=datetime.timezone.utc), media_type=8, product_type='carousel_container', thumbnail_url=None, location=None, user=types.UserShort(pk='244861834', username='marcouderzo', full_name='Marco Uderzo', profile_pic_url=types.HttpUrl('https://instagram.fmxp5-1.fna.fbcdn.net/v/t51.2885-19/300433054_476180640674958_6480412194885371836_n.jpg?stp=dst-jpg_s150x150&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=106&_nc_ohc=WdBRH6AOCNUAX8XlqQ4&edm=ABmJApABAAAA&ccb=7-5&oh=00_AT_P-AHIBMhXMG6fhKpjJla9sDn4QshOOXrE5tv0MVhAeg&oe=632EF626&_nc_sid=6136e7', scheme='https', host='instagram.fmxp5-1.fna.fbcdn.net', tld='net', host_type='domain', port='443', path='/v/t51.2885-19/300433054_476180640674958_6480412194885371836_n.jpg', query='stp=dst-jpg_s150x150&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=106&_nc_ohc=WdBRH6AOCNUAX8XlqQ4&edm=ABmJApABAAAA&ccb=7-5&oh=00_AT_P-AHIBMhXMG6fhKpjJla9sDn4QshOOXrE5tv0MVhAeg&oe=632EF626&_nc_sid=6136e7'), profile_pic_url_hd=None, is_private=False, stories=[]), comment_count=2, like_count=44, has_liked=False, caption_text='Asterix ⚔️\n\n#digitalart #art #artwork #artstation', accessibility_caption=None, usertags=[], video_url=None, view_count=0, video_duration=0.0, title='', resources=[types.Resource(pk='2922888190051368734', video_url=None, thumbnail_url=types.HttpUrl('https://instagram.fmxp5-1.fna.fbcdn.net/v/t51.2885-15/305581021_649382376752497_4108879936870536141_n.jpg?stp=dst-jpg_e35_p1080x1080&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=axKsxzOiApwAX-B_Tai&edm=ABmJApABAAAA&ccb=7-5&ig_cache_key=MjkyMjg4ODE5MDA1MTM2ODczNA%3D%3D.2-ccb7-5&oh=00_AT_ylOVVMjndmymijqPQWnraE-udOU14-fhqsZ5AQrtj3Q&oe=632E7DD8&_nc_sid=6136e7', scheme='https', host='instagram.fmxp5-1.fna.fbcdn.net', tld='net', host_type='domain', port='443', path='/v/t51.2885-15/305581021_649382376752497_4108879936870536141_n.jpg', query='stp=dst-jpg_e35_p1080x1080&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=axKsxzOiApwAX-B_Tai&edm=ABmJApABAAAA&ccb=7-5&ig_cache_key=MjkyMjg4ODE5MDA1MTM2ODczNA%3D%3D.2-ccb7-5&oh=00_AT_ylOVVMjndmymijqPQWnraE-udOU14-fhqsZ5AQrtj3Q&oe=632E7DD8&_nc_sid=6136e7'), media_type=1), types.Resource(pk='2922888190051309277', video_url=None, thumbnail_url=types.HttpUrl('https://instagram.fmxp5-1.fna.fbcdn.net/v/t51.2885-15/305891455_619332293079020_6104277027525319527_n.jpg?stp=dst-jpg_e35_p1080x1080&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=108&_nc_ohc=rqxlwvs4JOsAX9BD8-s&edm=ABmJApABAAAA&ccb=7-5&ig_cache_key=MjkyMjg4ODE5MDA1MTMwOTI3Nw%3D%3D.2-ccb7-5&oh=00_AT-jVLDcCr78o3ptPWduL9pUTdNAqgDklyoR8mxmBsxFHw&oe=632F09DE&_nc_sid=6136e7', scheme='https', host='instagram.fmxp5-1.fna.fbcdn.net', tld='net', host_type='domain', port='443', path='/v/t51.2885-15/305891455_619332293079020_6104277027525319527_n.jpg', query='stp=dst-jpg_e35_p1080x1080&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=108&_nc_ohc=rqxlwvs4JOsAX9BD8-s&edm=ABmJApABAAAA&ccb=7-5&ig_cache_key=MjkyMjg4ODE5MDA1MTMwOTI3Nw%3D%3D.2-ccb7-5&oh=00_AT-jVLDcCr78o3ptPWduL9pUTdNAqgDklyoR8mxmBsxFHw&oe=632F09DE&_nc_sid=6136e7'), media_type=1)], clips_metadata={})                                       
-                                                
 
 
     def test_buildFromInstagrapiMediaAndLocation(self):
@@ -127,22 +126,28 @@ class TestFoxyByteMediaFactory(unittest.TestCase):
                                                         "Website" : "http://www.lunaelaltro.it"}),
                                                         
         self.assertEqual(media.getLikeCount(), 4)
-        self.assertEqual(media.getMediaURL(), "https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968")                                                                                                                                  
+        self.assertEqual(media.getMediaURLs(), "https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968")                                                                                                                                  
 
 
 
 
-    def test_buildFromInstagrapiMediaAlbumAndLocation(self): #FAILS
-        media = FoxyByteMediaFactory.buildFromInstagrapiMediaAndLocation(self.testAlbumInstagrapiPost, [2022, 9, 8, 16, 44, 6], {}, InstagrapiUtils.parseMediaUrl(InstagrapiUtils, InstagrapiUtils.getMediaURL(InstagrapiUtils, self.testAlbumInstagrapiPost))) 
+    def test_buildFromInstagrapiMediaAlbumAndLocation(self):
+        urls= InstagrapiUtils.getMediaURL(InstagrapiUtils, self.testAlbumInstagrapiPost)
+        print(urls)
+        parsedurls = InstagrapiUtils.parseMediaUrl(InstagrapiUtils, urls) #FAILS: PARSEMEDIAURL SHOULD PARSE EVERY LINK BUT RETURN A LIST OF PARSED LINKS!
+        print(urls)
+        media = FoxyByteMediaFactory.buildFromInstagrapiMediaAndLocation(self.testAlbumInstagrapiPost, [2022, 9, 8, 16, 44, 6], {}, parsedurls) 
         self.assertEqual(media.getPostPartialURL(), "CiQL1Pfs7Ol")
-        self.assertEqual(media.getMediaType(), 1)
+        self.assertEqual(media.getMediaType(), 8)
         self.assertEqual(media.getAuthorUsername(), "marcouderzo")
-        self.assertEqual(media.getCaptionText(), "'Asterix ⚔️\n\n#digitalart #art #artwork #artstation'")
+        self.assertEqual(media.getCaptionText(), "Asterix ⚔️\n\n#digitalart #art #artwork #artstation")
         self.assertEqual(media.getTakenAtTime(), [2022, 9, 8, 16, 44, 6])
-        self.assertEqual(media.getTakenAtLocation(), {}),
-                                                        
+        self.assertEqual(media.getTakenAtLocation(), {}),                                                    
         self.assertEqual(media.getLikeCount(), 44)
-        self.assertEqual(media.getMediaURL(), "https://instagram.fmxp5-1.fna.fbcdn.net/v/t51.2885-15/305581021_649382376752497_4108879936870536141_n.jpg?stp=dst-jpg_e35_p1080x1080&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=axKsxzOiApwAX-B_Tai&edm=ABmJApABAAAA&ccb=7-5&ig_cache_key=MjkyMjg4ODE5MDA1MTM2ODczNA%3D%3D.2-ccb7-5&oh=00_AT_ylOVVMjndmymijqPQWnraE-udOU14-fhqsZ5AQrtj3Q&oe=632E7DD8&_nc_sid=6136e7")                                                                                                                                  
+        print("media urls are:")
+        print(media.getMediaURLs())
+        self.assertEqual(media.getMediaURLs(), ["https://instagram.fmxp5-1.fna.fbcdn.net/v/t51.2885-15/305581021_649382376752497_4108879936870536141_n.jpg?stp=dst-jpg_e35_p1080x1080&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=axKsxzOiApwAX-B_Tai&edm=ABmJApABAAAA&ccb=7-5&ig_cache_key=MjkyMjg4ODE5MDA1MTM2ODczNA%3D%3D.2-ccb7-5&oh=00_AT_ylOVVMjndmymijqPQWnraE-udOU14-fhqsZ5AQrtj3Q&oe=632E7DD8&_nc_sid=6136e7",
+                                                "https://instagram.fmxp5-1.fna.fbcdn.net/v/t51.2885-15/305891455_619332293079020_6104277027525319527_n.jpg?stp=dst-jpg_e35_p1080x1080&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=108&_nc_ohc=rqxlwvs4JOsAX9BD8-s&edm=ABmJApABAAAA&ccb=7-5&ig_cache_key=MjkyMjg4ODE5MDA1MTMwOTI3Nw%3D%3D.2-ccb7-5&oh=00_AT-jVLDcCr78o3ptPWduL9pUTdNAqgDklyoR8mxmBsxFHw&oe=632F09DE&_nc_sid=6136e7"])                                                                                                                                  
 
 
 
@@ -162,7 +167,7 @@ class TestFoxyByteMediaFactory(unittest.TestCase):
                                                         "Website" : "http://www.lunaelaltro.it"}),
                                                         
         self.assertEqual(media.getLikeCount(), 4)
-        self.assertEqual(media.getMediaURL(), "https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968")                                                                                                                                   
+        self.assertEqual(media.getMediaURLs(), "https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968")                                                                                                                                   
 
 
 unittest.main()

@@ -9,7 +9,7 @@ from FoxyByteMedia import FoxyByteMedia
 class FoxyByteMediaFactory:
 
 	@staticmethod
-	def buildFromInstagrapiMediaAndLocation(media: Media, parsedTakenAt: list, parsedLocation: dict, parsedUrl: str):
+	def buildFromInstagrapiMediaAndLocation(media: Media, parsedTakenAt: list, parsedLocation: dict, parsedUrls: list[str]):
 		return FoxyByteMedia(media.code,
 							media.media_type,
 							media.user.username,
@@ -17,7 +17,7 @@ class FoxyByteMediaFactory:
 							parsedLocation, 
 							media.like_count, 
 							media.caption_text, 
-							parsedUrl) 
+							parsedUrls) 
 
 	@staticmethod
 	def buildFromDB(media: dict):
@@ -28,5 +28,5 @@ class FoxyByteMediaFactory:
 							media["TakenAtLocation"], 
 							media["LikeCount"],
 							media["CaptionText"],
-							media["MediaURL"])
+							media["MediaURLs"])
 
