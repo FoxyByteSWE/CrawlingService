@@ -100,7 +100,8 @@ class ProfileScraper:
 					if mediafound != None:
 						coordinates = self.instagrapiUtils.getMediaLocationCoordinates(post)
 						profilePic = self.instagrapiUtils.parseMediaUrl(self.instagrapiUtils.client.user_info_by_username(mediafound.user.username).profile_pic_url)
-						newlocation = LocationFactory.buildFromInstagrapi(detailedLocationInfo, profilePic, coordinates, "")
+						profilePicLink = profilePic[0]
+						newlocation = LocationFactory.buildFromInstagrapi(detailedLocationInfo, profilePicLink, coordinates, "")
 						self.trackLocation(newlocation)
 						keepUser=True
 

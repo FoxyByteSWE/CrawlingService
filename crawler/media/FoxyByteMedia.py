@@ -20,8 +20,21 @@ class FoxyByteMedia:
 		item['TakenAtLocation']=self.TakenAtLocation
 		item['LikeCount']=self.LikeCount
 		item['CaptionText']=self.CaptionText
-		item['MediaURL']=self.MediaURLs
+		item['MediaURLs']=self.convertMediaURLsToUniqueString(self.MediaURLs)
 		return item
+
+	def convertMediaURLsToUniqueString(self, inputlist: list) -> str:
+		string = ""
+		for item in inputlist:
+			string += item
+			string += "|"
+		string= string[:-1]
+		return string
+
+	def convertMediaUniqueStringToMediaURLs(inputstring) -> list[str]:
+		newlist = []
+		newlist = inputstring.split("|")
+		return newlist
 
 	def getPostPartialURL(self) -> str:
 		return self.PostPartialURL
@@ -46,5 +59,3 @@ class FoxyByteMedia:
 
 	def getMediaURLs(self) -> list[str]:
 		return self.MediaURLs
-	
-	

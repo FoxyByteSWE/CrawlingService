@@ -28,5 +28,5 @@ class FoxyByteMediaFactory:
 							media["TakenAtLocation"], 
 							media["LikeCount"],
 							media["CaptionText"],
-							media["MediaURLs"])
+							FoxyByteMedia.convertMediaUniqueStringToMediaURLs(media["MediaURLs"]))
 

@@ -112,13 +112,21 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         dict["website"] = input["website"]
         return dict;
 
-    def parseMediaUrl(self, input: list) -> list[str]: #TODO: RETURN A LIST OF PARSED MEDIAS
-        url = str(input)
-        start = url.find("'") + 1
-        url = url[start:]
-        end = url.find("'")
-        url = url[:end]
-        return url
+    def parseMediaUrl(self, inputlist: list) -> list[str]: #TODO: RETURN A LIST OF PARSED MEDIAS, BUT PROFILEPICURL SHOULD ONLY BE A STRING
+        newlist = []
+        for item in inputlist:
+            url = str(item)
+            start = url.find("'") + 1
+            url = url[start:]
+            newlist.append(url)
+        print(newlist)
+        return newlist
+
+
+        
+
+        
+
 
 
     def getDetailedMediaLocationInfo(self, media: Media) -> Location: 
