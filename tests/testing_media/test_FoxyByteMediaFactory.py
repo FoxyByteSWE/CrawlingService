@@ -133,9 +133,7 @@ class TestFoxyByteMediaFactory(unittest.TestCase):
 
     def test_buildFromInstagrapiMediaAlbumAndLocation(self):
         urls= InstagrapiUtils.getMediaURL(InstagrapiUtils, self.testAlbumInstagrapiPost)
-        print(urls)
         parsedurls = InstagrapiUtils.parseMediaUrl(InstagrapiUtils, urls) #FAILS: PARSEMEDIAURL SHOULD PARSE EVERY LINK BUT RETURN A LIST OF PARSED LINKS!
-        print(urls)
         media = FoxyByteMediaFactory.buildFromInstagrapiMediaAndLocation(self.testAlbumInstagrapiPost, [2022, 9, 8, 16, 44, 6], {}, parsedurls) 
         self.assertEqual(media.getPostPartialURL(), "CiQL1Pfs7Ol")
         self.assertEqual(media.getMediaType(), 8)
@@ -144,11 +142,9 @@ class TestFoxyByteMediaFactory(unittest.TestCase):
         self.assertEqual(media.getTakenAtTime(), [2022, 9, 8, 16, 44, 6])
         self.assertEqual(media.getTakenAtLocation(), {}),                                                    
         self.assertEqual(media.getLikeCount(), 44)
-        print("media urls are:")
-        print(media.getMediaURLs())
         self.assertEqual(media.getMediaURLs(), ["https://instagram.fmxp5-1.fna.fbcdn.net/v/t51.2885-15/305581021_649382376752497_4108879936870536141_n.jpg?stp=dst-jpg_e35_p1080x1080&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=axKsxzOiApwAX-B_Tai&edm=ABmJApABAAAA&ccb=7-5&ig_cache_key=MjkyMjg4ODE5MDA1MTM2ODczNA%3D%3D.2-ccb7-5&oh=00_AT_ylOVVMjndmymijqPQWnraE-udOU14-fhqsZ5AQrtj3Q&oe=632E7DD8&_nc_sid=6136e7",
                                                 "https://instagram.fmxp5-1.fna.fbcdn.net/v/t51.2885-15/305891455_619332293079020_6104277027525319527_n.jpg?stp=dst-jpg_e35_p1080x1080&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=108&_nc_ohc=rqxlwvs4JOsAX9BD8-s&edm=ABmJApABAAAA&ccb=7-5&ig_cache_key=MjkyMjg4ODE5MDA1MTMwOTI3Nw%3D%3D.2-ccb7-5&oh=00_AT-jVLDcCr78o3ptPWduL9pUTdNAqgDklyoR8mxmBsxFHw&oe=632F09DE&_nc_sid=6136e7"])                                                                                                                                  
-
+        #print(media.convertToDict())
 
 
     def test_buildFromDB(self):
@@ -167,7 +163,7 @@ class TestFoxyByteMediaFactory(unittest.TestCase):
                                                         "Website" : "http://www.lunaelaltro.it"}),
                                                         
         self.assertEqual(media.getLikeCount(), 4)
-        self.assertEqual(media.getMediaURLs(), "https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968")                                                                                                                                   
+        self.assertEqual(media.getMediaURLs(), ["https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968"])                                                                                                                                   
 
 
 unittest.main()
