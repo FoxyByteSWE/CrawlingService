@@ -1,9 +1,12 @@
 import unittest
+from unittest import mock
 from unittest.mock import patch
 import sys
 
 sys.path.insert(1, (str(sys.path[0]))+"/../../")
-from crawler.InstagrapiUtils import InstagrapiUtils
+sys.path.insert(1, (str(sys.path[0]))+"/../../crawler/media")
+sys.path.insert(1, (str(sys.path[0]))+"/../../crawler")
+from InstagrapiUtils import InstagrapiUtils
 
 
 import instagrapi
@@ -143,28 +146,61 @@ class TestInstagrapi(unittest.TestCase):
         
 
     def test_parseMediaUrl(self):
-        self.assertEqual(self.instagrapiUtils.parseMediaUrl(self.media.thumbnail_url), "https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968") 
+        self.assertEqual(self.instagrapiUtils.parseMediaUrl([self.media.thumbnail_url]), ["https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968"]) 
 
-#    def test_parseTakenAtLocation(self):
-#        self.assertEqual(self.instagrapiUtils.parseTakenAtLocation(self.media.location), { "pk" : 3110887,
-#                                                                                            "name" : "Ristorante Pizzeria Lunaelaltro - Marostica",
-#                                                                                            "address" : "",
-#                                                                                            "coordinates" : [11.660707634193, 45.736862428411],
-#                                                                                            "category" : "Italian Restaurant",
-#                                                                                            "phone" : "+390424478098",
-#                                                                                            "website" : "http://www.lunaelaltro.it"}) 
+    def test_parseTakenAtLocation(self):
+        with patch('Crawler.InstagrapiUtils.getDetailedMediaLocationInfo') as mock_get:
+            mock_get.return_value = self.media.location
+            self.assertEqual(self.instagrapiUtils.parseTakenAtLocation(self.media), { "pk" : 3110887,
+                                                                                            "name" : "Ristorante Pizzeria Lunaelaltro - Marostica",
+                                                                                            "address" : None,
+                                                                                            "coordinates" : [11.660707634193, 45.736862428411],
+                                                                                            "category" : "",
+                                                                                            "phone" : "",
+                                                                                            "website" : ""}) 
 
     def test_getLocationPkCodeFromName(self):
-        self.assertEqual(self.instagrapiUtils.getLocationPkCodeFromName("Farina del mio sacco"),1788391034730029)
+        with patch('instagrapi.Client.fbsearch_places') as mock_search:
+            mock_search.return_value = [self.media.location]
+            mock_search.side_effect = None
+            self.assertEqual(self.instagrapiUtils.getLocationPkCodeFromName("Ristorante Pizzeria Lunaelaltro - Marostica"),3110887)
 
     def test_getMediaLocationCoordinates(self):
         self.assertEqual(self.instagrapiUtils.getMediaLocationCoordinates(self.media), {'lng': 11.660707634193, 'lat': 45.736862428411})
 
     def test_getMediaURL(self):  #type 1: photo
-        self.assertAlmostEqual(self.instagrapiUtils.getMediaURL(self.media), 'https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968')
+        self.assertEqual(self.instagrapiUtils.getMediaURL(self.media), ['https://instagram.fmxp5-1.fna.fbcdn.net/v/t39.30808-6/302560636_10225220452889775_4354789437307590688_n.jpg?stp=c0.64.1536.1920a_dst-jpg_e35_s1080x1080_sh0.08&_nc_ht=instagram.fmxp5-1.fna.fbcdn.net&_nc_cat=103&_nc_ohc=pbzOsujR_swAX_Fq5nc&edm=AKmAybEAAAAA&ccb=7-5&ig_cache_key=MjkxOTMwNTE0OTExOTExNjczMQ%3D%3D.2-ccb7-5&oh=00_AT_CMVHHNQjkJyzNJLmCevqu9yU3bJHph5EDe7f0gYtK5g&oe=63239D11&_nc_sid=bcb968'])
 
     def hasTaggedLocation(self):
         self.assertTrue(self.instagrapiUtils.hasTaggedLocation(self.media), True)
+
+
+    def test_getUserPosts(self):
+        with patch('instagrapi.Client.user_medias_v1') as mock_user_medias_v1:
+            mock_user_medias_v1.return_value = 'media'
+            self.assertEqual(self.instagrapiUtils.getUserPosts('1234', '1'), 'media')
+
+    def test_getProfileTaggedPosts(self):
+        with patch('instagrapi.Client.usertag_medias') as mock_usertag_medias:
+            mock_usertag_medias.return_value = 'media'
+            self.assertEqual(self.instagrapiUtils.getProfileTaggedPosts('1234'), 'media')
+    
+    def test_getSuggestedUsersFromFBSearch_mock(self):
+        with patch('instagrapi.Client.fbsearch_suggested_profiles') as mock_fbsearch_suggested_profiles:
+            mock_fbsearch_suggested_profiles.return_value = ['user']
+            self.assertEqual(self.instagrapiUtils.getSuggestedUsersFromFBSearch('1234'), ['user'])
+
+    def test_hasTaggedLocation(self):
+        return self.assertEqual(self.instagrapiUtils.hasTaggedLocation(self.media), True)
+
+    def test_getDetailedMediaLocationInfo(self):
+        with patch('instagrapi.Client.media_info_v1') as mock_media_info_v1, \
+            patch('instagrapi.Client.location_info') as mock_location_info:
+            mock_media_info_v1.return_value = self.media
+            mock_location_info.return_value = 'locationinfo'
+            self.assertEqual(self.instagrapiUtils.getDetailedMediaLocationInfo(self.media), 'locationinfo')
+
+
 
 
 

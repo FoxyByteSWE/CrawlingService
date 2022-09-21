@@ -99,20 +99,20 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         time.append(input.second)
         return time
 
-    def parseTakenAtLocation(self, media: Media) -> dict:
+    def parseTakenAtLocation(self, media: Media) -> dict: #SUBSCRIPTING TO .attr
         input = self.getDetailedMediaLocationInfo(media)
         coordinates = self.getMediaLocationCoordinates(media)
         dict = {}
-        dict["pk"] = input["pk"]
-        dict["name"] = input["name"]
-        dict["address"] = input["address"]
+        dict["pk"] = input.pk
+        dict["name"] = input.name
+        dict["address"] = input.address
         dict["coordinates"] = [coordinates["lng"], coordinates["lat"]]
-        dict["category"] = input["category"]
-        dict["phone"] = input["phone"]
-        dict["website"] = input["website"]
+        dict["category"] = input.category
+        dict["phone"] = input.phone
+        dict["website"] = input.website
         return dict;
 
-    def parseMediaUrl(self, inputlist: list) -> list[str]: #TODO: RETURN A LIST OF PARSED MEDIAS, BUT PROFILEPICURL SHOULD ONLY BE A STRING
+    def parseMediaUrl(self, inputlist: list) -> list[str]:
         newlist = []
         for item in inputlist:
             url = str(item)
@@ -139,7 +139,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
     def getUserPosts(self, userpk: int, amount) -> list[Media]:
         return self.client.user_medias_v1(userpk, amount)
 
-    def getSuggestedUsersFromFBSearch(self, userpk: int):
+    def getSuggestedUsersFromFBSearch(self, userpk: int) -> list[UserShort]: #following link -> URL signature expired
         print("WARNING: CHECK InstagrapiUtils.getSuggestedUsersFromFBSearch(user)")
         res =  self.client.fbsearch_suggested_profiles(userpk)  # For some reason an exception is thrown: Not eligible for chaining. 
         return res
@@ -153,5 +153,4 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
 
     def convertUserShortToUserv2(self, usershort: UserShort):
-        #print("convertUserShortToUserv2")
         return self.client.user_info_by_username_v1(usershort['username'])
