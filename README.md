@@ -1,6 +1,6 @@
-# IGCrawlerService
+# CrawlingService for GuidaMichelin@Social
 
-Questo repository contiene il servizio di crawling per il progetto di SWE 2021/22: Guida Michelin @Social proposto da Zero12. 
+Questo repository contiene il servizio di crawling per il progetto di SWE 2021/22: GuidaMichelin@Social proposto da Zero12. 
 
 ## Changes
 
