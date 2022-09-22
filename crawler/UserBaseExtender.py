@@ -29,9 +29,8 @@ class UserBaseExtender:
             for usersh in list[0:limit]:
                 usertmp = instagrapiUtils.convertUserShortToUserv2(usersh)
                 username = usertmp.username
-                usersugg = instagrapiUtils.getUserInfoByUsername(username).dict()
-                usersugg["LatestPostPartialURL"] = ''
-                if InstagrapiUtils.isProfilePrivate(usersugg) == False:
+                usersugg = instagrapiUtils.getUserInfoByUsername(username)
+                if instagrapiUtils.isProfilePrivate(usersugg) == False:
                     uncheckedUserList.append(UserProfileFactory.buildFromInstagrapi(usersugg, ""))
             return uncheckedUserList
 
@@ -51,9 +50,7 @@ class UserBaseExtender:
                     if limit == 0:
                         return
                     usersh=instagrapiUtils.convertUsertagToUser(usertag)
-                    usertagged = (instagrapiUtils.getUserInfoByUsername(usersh.username)).dict()
-                    #usertagged = (InstagrapiUtils.GetUserInfoByUsername(usersh.username)).dict()
-                    user["LatestPostPartialURL"] = ''
+                    usertagged = (instagrapiUtils.getUserInfoByUsername(usersh.username))
                     if instagrapiUtils.isProfilePrivate(usertagged) == False:
                         uncheckedUserList.append(UserProfileFactory.buildFromInstagrapi(usertagged, ""))
                         limit = limit-1
@@ -70,11 +67,9 @@ class UserBaseExtender:
                 print("No posts available in Tagged Posts Section")
             uncheckedUserList = []
             for media in list[0:limit]:
-                userposter=instagrapiUtils.getUserInfoByUsername(media.user.username).dict()
-                user["LatestPostPartialURL"] = ''
-                if self.isAlreadyTracked(userposter) == False:
-                    if instagrapiUtils.isProfilePrivate(userposter) == False:
-                        uncheckedUserList.append(UserProfileFactory.buildFromInstagrapi(userposter, ""))
+                userposter=instagrapiUtils.getUserInfoByUsername(media.user.username)
+                if instagrapiUtils.isProfilePrivate(userposter) == False:
+                    uncheckedUserList.append(UserProfileFactory.buildFromInstagrapi(userposter, ""))
             return uncheckedUserList
 
 

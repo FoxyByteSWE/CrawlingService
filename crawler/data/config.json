@@ -6,5 +6,6 @@
     "nPostsAllowedForProfileScraping": 40,
     "nPostsWantedForEachLocation": 50,
     "instagramUsername" : "foxybyte.swe",
-    "instagramPassword" : "tipregofunzionaswe"
+    "instagramPassword" : "tipregofunzionaswe",
+    "locationTags" : ["Restaurant", "Italian Restaurant","Pub", "Bar", "Grocery ", "Wine", "Diner", "Food", "Meal", "Breakfast", "Lunch", "Dinner", "Cafe", "Tea Room", "Hotel", "Pizza", "Coffee", "Bakery", "Dessert", "Gastropub","Sandwich", "Ice Cream", "Steakhouse", "Pizza place", "Fast food restaurant", "Deli"]
 }

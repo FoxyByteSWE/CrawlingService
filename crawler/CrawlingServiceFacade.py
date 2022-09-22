@@ -28,29 +28,12 @@ class CrawlingServiceFacade:
 		
 		trackedUsers = self.db.readItem("SELECT * FROM users")
 
-		#convert to UserProfile objects
-
-		"""
-		trackedUsers = [UserProfile(12345,
-								"marcouderzo",
-								False,
-								"12AB34CD")]
-		"""
-
-
-
 		if trackedUsers == []:
 			self.profileScraper.findKickoffUsers()
 			trackedUsers = self.db.readItem("SELECT * FROM users")
 
-
-		# LOAD FROM DB or JSON
-		#places_tags = self.db.readItem("SELECT * FROM PLACES_TAGS")
-		places_tags = ['Restaurant', 'Italian Restaurant','Pub', 'Bar', 'Grocery ', 'Wine', 'Diner', 'Food', 'Meal', 'Breakfast', 'Lunch',
-							'Dinner', 'Cafe', 'Tea Room', 'Hotel', 'Pizza', 'Coffee', 'Bakery', 'Dessert', 'Gastropub',
-							'Sandwich', 'Ice Cream', 'Steakhouse', 'Pizza place', 'Fast food restaurant', 'Deli']
-
-
+		#Load From JSON Config File.
+		places_tags = self.crawlingServiceConfig.locationTags
 
 		for user in trackedUsers:
 			userObj = UserProfileFactory.buildFromDB(user)

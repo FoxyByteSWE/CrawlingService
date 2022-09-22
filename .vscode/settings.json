@@ -1,0 +1,8 @@
+{
+    "python.analysis.extraPaths": [
+        "./crawler/location",
+        "./crawler/user",
+        "./crawler/media",
+        "./crawler"
+    ]
+}

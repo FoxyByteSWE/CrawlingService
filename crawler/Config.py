@@ -37,3 +37,4 @@ class CrawlingServiceConfig(metaclass=CrawlingServiceConfigBase):
         self.nPostsWantedForEachLocation = config["nPostsWantedForEachLocation"]
         self.instagramUsername = config["instagramUsername"]
         self.instagramPassword = config["instagramPassword"]
+        self.locationTags = config["locationTags"]

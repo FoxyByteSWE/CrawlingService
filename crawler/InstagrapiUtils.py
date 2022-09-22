@@ -44,7 +44,6 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
             print("Something went wrong during Instagrapi Login: " + str(e))
             return -1
 
-
     def save_cookies(self) -> None:
         """
         Save the cookies of the client in a local json file called cookie.json.
@@ -53,7 +52,6 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
 
     def loadCookies(self):
         return json.loads(open((str(sys.path[0]))+"/data/cookie.json").read())
-
 
 
 
@@ -67,12 +65,10 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         mediaListFromLocation = self.client.location_medias_recent(pkCode, amount)
         return mediaListFromLocation
 
-
     def getMediaLocationCoordinates(self, media: Media) -> dict:
         coordinates = {'lng': ((media.location).lng) , 
                        'lat': ((media.location).lat) }
         return coordinates
-
 
     def getMediaURL(self, media: Media):  #TODO: test for a multi-media (album) post
         #print("here")
@@ -89,7 +85,6 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
                 elif item.media_type == 2:
                     list.append(item.video_url)
             return list
-
 
     def parseTakenAtTime(self, input: datetime) -> list:
         time = []
@@ -124,13 +119,6 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         print(newlist)
         return newlist
 
-
-        
-
-        
-
-
-
     def getDetailedMediaLocationInfo(self, media: Media) -> Location: 
         mediainfo = self.client.media_info_v1(media.pk)
         if mediainfo.location != None:
@@ -142,7 +130,7 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
         return self.client.user_medias_v1(userpk, amount)
 
     def getSuggestedUsersFromFBSearch(self, userpk: int) -> list[UserShort]: #following link -> URL signature expired
-        print("WARNING: CHECK InstagrapiUtils.getSuggestedUsersFromFBSearch(user)")
+        print("WARNING: CHECK InstagrapiUtils.getSuggestedUsersFromFBSearch")
         res =  self.client.fbsearch_suggested_profiles(userpk)  # For some reason an exception is thrown: Not eligible for chaining. 
         return res
 
@@ -152,7 +140,14 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
     def getProfileTaggedPosts(self, userpk: int) -> list[Media]:
         return self.client.usertag_medias(userpk)
 
+    def getPostTaggedPeople(self, post: Media):
+        return post.usertags
 
+    def isProfilePrivate(self, user: User) -> bool:
+        return user.is_private
+
+    def getUserInfoByUsername(self, username: str) -> User:
+        return self.client.user_info_by_username_v1(username)
 
     def convertUserShortToUserv2(self, usershort: UserShort):
         return self.client.user_info_by_username_v1(usershort['username'])

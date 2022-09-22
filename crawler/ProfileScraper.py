@@ -104,6 +104,7 @@ class ProfileScraper:
 						newlocation = LocationFactory.buildFromInstagrapi(detailedLocationInfo, profilePicLink, coordinates, "")
 						self.trackLocation(newlocation)
 						keepUser=True
+						
 
 		
 		if keepUser == False:
