@@ -10,6 +10,7 @@ from instagrapi.types import Location
 from instagrapi.types import User
 from instagrapi.types import UserShort
 
+from Config import CrawlingServiceConfig
 
 class InstagrapiUtilsBase(type): #SINGLETON
 
@@ -36,7 +37,8 @@ class InstagrapiUtils(metaclass=InstagrapiUtilsBase):
     def createLoggedInClient(self) -> None:
         try:
             self.client = Client(self.loadCookies())
-            self.client.login("foxybyte.swe", "tipregofunzionaswe")
+            config = CrawlingServiceConfig()
+            self.client.login(config.instagramUsername, config.instagramPassword)
             print("Client Logged-In to Instagrapi")
         except Exception as e:
             print("Something went wrong during Instagrapi Login: " + str(e))

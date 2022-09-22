@@ -4,5 +4,7 @@
     "extendUserBasePolicy": 2,
     "nMaxUsersToAdd": 10,
     "nPostsAllowedForProfileScraping": 40,
-    "nPostsWantedForEachLocation": 50
+    "nPostsWantedForEachLocation": 50,
+    "instagramUsername" : "foxybyte.swe",
+    "instagramPassword" : "tipregofunzionaswe"
 }
